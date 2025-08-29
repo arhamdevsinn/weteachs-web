@@ -36,7 +36,7 @@ const Page = () => {
 
         {/* Settings / Stats */}
         <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
-          <div className='flex flex-col items-center'>
+          <div className="flex flex-col items-center">
             <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
               Profile Settings
             </button>
@@ -93,7 +93,7 @@ const Page = () => {
         <div className="mt-6 p-4 bg-secondary rounded-xl">
           <div className="font-bold text-lg text-gray-800 mb-2">About Me</div>
           <div className="text-gray-700">
-            Hello! I'm an experienced professional with over 5 years in digital marketing and content strategy. 
+            Hello! I&apos;m an experienced professional with over 5 years in digital marketing and content strategy. 
             I specialize in helping businesses grow their online presence through data-driven approaches.
           </div>
           <div className="text-primary font-semibold cursor-pointer mt-2 inline-block hover:underline">
@@ -121,8 +121,8 @@ const Page = () => {
               <button
                 key={tab}
                 className={`pb-2 px-1 transition-colors ${activeTab === tab.toLowerCase() 
-                  ? 'border-b-2 border-primary text-gray-800' 
-                  : 'text-gray-400 hover:text-gray-600'}`}
+                  ? "border-b-2 border-primary text-gray-800" 
+                  : "text-gray-400 hover:text-gray-600"}`}
                 onClick={() => setActiveTab(tab.toLowerCase())}
               >
                 {tab}
@@ -132,7 +132,7 @@ const Page = () => {
 
           {/* Tab Content */}
           <div className="bg-gray-50 rounded-xl p-4 min-h-[120px]">
-            {activeTab === 'images' && (
+            {activeTab === "images" && (
               <div className="text-sm">
                 <div className="font-bold text-gray-800 mb-2">Recent Work Samples</div>
                 <div className="grid grid-cols-3 gap-2 mb-3">
