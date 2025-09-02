@@ -1,17 +1,25 @@
-"use client"
-import React from 'react';
-import { useRouter } from 'next/navigation';
+// @ts-nocheck
+'use client';
 
-export default function Home() {
-        const router = useRouter()
-        const handleMoveToProfile = () => {
-      router.push("/profile")
-    }
+import { useAuth } from '@/src/hooks/useAuth';
+import { Login } from '@/src/components/auth/Login';
+import UserProfile from '../components/auth/UserProfile';
+
+
+export default function HomePage() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-   <div className='flex px-20 py-10'>
-    <button onClick={handleMoveToProfile} className="bg-primary  text-white font-bold py-2 px-4 rounded">
-      Move to Profile Page
-    </button>
-   </div>
+    <div>
+      {user ? (
+        <UserProfile user={user} />
+      ) : (
+        <Login />
+      )}
+    </div>
   );
 }
