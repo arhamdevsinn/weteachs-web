@@ -96,7 +96,7 @@ const CommunityPage = () => {
           <div className="bg-white p-8 rounded-2xl shadow-lg max-w-3xl mx-auto text-gray-800">
             <h3 className="text-2xl font-bold mb-4 text-primary">About Our Community</h3>
             <p className="mb-6">
-              Our platform brings together creators and learners in a vibrant community where knowledge is shared through video, audio, and chat sessions. Whether you're looking to learn new skills or share your expertise, we provide the tools you need to succeed.
+              Our platform brings together creators and learners in a vibrant community where knowledge is shared through video, audio, and chat sessions. Whether you&apos;re looking to learn new skills or share your expertise, we provide the tools you need to succeed.
             </p>
             <button className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary transition-colors">
               Discover Our Community

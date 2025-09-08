@@ -1,23 +1,31 @@
+
+'use client';
 import { useEffect, useState } from 'react';
 import { UserProfileAPI } from '@/src/lib/api/userProfile';
+import { UserProfileData as Profile, TeacherDetails } from '@/src/types/firebase';
 
 export const useUserProfile = (uid?: string) => {
-  const [profile, setProfile] = useState<any>(null);
-  const [teacherDetails, setTeacherDetails] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [teacherDetails, setTeacherDetails] = useState<TeacherDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+ 
   const fetchProfile = async () => {
     if (!uid) return;
-    console.log('Fetching profile for UID:', uid);
-
     try {
       setLoading(true);
-      const { profile, teacherDetails } = await UserProfileAPI.getProfile(uid);
+      const { profile , teacherDetails }: { profile: Profile; teacherDetails: TeacherDetails } =
+        await UserProfileAPI.getProfile(uid);
+
       setProfile(profile);
       setTeacherDetails(teacherDetails);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthService } from '@/src/lib/firebase/auth';
 import { UrlUtils } from '@/src/utils/urlUtils';
 
+const isErrorWithMessage = (error: unknown): error is { message: string } => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as { message: unknown }).message === "string"
+  );
+};
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,25 +23,26 @@ export const Login = () => {
 
   // Get redirect URL or default to dashboard
   const redirectPath = searchParams.get('redirect') || '/dashboard';
-  const intendedUrl = UrlUtils.addUserIdToUrl(redirectPath, 'temp'); // temp will be replaced
+//   const intendedUrl = UrlUtils.addUserIdToUrl(redirectPath, 'temp'); 
 
-  const handleLogin = async (e: React.FormEvent) => {
+ const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const userCredential = await AuthService.login(email, password);
       const userId = userCredential.user.uid;
-      
-      // Create the final URL with actual user ID
+
       const finalUrl = UrlUtils.addUserIdToUrl(redirectPath, userId);
-      
-      // Redirect to the intended page with user ID
       router.push(finalUrl);
-      
-    } catch (err: any) {
-      setError(err.message);
+
+    } catch (err: unknown) {
+      if (isErrorWithMessage(err)) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -81,7 +90,7 @@ export const Login = () => {
 
       {redirectPath !== '/dashboard' && (
         <p className="mt-4 text-sm text-gray-600">
-          After login, you'll be redirected to your intended page.
+          After login, you&apos;ll be redirected to your intended page.
         </p>
       )}
     </form>

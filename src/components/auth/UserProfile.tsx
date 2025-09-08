@@ -1,49 +1,53 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { AuthService } from '@/src/lib/firebase/auth';
+// import { AuthService } from '@/src/lib/firebase/auth';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useUserProfile } from '@/src/hooks/useUserProfile';
-import { UserProfileAPI } from '@/src/lib/api/userProfile';
+// import { UserProfileAPI } from '@/src/lib/api/userProfile';
 
 const UserProfile = () => {
-  const [activeTab, setActiveTab] = useState('profile');
+ const [activeTab, setActiveTab] = useState('profile');
   const { user } = useAuth();
   const router = useRouter();
-  const [actionLoading, setActionLoading] = useState(false);
-  const [error, setError] = useState('');
+//   const [actionLoading, setActionLoading] = useState(false);
+//   const [error, setError] = useState('');
 
-  const { 
-    profile, 
-    teacherDetails, 
-    loading: dataLoading, 
+  const {
+    profile,
+    teacherDetails,
+    loading: dataLoading,
     error: dataError,
-    refreshData 
+    // refreshData, // remove if unused
   } = useUserProfile(user?.uid);
   console.log('UserProfile data:', { profile, teacherDetails, dataError });
 
-  const handleSignOut = async () => {
-    setActionLoading(true);
-    setError('');
+//  const handleSignOut = async () => {
+//     setActionLoading(true);
+//     setError('');
 
-    try {
-      await AuthService.logout('/login');
-    } catch (err: any) {
-      setError(err.message);
-      setActionLoading(false);
-    }
-  };
+//     try {
+//       await AuthService.logout('/login');
+//     } catch (err: unknown) {
+//       if (err instanceof Error) {
+//         setError(err.message);
+//       } else {
+//         setError('An unknown error occurred');
+//       }
+//       setActionLoading(false);
+//     }
+//   };
 
-  const formatDate = (date: Date | undefined): string => {
-    if (!date) return 'Not specified';
+//   const formatDate = (date: Date | undefined): string => {
+//     if (!date) return 'Not specified';
     
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
-  };
+//     return new Intl.DateTimeFormat('en-US', {
+//       year: 'numeric',
+//       month: 'long',
+//       day: 'numeric'
+//     }).format(date);
+//   };
 
   if (!user) {
     return (
@@ -300,7 +304,7 @@ const UserProfile = () => {
       <div className="flex flex-col items-center">
         <div className="relative">
           <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-            <span className="text-2xl">{teacherDetails?.completedJobs || 42}</span>
+            <span className="text-2xl">{teacherDetails?.Number_of_completed_jobs || 42}</span>
           </div>
           <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full h-7 w-7 flex items-center justify-center shadow-md">
             +5
@@ -311,7 +315,7 @@ const UserProfile = () => {
       
       <div className="flex flex-col items-center">
         <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-          <span className="text-xl">${teacherDetails?.totalEarnings || '248.50'}</span>
+          <span className="text-xl">${teacherDetails?.Total_amount_earned || '248.50'}</span>
         </div>
         <div className="text-md mt-3 text-gray-700 font-medium">Total Earned</div>
       </div>
@@ -344,7 +348,7 @@ const UserProfile = () => {
     <div className="mt-6 p-4 bg-secondary rounded-xl">
       <div className="font-bold text-lg text-gray-800 mb-2">About Me</div>
       <div className="text-gray-700">
-        {profile.bio || "No bio set yet. Add your expertise and experience!"}
+        {teacherDetails?.bio_T || "No bio set yet. Add your expertise and experience!"}
       </div>
       <div className="text-primary font-semibold cursor-pointer mt-2 inline-block hover:underline">
         Read more

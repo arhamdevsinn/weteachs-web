@@ -1,9 +1,7 @@
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  signOut, 
   updateProfile, 
-  sendPasswordResetEmail, 
   User, 
   UserCredential,
   signOut as firebaseSignOut

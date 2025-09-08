@@ -1,4 +1,3 @@
-// src/types/firebase.ts
 export interface FirebaseTimestamp {
   seconds: number;
   nanoseconds: number;
@@ -10,8 +9,7 @@ export interface UserProfileData {
   display_name: string;
   email: string;
   photo_url: string;
-  
-  // Timestamps (converted from Firebase format)
+   // Timestamps (converted from Firebase format)
   Birthday?: Date;
   created_time?: Date;
   
@@ -32,7 +30,7 @@ export interface UserProfileData {
   user_call_manage?: string; // Path to call management document
   
   // Additional fields that might exist
-  [key: string]: any;
+  [key: string]: unknown;   // 🔥 safer than `any`
 }
 
 export interface TeacherDetails {
@@ -41,7 +39,11 @@ export interface TeacherDetails {
   qualifications?: string[];
   subjects?: string[];
   experience?: number;
+  Number_of_completed_jobs?: [string];
+  rating?: number;
+  bio_T?: string;
   hourly_rate?: number;
+  Total_amount_earned?: [string];
   availability?: string[];
   // ... other teacher fields
 }
@@ -51,6 +53,6 @@ export interface UserCallManagement {
   // Add call management fields here
   current_calls?: number;
   max_calls?: number;
-  call_history?: any[];
+  call_history?: Record<string, unknown>[];   // 🔥 structured instead of `any[]`
   // ... other call management fields
 }

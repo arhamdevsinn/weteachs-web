@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useAuth } from '@/src/hooks/useAuth';
@@ -16,7 +15,7 @@ export default function HomePage() {
   return (
     <div>
       {user ? (
-        <UserProfile user={user} />
+        <UserProfile  />
       ) : (
         <Login />
       )}

@@ -7,8 +7,6 @@ import {
   getDocs,
   getDoc,
   query,
-  where,
-  orderBy,
   DocumentData,
   QueryConstraint,
 } from 'firebase/firestore';
