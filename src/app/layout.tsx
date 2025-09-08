@@ -2,6 +2,7 @@
 import { Ubuntu } from "next/font/google";
 import "./globals.css";
 import Header from "../components/layout/Header";
+import { Suspense } from "react";
 // import Footer from "../components/layout/Footer";
 
 const ubuntu = Ubuntu({
@@ -27,8 +28,12 @@ export default function RootLayout({
       <body
        className={`${ubuntu.className} w-screen min-h-screen`}
       >
+         <Suspense fallback={<div>Loading...</div>}>
         <Header/>
+       
         {children}
+       
+        </Suspense>
         {/* <Footer/> */}
       </body>
     </html>
