@@ -1,19 +1,9 @@
 "use client";
-import React, { Suspense } from 'react';
-import { useSearchParams } from "next/navigation";
-
-const SearchParamsComponent = () => {
-  const params = useSearchParams();
-  // ...use params...
-  return <div>{params.get("someKey")}</div>;
-};
+import React from 'react';
 
 const CommunityPage = () => {
   return (
     <div className="min-h-screen bg-secondary">
-      <Suspense fallback={<div>Loading...</div>}>
-        <SearchParamsComponent />
-      </Suspense>
       {/* Hero Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">

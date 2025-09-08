@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthService } from '@/src/lib/firebase/auth';
 import { UrlUtils } from '@/src/utils/urlUtils';
+import { Suspense } from 'react';
 
 const isErrorWithMessage = (error: unknown): error is { message: string } => {
   return (
@@ -13,7 +14,8 @@ const isErrorWithMessage = (error: unknown): error is { message: string } => {
     typeof (error as { message: unknown }).message === "string"
   );
 };
-export const Login = () => {
+
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,9 +25,8 @@ export const Login = () => {
 
   // Get redirect URL or default to dashboard
   const redirectPath = searchParams.get('redirect') || '/dashboard';
-//   const intendedUrl = UrlUtils.addUserIdToUrl(redirectPath, 'temp'); 
 
- const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -36,7 +37,6 @@ export const Login = () => {
 
       const finalUrl = UrlUtils.addUserIdToUrl(redirectPath, userId);
       router.push(finalUrl);
-
     } catch (err: unknown) {
       if (isErrorWithMessage(err)) {
         setError(err.message);
@@ -51,7 +51,7 @@ export const Login = () => {
   return (
     <form onSubmit={handleLogin} className="max-w-md mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Login</h2>
-      
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
@@ -95,4 +95,11 @@ export const Login = () => {
       )}
     </form>
   );
-};
+}
+
+// 👇 Wrap it in Suspense for safe usage of useSearchParams()
+export const Login = () => (
+  <Suspense fallback={<div>Loading login...</div>}>
+    <LoginForm />
+  </Suspense>
+);

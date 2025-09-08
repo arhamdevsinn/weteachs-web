@@ -1,11 +1,25 @@
-import React from 'react'
+"use client";
+import { Suspense } from "react";
+import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 
-const page = () => {
+function DashboardContent() {
+  const { userId, isValidUserId } = useUserIdFromUrl();
+
   return (
     <div>
-      hello
+      <h1>Dashboard</h1>
+      <p>User ID: {userId}</p>
+      {!isValidUserId && (
+        <p className="text-red-500">⚠️ Invalid user ID in URL</p>
+      )}
     </div>
-  )
+  );
 }
 
-export default page
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading user info...</div>}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
