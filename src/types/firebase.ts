@@ -41,6 +41,7 @@ export interface TeacherDetails {
   subjects?: string[];
   experience?: number;
   Number_of_completed_jobs?: [string];
+  website?: string;
   rating?: number;
   bio_T?: string;
   hourly_rate?: number;

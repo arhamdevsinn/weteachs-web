@@ -336,7 +336,7 @@ const UserProfile = () => {
     {/* Website and Heart */}
     <div className="flex justify-between items-center mt-6 p-3 bg-gray-50 rounded-lg">
       <div className="flex items-center">
-        <span className="text-black font-bold mr-2">website.com/profile</span>
+        <span className="text-black font-bold mr-2">{teacherDetails?.website || 'https://yourwebsite.com'}</span>
         <span className="text-blue-500 text-xs bg-blue-100 px-2 py-1 rounded">Verified</span>
       </div>
       <button className="text-xl transition-transform hover:scale-110 active:scale-95">
