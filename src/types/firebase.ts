@@ -8,7 +8,8 @@ export interface UserProfileData {
   uid: string;
   display_name: string;
   email: string;
-  photo_url: string;
+  
+photo_url: string;
    // Timestamps (converted from Firebase format)
   Birthday?: Date;
   created_time?: Date;

@@ -263,13 +263,13 @@ const UserProfile = () => {
     <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
       <div className="relative">
         <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
-        {/* <Image
-          src={profile.photo_url || "/profile.png"}
+        <Image
+          src={profile.photo_url || "/profile.photo_url"}
           alt="profile"
           width={160}
           height={160}
           className="rounded-full border-4 border-secondary shadow-lg relative"
-        /> */}
+        />
       </div>
       <div className="text-center md:text-left">
         <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
