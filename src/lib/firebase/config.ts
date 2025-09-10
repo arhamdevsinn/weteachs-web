@@ -12,15 +12,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyAgTtk2vSlV-fMBcMSU9HVGsPDjMMf2B2I",
-//   authDomain: "weteach-4-z4d3id.firebaseapp.com",
-//   projectId:"weteach-4-z4d3id",
-//   storageBucket: "weteach-4-z4d3id.appspot.com",
-//   messagingSenderId: "160386547552",
-//   appId:"1:160386547552:web:d357aee115e74238e06805",
-// };
-
 let firebaseApp: FirebaseApp;
 
 if (!getApps().length) {

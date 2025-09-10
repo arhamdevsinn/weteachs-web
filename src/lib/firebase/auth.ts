@@ -14,19 +14,19 @@ export class AuthService {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
-static async register(
-  email: string,
-  password: string,
-  displayName?: string
-): Promise<{ userCredential: UserCredential; userId: string }> {
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  if (displayName) {
-    await updateProfile(userCredential.user, { displayName });
+  static async signup(
+    email: string,
+    password: string,
+    displayName?: string
+  ): Promise<UserCredential> {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    if (displayName) {
+      await updateProfile(userCredential.user, { displayName });
+    }
+    return userCredential;
   }
-  return { userCredential, userId: userCredential.user.uid };
-}
 
-static async logout(redirectTo: string = '/'): Promise<void> {
+  static async logout(redirectTo: string = '/'): Promise<void> {
     try {
       await firebaseSignOut(auth);
       

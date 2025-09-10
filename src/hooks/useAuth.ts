@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/src/lib/firebase/config';
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { User, onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/src/lib/firebase/config";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -15,22 +15,20 @@ export const useAuth = () => {
       setUser(user);
       setLoading(false);
 
-      // Sync user ID with URL if user is logged in
-      if (user && typeof window !== 'undefined') {
+      // ✅ Sync only when user logs in
+      if (user && typeof window !== "undefined") {
         const currentUrl = new URL(window.location.href);
-        const currentUserId = searchParams.get('userId');
-        
+        const currentUserId = searchParams.get("userId");
+
         if (currentUserId !== user.uid) {
           // Update URL with current user ID
-          currentUrl.searchParams.set('userId', user.uid);
+          currentUrl.searchParams.set("userId", user.uid);
           router.replace(currentUrl.toString(), { scroll: false });
         }
-      } else if (!user && searchParams.get('userId')) {
-        // Remove userId param if user logs out
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.delete('userId');
-        router.replace(currentUrl.toString(), { scroll: false });
       }
+
+      // ❌ Do not remove userId when user logs out
+      // We keep the URL intact so you can still access public pages with ?userId
     });
 
     return () => unsubscribe();

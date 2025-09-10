@@ -63,7 +63,7 @@ const Header = () => {
             <button
               onClick={handleSignOut}
               disabled={loading}
-              className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-red-600 disabled:opacity-50 transition-colors"
+              className="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-secondary hover:text-black disabled:opacity-50 transition-colors"
             >
               {loading ? '...' : 'Sign Out'}
             </button>

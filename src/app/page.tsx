@@ -1,12 +1,19 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/hooks/useAuth';
-import { Login } from '@/src/components/auth/Login';
 import UserProfile from '../components/auth/UserProfile';
-
 
 export default function HomePage() {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [loading, user, router]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -14,11 +21,7 @@ export default function HomePage() {
 
   return (
     <div>
-      {user ? (
-        <UserProfile  />
-      ) : (
-        <Login />
-      )}
+      {user && <UserProfile />}
     </div>
   );
 }
