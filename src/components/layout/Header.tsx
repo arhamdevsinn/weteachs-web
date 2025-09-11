@@ -15,6 +15,7 @@ const Header = () => {
     setLoading(true);
     try {
       await AuthService.logout();
+      window.location.href = "/auth/login"; // Redirect to login page after logout
     } catch (error) {
       console.error('Logout error:', error);
       setLoading(false);
@@ -26,11 +27,14 @@ const Header = () => {
   }
 
   const navigationItems = [
-    { href: '/dashboard', label: 'Dashboard' },
+    // { href: '/dashboard', label: 'Dashboard' },
     { href: '/profile', label: 'Profile' },
-    { href: '/settings', label: 'Settings' },
+    { href: '/about', label: 'About' },
+    { href: '/expert', label: 'Teach' },
+    { href: '/student', label: 'Learn' },
+    // { href: '/settings', label: 'Settings' },
     { href: '/community', label: 'Community' },
-    { href: '/categories', label: 'Categories' },
+    { href: '/categories', label: 'Explore' },
 
   ];
 
@@ -38,7 +42,7 @@ const Header = () => {
   return (
     <div className=' items-center justify-between w-full p-4  flex'>
      <div className='text-3xl font-bold text-primary flex items-center gap-2'>
-       <Image src="/logo.png" alt="logo" width={60} height={60}/>
+       {/* <Image src="/logo.png" alt="logo" width={60} height={60}/> */}
       WeTeachs
      </div>
        <div className="flex space-x-8">
@@ -58,7 +62,7 @@ const Header = () => {
           </div>
             <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600">
-              Hi, {user.displayName || user.email}
+              Hi, {user.email ? user.email.split('@')[0].trim() : ''}
             </span>
             <button
               onClick={handleSignOut}

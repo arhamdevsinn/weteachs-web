@@ -42,7 +42,11 @@ export interface TeacherDetails {
   experience?: number;
   Number_of_completed_jobs?: [string];
   website?: string;
-  rating?: number;
+  Instagram?: string; 
+  Facebook?: string;
+  youtube?: string;
+  Tiktok?: string;
+  rating?: [number];
   bio_T?: string;
   hourly_rate?: number;
   Total_amount_earned?: [string];

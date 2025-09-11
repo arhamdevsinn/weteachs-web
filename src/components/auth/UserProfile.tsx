@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserProfile } from '@/src/hooks/useUserProfile';
+import Link from 'next/link';
+// import { Instagram, Youtube, Facebook } from 'lucide-react';
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -17,6 +19,13 @@ const UserProfile = () => {
     error: dataError,
   } = useUserProfile(uid);
   console.log('UserProfile data:', { profile, teacherDetails, dataError });
+
+  // Calculate average rating and number of filled stars
+  const ratings = teacherDetails?.rating ?? [];
+  const averageRating = ratings.length > 0
+    ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
+    : 0;
+  const filledStars = Math.round(averageRating);
 
   if (dataLoading) {
     return (
@@ -88,9 +97,11 @@ const UserProfile = () => {
           Profile Settings
         </button>
         <div className="flex gap-1 mt-4 text-amber-400 text-xl">
-          {'★'.repeat(4)}
-          <span className="text-gray-300">★</span>
-          <span className="text-gray-600 text-sm ml-1 self-center">4.0</span>
+          {'★'.repeat(filledStars)}
+          <span className="text-gray-300">{'★'.repeat(5 - filledStars)}</span>
+          <span className="text-gray-600 text-sm ml-1 self-center">
+            {averageRating.toFixed(1)}
+          </span>
         </div>
       </div>
       
@@ -99,9 +110,9 @@ const UserProfile = () => {
           <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
             <span className="text-2xl">{teacherDetails?.Number_of_completed_jobs || 42}</span>
           </div>
-          <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full h-7 w-7 flex items-center justify-center shadow-md">
+          {/* <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full h-7 w-7 flex items-center justify-center shadow-md">
             +5
-          </div>
+          </div> */}
         </div>
         <div className="text-md mt-3 text-gray-700 font-medium">Completed Jobs</div>
       </div>
@@ -115,16 +126,43 @@ const UserProfile = () => {
     </div>
 
     {/* Socials */}
-    <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 mt-6 text-sm">
-      <div className="text-gray-700 font-medium mb-2 sm:mb-0">Connect with me:</div>
-      <div className="flex gap-4 text-2xl">
-        {['🎥', '📸', '🎵', '🔗'].map((icon, i) => (
-          <a key={i} href="#" className="bg-secondary p-2 rounded-full hover:bg-gray-200 transition-colors">
-            <span>{icon}</span>
-          </a>
-        ))}
-      </div>
-    </div>
+   <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 mt-6 text-sm">
+  <div className="text-gray-700 font-medium mb-2 sm:mb-0">Connect with me:</div>
+  <div className="flex gap-4 text-2xl">
+    {teacherDetails?.Instagram && (
+      <Link
+        href={`https://www.instagram.com/${teacherDetails.Instagram}`}
+      >
+        <Image src="/instagram.png" alt="instagram" width={24} height={24} />
+      </Link>
+    )}
+
+    {teacherDetails?.Facebook && (
+      <Link
+        href={`https://www.facebook.com/${teacherDetails.Facebook}`}
+      >
+        <Image src="/facebook.png" alt="facebook" width={24} height={24} />
+      </Link>
+    )}
+
+    {teacherDetails?.Tiktok && (
+      <Link
+        href={`https://www.tiktok.com/${teacherDetails.Tiktok}`}
+      >
+        <Image src="/social-media.png" alt="tiktok" width={24} height={24} />
+      </Link>
+    )}
+
+    {teacherDetails?.youtube && (
+      <Link
+        href={`https://www.youtube.com/${teacherDetails.youtube}`}
+      >
+        <Image src="/youtube.png" alt="youtube" width={24} height={24} />
+      </Link>
+    )}
+  </div>
+</div>
+
 
     {/* Website and Heart */}
     <div className="flex justify-between items-center mt-6 p-3 bg-gray-50 rounded-lg">
@@ -133,7 +171,11 @@ const UserProfile = () => {
         <span className="text-blue-500 text-xs bg-blue-100 px-2 py-1 rounded">Verified</span>
       </div>
       <button className="text-xl transition-transform hover:scale-110 active:scale-95">
-        <span className="text-red-500">❤️</span>
+        <span className="text-red-500">
+               <Image
+        src="/share.png" alt="instagram" width={20} height={20}
+        />
+        </span>
       </button>
     </div>
 
@@ -143,9 +185,9 @@ const UserProfile = () => {
       <div className="text-gray-700">
         {teacherDetails?.bio_T || "No bio set yet. Add your expertise and experience!"}
       </div>
-      <div className="text-primary font-semibold cursor-pointer mt-2 inline-block hover:underline">
+      {/* <div className="text-primary font-semibold cursor-pointer mt-2 inline-block hover:underline">
         Read more
-      </div>
+      </div> */}
     </div>
 
     {/* Sections */}

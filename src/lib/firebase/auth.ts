@@ -26,7 +26,7 @@ export class AuthService {
     return userCredential;
   }
 
-  static async logout(redirectTo: string = '/'): Promise<void> {
+  static async logout(redirectTo: string = '/auth/login'): Promise<void> {
     try {
       await firebaseSignOut(auth);
       

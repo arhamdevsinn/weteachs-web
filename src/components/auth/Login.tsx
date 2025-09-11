@@ -24,7 +24,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const redirectPath = searchParams.get('redirect') || '/dashboard';
+  const redirectPath = searchParams.get('redirect') || '/profile';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +56,7 @@ function LoginForm() {
         </div>
 
         {/* Header Text */}
-        <h1 className="text-2xl font-bold text-green-800 mb-1">Welcome to WeTeaches</h1>
+        <h1 className="text-2xl font-bold text-green-800 mb-1">Welcome to WeTeachs</h1>
         <p className="text-sm text-gray-600 mb-6">You're Asking! We're Listening!</p>
 
         <form onSubmit={handleLogin} className="text-left">
@@ -127,7 +127,7 @@ function LoginForm() {
         <p className="mt-6 text-sm text-gray-700">
           Don’t have an account? <a href="/auth/signup" className="text-primary font-medium hover:underline">Sign up</a>
         </p>
-        <p className="mt-2 text-sm font-medium text-primary">WeTeaches.com</p>
+        <p className="mt-2 text-sm font-medium text-primary">WeTeachs.com</p>
       </div>
     </div>
   );
