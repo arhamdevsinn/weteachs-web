@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthService } from '@/src/lib/firebase/auth';
 import { UrlUtils } from '@/src/utils/urlUtils';
 import { Suspense } from 'react';
+import Image from 'next/image';
 
 const isErrorWithMessage = (error: unknown): error is { message: string } => {
   return (
@@ -48,16 +49,18 @@ function LoginForm() {
       <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 text-center">
         {/* Logo */}
         <div className="mb-4">
-          <img
+          <Image
             src="/logo.png" // Update this to your actual logo path
             alt="WeTeaches Logo"
+            width={80}
+            height={80}
             className="mx-auto w-20 h-20 rounded-full"
           />
         </div>
 
         {/* Header Text */}
         <h1 className="text-2xl font-bold text-green-800 mb-1">Welcome to WeTeachs</h1>
-        <p className="text-sm text-gray-600 mb-6">You're Asking! We're Listening!</p>
+        <p className="text-sm text-gray-600 mb-6">You&apos;re Asking! We&apos;re Listening!</p>
 
         <form onSubmit={handleLogin} className="text-left">
           {error && (

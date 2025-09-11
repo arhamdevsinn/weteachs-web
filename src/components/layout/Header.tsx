@@ -1,6 +1,5 @@
 "use client"
 import React from 'react'
-import Image from 'next/image'
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { AuthService } from '@/src/lib/firebase/auth';
