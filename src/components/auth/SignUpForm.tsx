@@ -14,6 +14,7 @@ const isErrorWithMessage = (error: unknown): error is { message: string } => {
     typeof (error as { message: unknown }).message === "string"
   );
 };
+
 function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
