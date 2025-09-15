@@ -5,7 +5,17 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useUserProfile } from '@/src/hooks/useUserProfile';
 import Link from 'next/link';
-// import { Instagram, Youtube, Facebook } from 'lucide-react';
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/src/components/ui/dialog";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -20,6 +30,13 @@ const UserProfile = () => {
     error: dataError,
   } = useUserProfile(uid);
   console.log('UserProfile data:', { profile, teacherDetails, dataError });
+    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+const [open, setOpen] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setOpen(false); // close dialog
+    toast.success("Profile link copied successfully!");
+  };
 
   // Calculate average rating and number of filled stars
   const ratings = teacherDetails?.rating ?? [];
@@ -77,21 +94,38 @@ const UserProfile = () => {
       <div className="text-center md:text-left">
         <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
           {profile.display_name || "Your Name"}
+        {profile.isTeacher && (
+          <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Teacher</span>
+        )}
+          {profile.isStudent && (
+          <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Student</span>
+        )}
+         
+        </div>
+        <div className='text-gray-600'>
+          {profile.email}
         </div>
         <div className="text-gray-600 mb-1 flex items-center justify-center md:justify-start">
           <span className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
           Available now (0/15min)
         </div>
         <div className="text-gray-600 mb-1">Languages: English</div>
-        {profile.isTeacher && (
-          <div className="bg-secondary text-primary text-sm px-3 py-1 rounded-full inline-block mt-2">
-            👨‍🏫 Teacher
-          </div>
-        )}
+        <div className="bg-secondary text-primary text-sm px-3 py-1 rounded-full inline-block mt-2">
+<span className='font-semibold'>  Joining Date:</span> {profile.created_time?.seconds
+    ? new Date(profile.created_time.seconds * 1000).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "Unknown"}
+</div>
+
+        {/* )} */}
       </div>
     </div>
 
     {/* Stats / Settings */}
+    {profile.isTeacher && (
     <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
       <div className="flex flex-col items-center">
         <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
@@ -105,7 +139,7 @@ const UserProfile = () => {
           </span>
         </div>
       </div>
-      
+        
       <div className="flex flex-col items-center">
         <div className="relative">
           <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
@@ -124,7 +158,9 @@ const UserProfile = () => {
         </div>
         <div className="text-md mt-3 text-gray-700 font-medium">Total Earned</div>
       </div>
+      
     </div>
+      )}
 
     {/* Socials */}
    <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 mt-6 text-sm">
@@ -171,13 +207,25 @@ const UserProfile = () => {
         <span className="text-black font-bold mr-2">{teacherDetails?.website || 'https://yourwebsite.com'}</span>
         <span className="text-blue-500 text-xs bg-blue-100 px-2 py-1 rounded">Verified</span>
       </div>
-      <button className="text-xl transition-transform hover:scale-110 active:scale-95">
-        <span className="text-red-500">
-               <Image
-        src="/share.png" alt="instagram" width={20} height={20}
-        />
-        </span>
-      </button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <button className="text-xl transition-transform hover:scale-110 active:scale-95">
+              <Image src="/share.png" alt="share" width={20} height={20} />
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Share Profile</DialogTitle>
+              <DialogDescription>
+                Copy the link below and share it with others.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center space-x-2">
+              <Input value={shareUrl} readOnly />
+              <Button onClick={handleCopy}>Copy</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
     </div>
 
     {/* About Me */}
@@ -192,7 +240,7 @@ const UserProfile = () => {
     </div>
 
     {/* Sections */}
-    <div className="mt-6 flex flex-wrap gap-3 justify-start">
+    {/* <div className="mt-6 flex flex-wrap gap-3 justify-start">
       {['Services', 'Portfolio', 'Testimonials', 'Resources', 'Contact'].map((item, index) => (
         <a 
           key={index} 
@@ -202,7 +250,7 @@ const UserProfile = () => {
           {item}
         </a>
       ))}
-    </div>
+    </div> */}
 
     {/* Tabs */}
     <div className="mt-8 border-t border-gray-100 pt-6">
