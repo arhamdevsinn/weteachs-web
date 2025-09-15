@@ -86,7 +86,7 @@ function LoginForm() {
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
               <label className="text-sm font-medium text-green-800">Password</label>
-              <a href="#" className="text-sm text-primary hover:underline">Forgot Password?</a>
+              <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">Forgot Password?</a>
             </div>
             <input
               type="password"
