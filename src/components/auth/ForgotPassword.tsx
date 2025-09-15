@@ -9,6 +9,14 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 
+const isErrorWithMessage = (error: unknown): error is { message: string } => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as { message: unknown }).message === "string"
+  );
+};
 const ForgotPassword = () => {
     const router = useRouter();
   const [email, setEmail] = useState("");
@@ -25,8 +33,8 @@ const ForgotPassword = () => {
       toast.success("Password reset email sent!");
       router.push("/auth/login");
       setEmail(""); // clear input
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send reset email");
+    } catch (err: unknown) {
+      setError(isErrorWithMessage(err) ? err.message : 'Failed to send reset email.');
     } finally {
       setLoading(false);
     }

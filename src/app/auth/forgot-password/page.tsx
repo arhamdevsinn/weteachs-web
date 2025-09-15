@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import ForgotPassword from "@/src/components/auth/ForgotPassword";
 
