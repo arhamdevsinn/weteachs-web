@@ -1,11 +1,13 @@
 // @ts-nocheck
 "use client";
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useUserProfile } from '@/src/hooks/useUserProfile';
 import Link from 'next/link';
 import { toast } from "sonner";
+import { db } from "@/src/lib/firebase/config";
+import { doc, updateDoc } from "firebase/firestore";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +24,6 @@ const UserProfile = () => {
   // const router = useRouter();
   const searchParams = useSearchParams();
   const uid = searchParams.get('userId') || undefined;
-
   const {
     profile,
     teacherDetails,
@@ -38,12 +39,65 @@ const [open, setOpen] = useState(false);
     toast.success("Profile link copied successfully!");
   };
 
+const [formData, setFormData] = useState({
+  display_name: "",
+  email: "",
+  photo_url: "",
+  website: "",
+  bio_T: "",
+});
+
+useEffect(() => {
+  if (profile) {
+    setFormData({
+      display_name: profile.display_name || "",
+      email: profile.email || "",
+      photo_url: profile.photo_url || "",
+      website: teacherDetails?.website || "",
+      bio_T: teacherDetails?.bio_T || "",
+    });
+  }
+}, [profile, teacherDetails]);
+
+
   // Calculate average rating and number of filled stars
   const ratings = teacherDetails?.rating ?? [];
   const averageRating = ratings.length > 0
     ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
     : 0;
   const filledStars = Math.round(averageRating);
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+
+
+  const handleSave = async (e) => {
+  e.preventDefault();
+  try {
+    if (!uid) {
+      toast.error("User ID not found!");
+      return;
+    }
+
+    const userRef = doc(db, "users", uid);
+    await update(userRef, {
+      display_name: formData.display_name,
+      email: formData.email,
+      photo_url: formData.photo_url,
+      website: formData.website,
+      bio_T: formData.bio_T,
+      updated_at: new Date(),
+    });
+
+    toast.success("Profile updated successfully!");
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    toast.error("Failed to update profile");
+  }
+};
 
   if (dataLoading) {
     return (
@@ -73,7 +127,6 @@ const [open, setOpen] = useState(false);
       </div>
     );
   }
-
   return (
     <div className="bg-secondary min-h-screen py-8 px-4">
   {/* Profile Card */}
@@ -100,7 +153,59 @@ const [open, setOpen] = useState(false);
           {profile.isStudent && (
           <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Student</span>
         )}
-         
+         <Dialog>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="ml-3">
+          Edit Profile
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>
+            Update your personal information below.
+          </DialogDescription>
+        </DialogHeader>
+ {/* Edit Form */}
+       <form onSubmit={handleSave} className="flex flex-col gap-4 mt-4">
+  <Input
+    name="display_name"
+    placeholder="Full Name"
+    value={formData.display_name}
+    onChange={handleChange}
+  />
+  <Input
+    name="email"
+    placeholder="Email"
+    value={formData.email}
+    onChange={handleChange}
+  />
+  <Input
+    name="photo_url"
+    placeholder="Photo URL"
+    value={formData.photo_url}
+    onChange={handleChange}
+  />
+  <Input
+    name="website"
+    placeholder="Website"
+    value={formData.website}
+    onChange={handleChange}
+  />
+  <Input
+    name="bio_T"
+    placeholder="Bio"
+    value={formData.bio_T}
+    onChange={handleChange}
+  />
+
+  <Button type="submit" className="w-full">
+    Save Changes
+  </Button>
+</form>
+
+      </DialogContent>
+    </Dialog>
         </div>
         <div className='text-gray-600'>
           {profile.email}
