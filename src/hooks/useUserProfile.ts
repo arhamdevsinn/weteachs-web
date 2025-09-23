@@ -17,7 +17,6 @@ export const useUserProfile = (uid?: string) => {
     try {
       setLoading(true);
       const { profile, teacherDetails, gallery } = await UserProfileAPI.getProfile(uid);
-
       setProfile(profile);
       setTeacherDetails(teacherDetails);
       setGallery(gallery); // 🔹 store gallery
