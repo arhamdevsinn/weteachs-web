@@ -18,7 +18,8 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 
 const UserProfile = () => {
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('images');
+
   // const router = useRouter();
   const searchParams = useSearchParams();
   const uid = searchParams.get('userId') || undefined;
@@ -26,10 +27,11 @@ const UserProfile = () => {
   const {
     profile,
     teacherDetails,
+    gallery,
     loading: dataLoading,
     error: dataError,
   } = useUserProfile(uid);
-  console.log('UserProfile data:', { profile, teacherDetails, dataError });
+  console.log('UserProfile data:', { profile, teacherDetails, gallery, dataError });
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 const [open, setOpen] = useState(false);
   const handleCopy = () => {
@@ -227,7 +229,9 @@ const [open, setOpen] = useState(false);
           </DialogContent>
         </Dialog>
     </div>
-
+<div>
+ <Link href="/categories?userId={uid}"><Button className='my-5'>Categories</Button></Link> 
+</div>
     {/* About Me */}
     <div className="mt-6 p-4 bg-secondary rounded-xl">
       <div className="font-bold text-lg text-gray-800 mb-2">About Me</div>
@@ -252,55 +256,53 @@ const [open, setOpen] = useState(false);
       ))}
     </div> */}
 
-    {/* Tabs */}
-    <div className="mt-8 border-t border-gray-100 pt-6">
-      <div className="flex gap-6 mb-4 font-semibold">
-        {['Images', 'Videos', 'Info'].map((tab) => (
-          <button
-            key={tab}
-            className={`pb-2 px-1 transition-colors ${activeTab === tab.toLowerCase() 
-              ? "border-b-2 border-primary text-gray-800" 
-              : "text-gray-400 hover:text-gray-600"}`}
-            onClick={() => setActiveTab(tab.toLowerCase())}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
 
-      {/* Tab Content */}
-      <div className="bg-gray-50 rounded-xl p-4 min-h-[120px]">
-        {activeTab === "images" && (
-          <div className="text-sm">
-            <div className="font-bold text-gray-800 mb-2">Recent Work Samples</div>
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="aspect-square bg-secondary rounded-lg flex items-center justify-center text-gray-500">
-                  <Image
-                    src="/sample.png" alt="placeholder" width={400} height={300}/>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between items-center">
-              <div className="text-xs text-gray-500">Uploaded 2 days ago</div>
-              <div className="flex items-center text-sm text-gray-700">
-                <span className="mr-1">❤️</span>
-                <span>24 Likes</span>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {activeTab === 'videos' && (
-          <div className="text-center
-    text-gray-500 py-8">
-            No videos uploaded yet.
-          </div>
-        )}
+  
+  <div className="text-sm py-6">
+  <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+    ✨ Recent Work Samples
+  </h2>
+
+  {gallery && gallery.length > 0 ? (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {gallery.map((url, index) => (
+        <div
+          key={index}
+          className="relative group rounded-xl overflow-hidden shadow-md bg-white"
+        >
+          <Image
+            src={url}
+            alt={`Gallery image ${index + 1}`}
+            width={500}
+            height={500}
+            className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
+          />
         </div>
-        </div>
-      </div>
+      ))}
     </div>
+  ) : (
+    <div className="text-gray-500 text-center py-10 flex flex-col items-center justify-center">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-12 h-12 mb-3 text-gray-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 7l9-4 9 4-9 4-9-4zm0 7l9 4 9-4M3 7v10"
+        />
+      </svg>
+      <p>No images uploaded yet.</p>
+    </div>
+  )}
+</div>
+  </div>
+        </div>
+    
   
   );
 };

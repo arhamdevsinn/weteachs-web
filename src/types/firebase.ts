@@ -44,6 +44,7 @@ export interface TeacherDetails {
   website?: string;
   Instagram?: string; 
   Facebook?: string;
+  teacher_gallery?: string;
   youtube?: string;
   Tiktok?: string;
   rating?: [number];
