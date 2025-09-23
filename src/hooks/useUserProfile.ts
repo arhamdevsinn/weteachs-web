@@ -2,12 +2,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { UserProfileAPI } from '@/src/lib/api/userProfile';
-import {UserProfileData, TeacherDetails} from '@/src/types/firebase';
+import {UserProfileData, TeacherDetails, Category} from '@/src/types/firebase';
 
 export const useUserProfile = (uid?: string) => {
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [teacherDetails, setTeacherDetails] = useState<TeacherDetails | null>(null);
   const [gallery, setGallery] = useState<string[]>([]); // 🔹 add gallery state
+  const [categories, setCategories] = useState<Category[]>([]); // 🔹 add gallery state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,8 +17,9 @@ export const useUserProfile = (uid?: string) => {
 
     try {
       setLoading(true);
-      const { profile, teacherDetails, gallery } = await UserProfileAPI.getProfile(uid);
+      const { profile, teacherDetails, gallery, categories } = await UserProfileAPI.getProfile(uid);
       setProfile(profile);
+      setCategories(categories)
       setTeacherDetails(teacherDetails);
       setGallery(gallery); // 🔹 store gallery
     } catch (err: unknown) {
@@ -38,6 +40,7 @@ export const useUserProfile = (uid?: string) => {
     profile,
     teacherDetails,
     gallery, // 🔹 expose gallery to components
+    categories,
     loading,
     error,
     refreshData: fetchProfile,

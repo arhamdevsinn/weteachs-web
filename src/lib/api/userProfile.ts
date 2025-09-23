@@ -15,6 +15,7 @@ export const UserProfileAPI = {
 
     let teacherDetails = null;
     let gallery: string[] = [];
+    let categories: any[] = []; // 👈 will hold resolved categories
 
     if (profileData.isTeacher && profileData.teacher_ref) {
       const teacherRef = profileData.teacher_ref; // DocumentReference -> TeacherDetails/{id}
@@ -22,6 +23,17 @@ export const UserProfileAPI = {
 
       if (teacherSnap.exists()) {
         teacherDetails = { id: teacherRef.id, ...teacherSnap.data() };
+
+        // 🔹 fetch categories from cat_refs
+        if (Array.isArray(teacherDetails.cat_refs)) {
+          const catDocs = await Promise.all(
+            teacherDetails.cat_refs.map(async (catRef: any) => {
+              const catSnap = await getDoc(catRef);
+              return catSnap.exists() ? { id: catRef.id, ...catSnap.data() } : null;
+            })
+          );
+          categories = catDocs.filter(Boolean); // remove nulls
+        }
 
         // 🔹 teacher_gallery is a DocumentReference
         if (teacherDetails.teacher_gallery) {
@@ -45,7 +57,8 @@ export const UserProfileAPI = {
         uid,
       },
       teacherDetails,
-      gallery, // ✅ will now be the array of image URLs
+      gallery,     // ✅ images
+      categories,  // ✅ resolved category objects
     };
   },
 };

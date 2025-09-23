@@ -63,3 +63,19 @@ export interface UserCallManagement {
   call_history?: Record<string, unknown>[];   // 🔥 structured instead of `any[]`
   // ... other call management fields
 }
+export interface Category {
+  id: string;
+  message: string;
+  ExperienceLevel?: string;
+  Language?: string;
+  category_rate?: number;
+  description?: string;
+  image?: string;
+  teacher_name?: string;
+  teacher_ref?: any; // Firestore DocumentReference
+  title?: string;
+  topic?: string;
+  upload_time?: any; // Firestore Timestamp
+  who_created_ref?: any; // Firestore DocumentReference
+  iSAvailable?: boolean;
+}

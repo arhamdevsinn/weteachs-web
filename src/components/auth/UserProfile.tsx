@@ -28,10 +28,11 @@ const UserProfile = () => {
     profile,
     teacherDetails,
     gallery,
+    categories,
     loading: dataLoading,
     error: dataError,
   } = useUserProfile(uid);
-  console.log('UserProfile data:', { profile, teacherDetails, gallery, dataError });
+  console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, dataError });
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 const [open, setOpen] = useState(false);
   const handleCopy = () => {
