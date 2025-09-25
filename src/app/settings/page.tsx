@@ -1,24 +1,12 @@
-// 'use client';
-
-// import { Suspense } from "react";
-// import NotFoundContent from "@/src/components/NotFoundContent";
-
-// export default function NotFoundPage() {
-//   return (
-//     <Suspense fallback={<div>Loading...</div>}>
-//       <NotFoundContent />
-//     </Suspense>
-//   );
-// }
-
+"use client"
 import React from 'react'
 
-const page = () => {
+const Page = () => {
   return (
     <div>
-      hhjj
+      sdfa
     </div>
   )
 }
 
-export default page
+export default Page

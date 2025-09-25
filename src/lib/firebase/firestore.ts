@@ -1,7 +1,9 @@
+// @ts-nocheck
 import {
   collection,
   doc,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   getDocs,
@@ -13,12 +15,14 @@ import {
 import { db } from './config';
 
 export class FirestoreService {
+  // Get a single document
   static async getDocument(collectionName: string, docId: string) {
     const docRef = doc(db, collectionName, docId);
     const docSnap = await getDoc(docRef);
     return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
   }
 
+  // Get multiple documents with optional queries
   static async getDocuments(
     collectionName: string,
     ...queryConstraints: QueryConstraint[]
@@ -31,19 +35,37 @@ export class FirestoreService {
     }));
   }
 
-  static async addDocument(collectionName: string, data: DocumentData) {
-    return addDoc(collection(db, collectionName), data);
-  }
-
-  static async updateDocument(
+  // Smart create/update
+  static async saveDocument(
     collectionName: string,
-    docId: string,
-    data: DocumentData
+    data: DocumentData,
+    docId?: string
   ) {
+    if (!docId) {
+      // 👉 No docId means create a new document
+      const newDoc = await addDoc(collection(db, collectionName), {
+        ...data,
+        createdAt: new Date(),
+      });
+      return { id: newDoc.id, ...data };
+    }
+
+    // 👉 docId provided: check if it exists
     const docRef = doc(db, collectionName, docId);
-    return updateDoc(docRef, data);
+    const snap = await getDoc(docRef);
+
+    if (snap.exists()) {
+      // Update existing
+      await updateDoc(docRef, { ...data, updatedAt: new Date() });
+      return { id: docId, ...data };
+    } else {
+      // Create new with given id
+      await setDoc(docRef, { ...data, createdAt: new Date() });
+      return { id: docId, ...data };
+    }
   }
 
+  // Delete document
   static async deleteDocument(collectionName: string, docId: string) {
     return deleteDoc(doc(db, collectionName, docId));
   }

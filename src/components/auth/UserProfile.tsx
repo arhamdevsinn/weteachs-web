@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useUserProfile } from '@/src/hooks/useUserProfile';
 import Link from 'next/link';
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,15 @@ const UserProfile = () => {
   console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, dataError });
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 const [open, setOpen] = useState(false);
+ const router = useRouter();
+
+  const handleClick = () => {
+    if (!teacherDetails?.id) {
+      console.error("Teacher ID not available");
+      return;
+    }
+    router.push(`/categories?userId=${uid}&teacherId=${teacherDetails.id}`);
+  };
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
     setOpen(false); // close dialog
@@ -105,9 +115,9 @@ const [open, setOpen] = useState(false);
         )}
          
         </div>
-        <div className='text-gray-600'>
+        {/* <div className='text-gray-600'>
           {profile.email}
-        </div>
+        </div> */}
         <div className="text-gray-600 mb-1 flex items-center justify-center md:justify-start">
           <span className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
           Available now (0/15min)
@@ -131,9 +141,11 @@ const [open, setOpen] = useState(false);
     {profile.isTeacher && (
     <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
       <div className="flex flex-col items-center">
+        <Link href="/settings">
         <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
           Profile Settings
         </button>
+        </Link>
         <div className="flex gap-1 mt-4 text-amber-400 text-xl">
           {'★'.repeat(filledStars)}
           <span className="text-gray-300">{'★'.repeat(5 - filledStars)}</span>
@@ -231,7 +243,9 @@ const [open, setOpen] = useState(false);
         </Dialog>
     </div>
 <div>
- <Link href="/categories?userId={uid}"><Button className='my-5'>Categories</Button></Link> 
+   <Button className="my-5" onClick={handleClick}>
+      Categories
+    </Button>
 </div>
     {/* About Me */}
     <div className="mt-6 p-4 bg-secondary rounded-xl">
@@ -245,17 +259,33 @@ const [open, setOpen] = useState(false);
     </div>
 
     {/* Sections */}
-    {/* <div className="mt-6 flex flex-wrap gap-3 justify-start">
-      {['Services', 'Portfolio', 'Testimonials', 'Resources', 'Contact'].map((item, index) => (
+    <div className="mt-6 flex flex-wrap gap-3 justify-start">
         <a 
-          key={index} 
           href="#" 
-          className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm"
-        >
-          {item}
+          className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
+          {teacherDetails?.section_1_name}
         </a>
-      ))}
-    </div> */}
+          <a 
+          href="#" 
+          className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
+          {teacherDetails?.section_2_name}
+        </a>
+          <a 
+          href="#" 
+          className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
+          {teacherDetails?.section_3_name}
+        </a>
+          <a 
+          href="#" 
+          className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
+          {teacherDetails?.section_4_name}
+        </a>
+          <a 
+          href="#" 
+          className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
+          {teacherDetails?.section_5_name}
+        </a>
+    </div>
 
 
   

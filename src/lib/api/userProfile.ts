@@ -57,8 +57,8 @@ export const UserProfileAPI = {
         uid,
       },
       teacherDetails,
-      gallery,     // ✅ images
-      categories,  // ✅ resolved category objects
+      gallery,     
+      categories,  
     };
   },
 };

@@ -3,6 +3,8 @@ import React from "react";
 import { useSearchParams } from "next/navigation";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // Skeleton Loader
 const SkeletonCard = () => (
@@ -18,12 +20,16 @@ const SkeletonCard = () => (
 const CategoriesCard = () => {
   const searchParams = useSearchParams();
   const uid = searchParams.get("userId") || undefined;
+   const router = useRouter();
+  
 
   const {
     categories,
+    teacherDetails,
     loading: dataLoading,
     error: dataError,
   } = useUserProfile(uid);
+  console.log(categories)
 
   if (dataError) {
     return (
@@ -32,6 +38,14 @@ const CategoriesCard = () => {
       </div>
     );
   }
+  const teacherId = teacherDetails?.id || null;
+  const handleCreate = () => {
+    if (!teacherId) {
+      console.error("Teacher ID not found from teacher_ref");
+      return;
+    }
+    router.push(`/upload?teacherId=${teacherId}`);
+  };
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -45,11 +59,13 @@ const CategoriesCard = () => {
             className="border px-3 py-2 rounded w-64 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
-        <button className="bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-green-800 transition">
+         <button
+          onClick={handleCreate}
+          className="bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-green-800 transition"
+        >
           + Create
         </button>
       </div>
-
       {/* Grid of Cards */}
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {dataLoading ? (
