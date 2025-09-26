@@ -38,6 +38,11 @@ const UserProfile = () => {
 const [open, setOpen] = useState(false);
  const router = useRouter();
 
+const handleSettingsClick = () => {
+  router.push("/settings", {
+    state: { userImg: profile.photo_url || "/profile.photo_url" },
+  });
+};
   const handleClick = () => {
     if (!teacherDetails?.id) {
       console.error("Teacher ID not available");
@@ -141,11 +146,16 @@ const [open, setOpen] = useState(false);
     {profile.isTeacher && (
     <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
       <div className="flex flex-col items-center">
-        <Link href="/settings">
+       <Link
+        href={{
+          pathname: "/settings",
+          query: { userImg: profile.photo_url || "/profile.photo_url" },
+        }}
+      >
         <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
           Profile Settings
         </button>
-        </Link>
+      </Link>
         <div className="flex gap-1 mt-4 text-amber-400 text-xl">
           {'★'.repeat(filledStars)}
           <span className="text-gray-300">{'★'.repeat(5 - filledStars)}</span>
@@ -154,7 +164,7 @@ const [open, setOpen] = useState(false);
           </span>
         </div>
       </div>
-        
+      
       <div className="flex flex-col items-center">
         <div className="relative">
           <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
