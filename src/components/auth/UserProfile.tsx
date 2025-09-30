@@ -17,6 +17,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
+import { div } from 'framer-motion/client';
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('images');
@@ -300,10 +301,25 @@ const handleSettingsClick = () => {
 
   
   <div className="text-sm py-6">
-  <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
     ✨ Recent Work Samples
   </h2>
-
+  <div className="mt-8 border-t border-gray-100 pt-6">
+      <div className="flex w-full grid grid-cols-3 mb-4 font-semibold">
+        {['Images', 'Videos', 'Info'].map((tab) => (
+          <button
+            key={tab}
+            className={`pb-2 px-1 transition-colors ${activeTab === tab.toLowerCase() 
+              ? "border-b-2 border-primary text-primary" 
+              : "text-gray-400 hover:text-gray-600"}`}
+            onClick={() => setActiveTab(tab.toLowerCase())}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+       {activeTab === "images" && (
+        <div>
   {gallery && gallery.length > 0 ? (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {gallery.map((url, index) => (
@@ -340,6 +356,34 @@ const handleSettingsClick = () => {
       <p>No images uploaded yet.</p>
     </div>
   )}
+</div>
+)}
+{activeTab === "videos" && (
+  <div className="text-gray-500 text-center py-10 flex flex-col items-center justify-center">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-12 h-12 mb-3 text-gray-400"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+    <p>No videos uploaded yet.</p>
+  </div>
+)}
+{activeTab === "info" && (
+  <div className="text-gray-700">
+    <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
+    <p>{teacherDetails?.additional_info || "No additional information provided."}</p>
+  </div>
+)}  
+</div>
 </div>
   </div>
         </div>
