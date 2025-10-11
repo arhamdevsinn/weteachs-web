@@ -2,13 +2,19 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { UserProfileAPI } from '@/src/lib/api/userProfile';
-import {UserProfileData, TeacherDetails, Category} from '@/src/types/firebase';
+import { UserProfileData, TeacherDetails, Category } from '@/src/types/firebase';
 
 export const useUserProfile = (uid?: string) => {
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [teacherDetails, setTeacherDetails] = useState<TeacherDetails | null>(null);
-  const [gallery, setGallery] = useState<string[]>([]); // 🔹 add gallery state
-  const [categories, setCategories] = useState<Category[]>([]); // 🔹 add gallery state
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [subcollections, setSubcollections] = useState({
+    videos: [],
+    reviews: [],
+    galleryCollection: [],
+    expertTexts: [],
+  });
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,16 +23,25 @@ export const useUserProfile = (uid?: string) => {
 
     try {
       setLoading(true);
-      const { profile, teacherDetails, gallery, categories } = await UserProfileAPI.getProfile(uid);
+      const { profile, teacherDetails, gallery, categories, subcollections } =
+        await UserProfileAPI.getProfile(uid);
+
       setProfile(profile);
-      setCategories(categories)
+      setCategories(categories);
       setTeacherDetails(teacherDetails);
-      setGallery(gallery); // 🔹 store gallery
+      setGallery(gallery);
+      setSubcollections(subcollections);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
       setProfile(null);
       setTeacherDetails(null);
       setGallery([]);
+      setSubcollections({
+        videos: [],
+        reviews: [],
+        galleryCollection: [],
+        expertTexts: [],
+      });
     } finally {
       setLoading(false);
     }
@@ -39,8 +54,9 @@ export const useUserProfile = (uid?: string) => {
   return {
     profile,
     teacherDetails,
-    gallery, // 🔹 expose gallery to components
+    gallery,
     categories,
+    subcollections, // ✅ use state, not undefined variables
     loading,
     error,
     refreshData: fetchProfile,

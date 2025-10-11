@@ -15,15 +15,14 @@ const Header = () => {
     setLoading(true);
     try {
       await AuthService.logout();
-      window.location.href = "/auth/login"; // Redirect to login page after logout
+      window.location.href = "/auth/login";
     } catch (error) {
       console.error("Logout error:", error);
       setLoading(false);
     }
   };
-
   if (!user) {
-    return null; // Don't show navigation for non-authenticated users
+    return null;
   }
 
   const navigationItems = [

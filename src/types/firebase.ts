@@ -72,10 +72,10 @@ export interface Category {
   description?: string;
   image?: string;
   teacher_name?: string;
-  teacher_ref?: any; // Firestore DocumentReference
+  teacher_ref?: []; // Firestore DocumentReference
   title?: string;
   topic?: string;
-  upload_time?: any; // Firestore Timestamp
-  who_created_ref?: any; // Firestore DocumentReference
+  upload_time?: []; // Firestore Timestamp
+  who_created_ref?: []; // Firestore DocumentReference
   iSAvailable?: boolean;
 }

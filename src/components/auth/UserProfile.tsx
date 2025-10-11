@@ -21,6 +21,7 @@ import { div } from 'framer-motion/client';
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('images');
+  const [selectedSection, setSelectedSection] = useState("all");
 
   // const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,10 +32,11 @@ const UserProfile = () => {
     teacherDetails,
     gallery,
     categories,
+      subcollections,
     loading: dataLoading,
     error: dataError,
   } = useUserProfile(uid);
-  console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, dataError });
+  console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 const [open, setOpen] = useState(false);
  const router = useRouter();
@@ -270,7 +272,7 @@ const handleSettingsClick = () => {
     </div>
 
     {/* Sections */}
-    <div className="mt-6 flex flex-wrap gap-3 justify-start">
+    {/* <div className="mt-6 flex flex-wrap gap-3 justify-start">
         <a 
           href="#" 
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
@@ -296,94 +298,206 @@ const handleSettingsClick = () => {
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
           {teacherDetails?.section_5_name}
         </a>
-    </div>
+    </div> */}
 
 
   
-  <div className="text-sm py-6">
-  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-    ✨ Recent Work Samples
+<div className="text-sm py-8">
+  <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+    <span className="text-primary text-3xl">✨</span> Recent Work Samples
   </h2>
-  <div className="mt-8 border-t border-gray-100 pt-6">
-      <div className="flex w-full grid grid-cols-3 mb-4 font-semibold">
-        {['Images', 'Videos', 'Info'].map((tab) => (
+
+  {/* Section & Tabs Header */}
+  <div className=" border-gray-200 pt-2">
+    {/* Section Filter */}
+    <div className="flex flex-wrap gap-3 justify-start mb-6">
+      {[
+        { key: "all", label: "All" },
+        { key: "section_1", label: teacherDetails?.section_1_name },
+        { key: "section_2", label: teacherDetails?.section_2_name },
+        { key: "section_3", label: teacherDetails?.section_3_name },
+        { key: "section_4", label: teacherDetails?.section_4_name },
+        { key: "section_5", label: teacherDetails?.section_5_name },
+      ]
+        .filter((s) => s.label)
+        .map((section) => (
           <button
-            key={tab}
-            className={`pb-2 px-1 transition-colors ${activeTab === tab.toLowerCase() 
-              ? "border-b-2 border-primary text-primary" 
-              : "text-gray-400 hover:text-gray-600"}`}
-            onClick={() => setActiveTab(tab.toLowerCase())}
+            key={section.key}
+            onClick={() => setSelectedSection(section.key)}
+            className={`px-5 py-2.5 rounded-full border text-sm font-medium shadow-sm transition-all duration-300 ${
+              selectedSection === section.key
+                ? "bg-primary text-white shadow-md scale-105"
+                : "bg-white text-primary border-primary hover:bg-primary/5"
+            }`}
           >
-            {tab}
+            {section.label}
           </button>
         ))}
-      </div>
-       {activeTab === "images" && (
-        <div>
-  {gallery && gallery.length > 0 ? (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-      {gallery.map((url, index) => (
-        <div
-          key={index}
-          className="relative group rounded-xl overflow-hidden shadow-md bg-white"
+    </div>
+
+    {/* Tabs (Images, Videos, Info) */}
+    <div className="flex w-full justify-center mb-6 border-b border-gray-100">
+      {[
+        { key: "images", label: "Images" },
+        { key: "videos", label: "Videos" },
+        { key: "info", label: "Info" },
+      ].map((tab) => (
+        <button
+          key={tab.key}
+          onClick={() => setActiveTab(tab.key)}
+          className={`relative w-full pb-2 px-2 font-semibold transition-all ${
+            activeTab === tab.key
+              ? "text-primary after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-primary"
+              : "text-gray-400 hover:text-gray-600"
+          }`}
         >
-          <Image
-            src={url}
-            alt={`Gallery image ${index + 1}`}
-            width={500}
-            height={500}
-            className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
-          />
-        </div>
+          {tab.label}
+        </button>
       ))}
     </div>
-  ) : (
-    <div className="text-gray-500 text-center py-10 flex flex-col items-center justify-center">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-12 h-12 mb-3 text-gray-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 7l9-4 9 4-9 4-9-4zm0 7l9 4 9-4M3 7v10"
-        />
-      </svg>
-      <p>No images uploaded yet.</p>
-    </div>
-  )}
-</div>
-)}
-{activeTab === "videos" && (
-  <div className="text-gray-500 text-center py-10 flex flex-col items-center justify-center">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-12 h-12 mb-3 text-gray-400"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-      />
-    </svg>
-    <p>No videos uploaded yet.</p>
+
+    {/* === IMAGES TAB === */}
+    {activeTab === "images" && (
+      <div className="animate-fadeIn">
+        {gallery && gallery.length > 0 ? (
+          (() => {
+            const filtered = gallery.filter((img) =>
+              selectedSection === "all" ? true : img[selectedSection]
+            );
+            return filtered.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {filtered.map((url, i) => (
+                  <div
+                    key={i}
+                    className="relative group rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300"
+                  >
+                    <Image
+                      src={url.image_url || url}
+                      alt={`Gallery ${i + 1}`}
+                      width={500}
+                      height={500}
+                      className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
+                      View Image
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-10">No images found.</p>
+            );
+          })()
+        ) : (
+          <p className="text-gray-500 text-center py-10">No images uploaded yet.</p>
+        )}
+      </div>
+    )}
+
+    {/* === VIDEOS TAB === */}
+    {activeTab === "videos" && (
+      <div className="space-y-6 animate-fadeIn">
+        {subcollections.videos?.length ? (
+          (() => {
+            const filtered = subcollections.videos.filter((v) =>
+              selectedSection === "all" ? true : v[selectedSection]
+            );
+            return filtered.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {filtered.map((video, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+                  >
+                    <video
+                      src={video.video_gallery}
+                      poster={video.thumbnail_url || "/video-placeholder.png"}
+                      controls
+                      className="w-full h-48 object-cover rounded-t-xl"
+                    />
+                    <div className="p-4">
+                      <p className="font-semibold text-gray-900">
+                        {video.Title || "Untitled Video"}
+                      </p>
+                      {video.Description && (
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                          {video.Description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-10">
+                No videos found for this section.
+              </p>
+            );
+          })()
+        ) : (
+          <p className="text-gray-500 text-center py-10">No videos uploaded yet.</p>
+        )}
+      </div>
+    )}
+
+    {/* === INFO TAB === */}
+    {activeTab === "info" && (
+      <div className="text-gray-700 space-y-6 animate-fadeIn">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          🧠 Expert Texts
+        </h3>
+
+        {subcollections?.expertTexts?.length ? (
+          (() => {
+            const filtered = subcollections.expertTexts.filter((t) =>
+              selectedSection === "all" ? true : t[selectedSection]
+            );
+            return filtered.length > 0 ? (
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filtered.map((text, i) => (
+                  <li
+                    key={i}
+                    className="bg-white border border-gray-100 p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+                  >
+                    <p className="font-semibold text-lg text-gray-900 mb-2">
+                      {text.Title || "Untitled"}
+                    </p>
+                    {text.Description && (
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-3">
+                        {text.Description}
+                      </p>
+                    )}
+                    {text.Link && (
+                      <a
+                        href={
+                          text.Link.startsWith("http")
+                            ? text.Link
+                            : `https://${text.Link}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline"
+                      >
+                        🔗 Visit Link
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 text-center py-10">
+                No expert texts found for this section.
+              </p>
+            );
+          })()
+        ) : (
+          <p className="text-gray-500 text-center py-10">
+            No expert texts available.
+          </p>
+        )}
+      </div>
+    )}
   </div>
-)}
-{activeTab === "info" && (
-  <div className="text-gray-700">
-    <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
-    <p>{teacherDetails?.additional_info || "No additional information provided."}</p>
-  </div>
-)}  
-</div>
 </div>
   </div>
         </div>
