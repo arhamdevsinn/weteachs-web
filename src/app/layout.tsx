@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "../components/layout/Header";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
+import Footer from "../components/layout/Footer";
 // import Footer from "../components/layout/Footer";
 
 const ubuntu = Ubuntu({
@@ -35,7 +36,7 @@ export default function RootLayout({
         {children}
        <Toaster/>
         </Suspense>
-        {/* <Footer/> */}
+        <Footer/>
       </body>
     </html>
   );

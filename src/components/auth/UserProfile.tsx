@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useUserProfile } from '@/src/hooks/useUserProfile';
@@ -22,6 +22,7 @@ import { div } from 'framer-motion/client';
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('images');
   const [selectedSection, setSelectedSection] = useState("all");
+  
 
   // const router = useRouter();
   const searchParams = useSearchParams();
@@ -65,6 +66,11 @@ const handleSettingsClick = () => {
     ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
     : 0;
   const filledStars = Math.round(averageRating);
+   useEffect(() => {
+    if (!dataLoading && (dataError || !profile)) {
+      router.push("/create-profile");
+    }
+  }, [dataLoading, dataError, profile, router]);
 
   if (dataLoading) {
     return (
@@ -77,23 +83,22 @@ const handleSettingsClick = () => {
     );
   }
 
+  // useEffect(() => {
+  //   if (dataError || !profile) {
+  //     // Redirect to create-profile page
+  //     router.push('/create-profile');
+  //   }
+  // }, [dataError, profile, router]);
+
   if (dataError || !profile) {
+    // Optionally, show a loading spinner while redirecting
     return (
-      <div className="bg-secondary min-h-screen py-8 px-4 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="text-red-500 text-4xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold mb-2">Error Loading Profile</h2>
-          <p className="text-gray-600 mb-4">{dataError || 'Profile not found'}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-secondary">
+        <p className="text-gray-700 text-lg">Redirecting to profile setup...</p>
       </div>
     );
   }
+
 
   return (
     <div className="bg-secondary min-h-screen py-8 px-4">

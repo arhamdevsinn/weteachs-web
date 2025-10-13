@@ -23,7 +23,7 @@ const userImg = searchParams.get("userImg") || "/profile.photo_url";
     return () => clearTimeout(timer);
   }, []);
 
-  const userImage = "https://i.pravatar.cc/150?img=32"; // Example user image
+  const userImage = "https://i.pravatar.cc/150?img=32"; 
 
   return (
     <div className="w-full min-h-screen p-6 bg-gray-50 flex flex-col items-center">

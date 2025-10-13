@@ -43,7 +43,7 @@ function SignUpForm() {
 
     try {
       await AuthService.signup(email, password);
-      router.push('/auth/login'); // or redirect to login
+      router.push('/create-profile'); // or redirect to login
     } catch (err: unknown) {
       setError(isErrorWithMessage(err) ? err.message : 'An unexpected error occurred.');
     } finally {

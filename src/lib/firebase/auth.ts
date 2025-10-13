@@ -20,6 +20,7 @@ export class AuthService {
     displayName?: string
   ): Promise<UserCredential> {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    
     if (displayName) {
       await updateProfile(userCredential.user, { displayName });
     }

@@ -50,22 +50,50 @@ const CategoriesCard = () => {
   return (
     <div className="min-h-screen bg-secondary">
       {/* Header */}
-      <div className="px-6 py-4 flex items-center justify-between bg-white shadow-md sticky top-0 z-10">
-        <div className="flex items-center space-x-3">
-          <button className="text-2xl">☰</button>
-          <input
-            type="text"
-            placeholder="Search categories..."
-            className="border px-3 py-2 rounded w-64 focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-         <button
-          onClick={handleCreate}
-          className="bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-green-800 transition"
-        >
-          + Create
-        </button>
-      </div>
+     <div className="px-8 py-5 flex items-center justify-between bg-gradient-to-r from-white to-gray-50 shadow-md border-b sticky top-0 z-20">
+  {/* Left Section */}
+  <div className="flex items-center space-x-3">
+    <div className="p-2 bg-primary/10 rounded-lg">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+        className="w-6 h-6 text-primary"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 7.5l8.485 8.485a2.121 2.121 0 002.121 0L21 7.5"
+        />
+      </svg>
+    </div>
+    <div>
+      <h1 className="font-extrabold text-2xl text-gray-900">Categories</h1>
+      <p className="text-sm text-gray-500">Manage and organize your product categories</p>
+    </div>
+  </div>
+
+  {/* Right Section */}
+  <button
+    onClick={handleCreate}
+    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-transform transform hover:scale-105"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      stroke="currentColor"
+      className="w-5 h-5"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+    Create Category
+  </button>
+</div>
+
       {/* Grid of Cards */}
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {dataLoading ? (
