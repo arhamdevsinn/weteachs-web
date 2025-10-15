@@ -7,6 +7,7 @@ import { useUserProfile } from '@/src/hooks/useUserProfile';
 import Link from 'next/link';
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { div } from 'framer-motion/client';
 
+
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('images');
   const [selectedSection, setSelectedSection] = useState("all");
@@ -26,7 +28,11 @@ const UserProfile = () => {
 
   // const router = useRouter();
   const searchParams = useSearchParams();
-  const uid = searchParams.get('userId') || undefined;
+  const { userId, usernameT, isTeacher } = useUserIdFromUrl();
+
+console.log("Resolved User ID:", userId);
+console.log("Resolved Teacher Username:", usernameT);
+
 
   const {
     profile,
@@ -36,7 +42,7 @@ const UserProfile = () => {
       subcollections,
     loading: dataLoading,
     error: dataError,
-  } = useUserProfile(uid);
+  } = useUserProfile(userId);
   console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 const [open, setOpen] = useState(false);

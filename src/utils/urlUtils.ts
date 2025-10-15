@@ -1,7 +1,7 @@
 export class UrlUtils {
   static addUserIdToUrl(url: string, userId: string): string {
     const urlObj = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-    urlObj.searchParams.set('userId', userId);
+    // urlObj.searchParams.set('userId', userId);
     return urlObj.toString();
   }
 

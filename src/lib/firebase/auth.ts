@@ -13,7 +13,6 @@ export class AuthService {
   static async login(email: string, password: string): Promise<UserCredential> {
     return signInWithEmailAndPassword(auth, email, password);
   }
-
   static async signup(
     email: string,
     password: string,

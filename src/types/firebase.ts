@@ -52,6 +52,7 @@ export interface TeacherDetails {
   hourly_rate?: number;
   Total_amount_earned?: [string];
   availability?: string[];
+  usernameT?:string;
   // ... other teacher fields
 }
 

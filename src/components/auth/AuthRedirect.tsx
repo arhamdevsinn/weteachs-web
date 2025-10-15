@@ -10,10 +10,10 @@ interface AuthRedirectProps {
   redirectTo?: string;
 }
 
-export const AuthRedirect = ({ 
-  children, 
-  requireAuth = true, 
-  redirectTo = '/' 
+export const AuthRedirect = ({
+  children,
+  requireAuth = true,
+  redirectTo = '/auth/login', // ✅ better default redirect
 }: AuthRedirectProps) => {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -21,21 +21,22 @@ export const AuthRedirect = ({
   useEffect(() => {
     if (!loading) {
       if (requireAuth && !user) {
-        // Redirect to login with current path as redirect parameter
-        router.push(`${redirectTo}?redirect=${encodeURIComponent(window.location.pathname)}`);
+        // 🔒 Redirect unauthenticated users to login
+        const currentPath = encodeURIComponent(window.location.pathname);
+        router.push(`${redirectTo}?redirect=${currentPath}`);
       } else if (!requireAuth && user) {
-        // If user is logged in but shouldn't be on this page (like login page)
-        router.push('/?userId=' + user.uid);
+        // 🚫 Prevent logged-in users from visiting guest-only pages
+        router.push('/profile');
       }
     }
   }, [user, loading, requireAuth, router, redirectTo]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center py-8 text-gray-600">Loading...</div>;
   }
 
   if (requireAuth && !user) {
-    return <div>Redirecting to login...</div>;
+    return <div className="text-center py-8 text-gray-600">Redirecting to login...</div>;
   }
 
   return <>{children}</>;

@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { AuthService } from '@/src/lib/firebase/auth';
-import { UrlUtils } from '@/src/utils/urlUtils';
-import { Suspense } from 'react';
 import Image from 'next/image';
+import { Suspense } from 'react';
 
 const isErrorWithMessage = (error: unknown): error is { message: string } => {
   return (
@@ -23,9 +22,6 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const redirectPath = searchParams.get('redirect') || '/profile';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +31,14 @@ function LoginForm() {
     try {
       const userCredential = await AuthService.login(email, password);
       const userId = userCredential.user.uid;
-      const finalUrl = UrlUtils.addUserIdToUrl(redirectPath, userId);
-      router.push(finalUrl);
+
+      // ✅ Save userId to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userId', userId);
+      }
+
+      // ✅ Redirect to profile (no userId in URL)
+      router.push('/profile');
     } catch (err: unknown) {
       setError(isErrorWithMessage(err) ? err.message : 'An unexpected error occurred.');
     } finally {
@@ -50,7 +52,7 @@ function LoginForm() {
         {/* Logo */}
         <div className="mb-4">
           <Image
-            src="/logo.png" // Update this to your actual logo path
+            src="/logo.png"
             alt="WeTeaches Logo"
             width={80}
             height={80}
@@ -59,7 +61,7 @@ function LoginForm() {
         </div>
 
         {/* Header Text */}
-        <h1 className="text-2xl font-bold text-green-800 mb-1">Welcome to WeTeachs</h1>
+        <h1 className="text-2xl font-bold text-primary mb-1">Welcome to WeTeachs</h1>
         <p className="text-sm text-gray-600 mb-6">You&apos;re Asking! We&apos;re Listening!</p>
 
         <form onSubmit={handleLogin} className="text-left">
@@ -71,10 +73,10 @@ function LoginForm() {
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1 text-green-800">Email</label>
+            <label className="block text-sm font-medium mb-1 text-primary">Email</label>
             <input
               type="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary/20"
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -85,12 +87,12 @@ function LoginForm() {
           {/* Password */}
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
-              <label className="text-sm font-medium text-green-800">Password</label>
+              <label className="text-sm font-medium text-primary">Password</label>
               <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">Forgot Password?</a>
             </div>
             <input
               type="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-200"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary/20"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -113,22 +115,18 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-white py-2 rounded-full font-semibold hover:bg-green-700 transition disabled:opacity-50"
+            className="w-full bg-primary text-white py-2 rounded-full font-semibold hover:bg-primary/90 transition disabled:opacity-50"
           >
             {loading ? 'Logging in...' : 'Log in'}
           </button>
-
-      {redirectPath !== '/dashboard' && (
-        <p className="mt-4 text-sm text-gray-600">
-          After login, you&apos;ll be redirected to your intended page.
-        </p>
-      )}
-
         </form>
 
         {/* Sign up and Footer */}
         <p className="mt-6 text-sm text-gray-700">
-          Don’t have an account? <a href="/auth/signup" className="text-primary font-medium hover:underline">Sign up</a>
+          Don’t have an account?{' '}
+          <a href="/auth/signup" className="text-primary font-medium hover:underline">
+            Sign up
+          </a>
         </p>
         <p className="mt-2 text-sm font-medium text-primary">WeTeachs.com</p>
       </div>
