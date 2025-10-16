@@ -29,11 +29,8 @@ const UserProfile = () => {
   // const router = useRouter();
   const searchParams = useSearchParams();
   const { userId, usernameT, isTeacher } = useUserIdFromUrl();
-
 console.log("Resolved User ID:", userId);
 console.log("Resolved Teacher Username:", usernameT);
-
-
   const {
     profile,
     teacherDetails,
@@ -42,9 +39,37 @@ console.log("Resolved Teacher Username:", usernameT);
       subcollections,
     loading: dataLoading,
     error: dataError,
-  } = useUserProfile(userId);
+  } = useUserProfile(userId || usernameT);
   console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
-    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  // After your hooks:
+// const [noProfile, setNoProfile] = useState(false);
+
+// useEffect(() => {
+//   if (dataLoading) return; // wait until Firestore is done loading
+
+//   // If there’s an explicit Firestore “no document” error
+//   if (dataError?.message?.toLowerCase()?.includes("no document")) {
+//     setNoProfile(true);
+//     return;
+//   }
+
+//   // If teacherDetails is null, undefined, or empty object → no profile
+//   if (!teacherDetails || Object.keys(teacherDetails || {}).length === 0) {
+//     setNoProfile(true);
+//     return;
+//   }
+
+//   // Otherwise, profile exists
+//   setNoProfile(false);
+// }, [dataLoading, dataError, teacherDetails]);
+
+//   useEffect(() => {
+//     if (!userId && !usernameT) {
+//       // redirect if both missing
+//       window.location.href = "/auth/login";
+//     }
+//   }, [userId, usernameT]);
+const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 const [open, setOpen] = useState(false);
  const router = useRouter();
 
@@ -58,7 +83,7 @@ const handleSettingsClick = () => {
       console.error("Teacher ID not available");
       return;
     }
-    router.push(`/categories?userId=${uid}&teacherId=${teacherDetails.id}`);
+    router.push(`/categories?userId=${userId}&teacherId=${teacherDetails.id}`);
   };
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
@@ -97,6 +122,7 @@ const handleSettingsClick = () => {
   // }, [dataError, profile, router]);
 
   if (dataError || !profile) {
+    console.log("dfsf", dataError)
     // Optionally, show a loading spinner while redirecting
     return (
       <div className="flex items-center justify-center min-h-screen bg-secondary">

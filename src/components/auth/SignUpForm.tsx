@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CircleArrowLeft } from 'lucide-react';
+import { toast } from "sonner";
 import { AuthService } from '@/src/lib/firebase/auth'; // Adjust if needed
 
 const isErrorWithMessage = (error: unknown): error is { message: string } => {
@@ -41,10 +42,11 @@ function SignUpForm() {
 
     setLoading(true);
 
-    try {
-      await AuthService.signup(email, password);
-      router.push('/create-profile'); // or redirect to login
-    } catch (err: unknown) {
+ try {
+  await AuthService.signup(email, password);
+  toast.success("Signup successful! Please log in.");
+  router.push('/auth/login');
+} catch (err) {
       setError(isErrorWithMessage(err) ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);

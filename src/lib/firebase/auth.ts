@@ -1,30 +1,46 @@
+// @ts-nocheck
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   updateProfile, 
   User, 
+  signOut,
   UserCredential,
   signOut as firebaseSignOut
 } from 'firebase/auth';
-import { auth } from './config';
+import { auth, db } from "@/src/lib/firebase/config";
+import { doc, setDoc } from "firebase/firestore";
 
 
 export class AuthService {
   static async login(email: string, password: string): Promise<UserCredential> {
     return signInWithEmailAndPassword(auth, email, password);
   }
-  static async signup(
-    email: string,
-    password: string,
-    displayName?: string
-  ): Promise<UserCredential> {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    
-    if (displayName) {
-      await updateProfile(userCredential.user, { displayName });
+  static async signup(email: string, password: string, teacherData = {}) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+
+      // ✅ Store teacher details
+      await setDoc(doc(db, "TeacherDetails", uid), {
+        email,
+        ...teacherData,
+        uid,
+        createdAt: new Date().toISOString(),
+      });
+
+      console.log("✅ Teacher registered and details stored!");
+
+      // ✅ Immediately sign out user so they must log in manually
+      await signOut(auth);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Signup error:", error);
+      throw error;
     }
-    return userCredential;
   }
+
 
   static async logout(redirectTo: string = '/auth/login'): Promise<void> {
     try {

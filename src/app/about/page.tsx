@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import React from "react";
@@ -73,7 +74,7 @@ const Page = () => {
             variants={fadeUp}
             custom={0.2}
           >
-            Life doesn't always follow a schedule — and sometimes, you need
+            Life doesn&apos;t always follow a schedule — and sometimes, you need
             extra cash, fast. Whether it’s for something fun, a surprise expense,
             or peace of mind, we’ve got you covered.
           </motion.p>

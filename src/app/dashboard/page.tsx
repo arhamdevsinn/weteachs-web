@@ -3,15 +3,15 @@ import { Suspense } from "react";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 
 function DashboardContent() {
-  const { userId, isValidUserId } = useUserIdFromUrl();
+  const { userId, } = useUserIdFromUrl();
 
   return (
     <div>
       <h1>Dashboard</h1>
       <p>User ID: {userId}</p>
-      {!isValidUserId && (
+  
         <p className="text-red-500">⚠️ Invalid user ID in URL</p>
-      )}
+    
     </div>
   );
 }

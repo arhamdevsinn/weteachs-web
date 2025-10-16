@@ -37,8 +37,8 @@ const PrivacyPolicyPage = () => {
             </h2>
             <p>
               This privacy policy applies to the <strong>WeTeach</strong> app
-              (hereby referred to as "Application") created by{" "}
-              <strong>Isaiah Joseph</strong> ("Service Provider") as a Free
+              (hereby referred to as &quot;Application&quot;) created by{" "}
+              <strong>Isaiah Joseph</strong> (&quot;Service Provider&quot;) as a Free
               service. This service is intended for use <strong>“AS IS”</strong>.
             </p>
           </motion.div>

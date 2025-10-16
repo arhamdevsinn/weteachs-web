@@ -70,3 +70,16 @@ export class FirestoreService {
     return deleteDoc(doc(db, collectionName, docId));
   }
 }
+async function saveTeacherDetails(uid: string, teacherData) {
+  try {
+    // Always create or overwrite the doc
+    await setDoc(doc(db, "TeacherDetails", uid), {
+      ...teacherData,
+      createdAt: new Date().toISOString(),
+    });
+
+    console.log("✅ Teacher details saved successfully!");
+  } catch (error) {
+    console.error("❌ Error saving teacher details:", error);
+  }
+}

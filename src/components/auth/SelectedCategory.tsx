@@ -1,5 +1,5 @@
 import React from 'react';
-import ExpertDialog from '../profile/ExpertProfile';
+import ExpertDialog from '@/src/components/profile/ExpertProfile';
 
 const SelectedCategory = () => {
   return (

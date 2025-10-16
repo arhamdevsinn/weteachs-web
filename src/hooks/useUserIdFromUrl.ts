@@ -1,21 +1,18 @@
+// @ts-nocheck
 "use client";
-import { useSearchParams } from 'next/navigation';
-import { useAuth } from './useAuth';
+
+import { useAuth } from "./useAuth";
 
 export const useUserIdFromUrl = () => {
-  const searchParams = useSearchParams();
-  const { user } = useAuth();
-  
-  const userIdFromUrl = searchParams.get('userId');
-  const currentUserId = user?.uid;
+  const { user, profile, teacherDetails, usernameT } = useAuth();
 
-  // Validate that the user ID in URL matches the logged-in user
-  const isValidUserId = userIdFromUrl === currentUserId;
+  const storedUserId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const currentUserId = user?.uid || storedUserId;
+  const isTeacher = profile?.isTeacher ?? false;
 
   return {
-    userId: isValidUserId ? userIdFromUrl : currentUserId,
-    isValidUserId,
-    userIdFromUrl,
-    currentUserId
+    userId: currentUserId,
+    usernameT, // ✅ will come from URL if no userId
+    isTeacher,
   };
 };

@@ -1,26 +1,55 @@
 // @ts-nocheck
-import { CategoryAPI } from "@/src/lib/api/createCategory";
 import { useState } from "react";
+import { FirestoreService } from "@/src/lib/firebase/firestore";
+import { useUploadImage } from "@/src/hooks/useUploadImage";
+import { useSearchParams } from "next/navigation";
 
-export function useCreateCategory() {
+export const useCreateCategory = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { uploadImage } = useUploadImage();
+  const searchParams = useSearchParams(); // ✅ must be initialized here
 
-  const createCategory = async (teacherId: string, data) => {
+  const createCategory = async (data) => {
     setLoading(true);
-    setError("");
-    setSuccess(false);
+    setError(null);
+
     try {
-      await CategoryAPI.createTeacherCategory(teacherId, data);
-      setSuccess(true);
+      const expertId = searchParams.get("userId"); // ✅ extract once
+      if (!expertId) {
+        throw new Error("Missing expertId (userId) in URL!");
+      }
+
+      // ✅ upload image if provided
+      let imageUrl = "";
+      if (data.imageFile) {
+        imageUrl = await uploadImage(data.imageFile, "categories");
+      }
+
+      const categoryData = {
+        expertId,
+        category: data.category,
+        level: data.level,
+        topic: data.topic,
+        description: data.description,
+        rate: Number(data.rate),
+        language: data.language,
+        inviteCode: data.inviteCode || "",
+        imageUrl,
+        createdAt: new Date(),
+      };
+
+      await FirestoreService.saveDocument("ExpertCategories", categoryData);
+
+      return { success: true, message: "Category created successfully!" };
     } catch (err) {
+      console.error("❌ Error creating category:", err);
       setError(err.message);
-      throw err;
+      return { success: false, message: err.message };
     } finally {
       setLoading(false);
     }
   };
 
-  return { createCategory, loading, error, success };
-}
+  return { createCategory, loading, error };
+};
