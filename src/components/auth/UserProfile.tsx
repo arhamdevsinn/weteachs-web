@@ -45,7 +45,7 @@ const storedId =
   } = useUserProfile(storedId);
   console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
 
-  const usernameT = searchParams.get("username"); 
+  const usernameT = searchParams.get("name"); 
   console.log(usernameT)
 useEffect(() => {
   const fetchFallbackTeacher = async () => {
