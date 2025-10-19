@@ -68,7 +68,7 @@ export const useAuth = () => {
       const currentParam = currentMatch ? currentMatch[1] : null;
 
       if (currentParam !== teacherDetails.usernameT) {
-        router.replace(`/profile?username=${teacherDetails.usernameT}`, { scroll: false });
+        router.replace(`/profile?name=${teacherDetails.usernameT}`, { scroll: false });
       }
     }
   }, [pathname, profile, teacherDetails, router]);
