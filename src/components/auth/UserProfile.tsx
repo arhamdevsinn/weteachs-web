@@ -1,13 +1,12 @@
 // @ts-nocheck
 "use client";
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { useUserProfile } from '@/src/hooks/useUserProfile';
-import Link from 'next/link';
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
+import { useUserProfile } from "@/src/hooks/useUserProfile";
+import { UserProfileAPI } from "@/src/lib/api/userProfile";
 import {
   Dialog,
   DialogContent,
@@ -16,62 +15,77 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/components/ui/dialog";
+import { usePathname } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
-import { div } from 'framer-motion/client';
-
 
 const UserProfile = () => {
-  const [activeTab, setActiveTab] = useState('images');
+  const [activeTab, setActiveTab] = useState("images");
   const [selectedSection, setSelectedSection] = useState("all");
-  
+  const [fallbackTeacher, setFallbackTeacher] = useState(null);
+  const [fallbackProfile, setFallbackProfile] = useState(null);
+  const [fallbackCategories, setFallbackCategories] = useState([]);
+  const [loadingFallback, setLoadingFallback] = useState(false);
 
-  // const router = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const { userId, usernameT, isTeacher } = useUserIdFromUrl();
-console.log("Resolved User ID:", userId);
-console.log("Resolved Teacher Username:", usernameT);
+const storedId =
+  typeof window !== "undefined"
+    ? localStorage.getItem("user_id") || localStorage.getItem("userId")
+    : null;
+  
   const {
     profile,
     teacherDetails,
     gallery,
     categories,
-      subcollections,
+    subcollections,
     loading: dataLoading,
     error: dataError,
-  } = useUserProfile(userId || usernameT);
+  } = useUserProfile(storedId);
   console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
-  // After your hooks:
-// const [noProfile, setNoProfile] = useState(false);
 
-// useEffect(() => {
-//   if (dataLoading) return; // wait until Firestore is done loading
+  const usernameT = searchParams.get("username"); 
+  console.log(usernameT)
+useEffect(() => {
+  const fetchFallbackTeacher = async () => {
+    try {
+      setLoadingFallback(true);
+      const { teacher, userProfile, categories, subcollections } =
+        await UserProfileAPI.getTeacherByUsername(usernameT);
 
-//   // If there’s an explicit Firestore “no document” error
-//   if (dataError?.message?.toLowerCase()?.includes("no document")) {
-//     setNoProfile(true);
-//     return;
-//   }
+      console.log("Fetched public teacher:", teacher, userProfile, categories, subcollections);
 
-//   // If teacherDetails is null, undefined, or empty object → no profile
-//   if (!teacherDetails || Object.keys(teacherDetails || {}).length === 0) {
-//     setNoProfile(true);
-//     return;
-//   }
+      setFallbackTeacher(teacher);
+      setFallbackProfile(userProfile);
+      setFallbackCategories(categories);
 
-//   // Otherwise, profile exists
-//   setNoProfile(false);
-// }, [dataLoading, dataError, teacherDetails]);
+      // ✅ Temporarily store userId
+      if (userProfile?.uid) {
+        localStorage.setItem("user_id", userProfile.uid);
+        console.log("✅ Stored uid:", userProfile.uid);
+      } else if (userProfile?.id) {
+        localStorage.setItem("user_id", userProfile.id);
+        console.log("✅ Stored uid (from id):", userProfile.id);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching fallback teacher:", err);
+      toast.error("No teacher found for this username.");
+    } finally {
+      setLoadingFallback(false);
+    }
+  };
 
-//   useEffect(() => {
-//     if (!userId && !usernameT) {
-//       // redirect if both missing
-//       window.location.href = "/auth/login";
-//     }
-//   }, [userId, usernameT]);
-const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-const [open, setOpen] = useState(false);
- const router = useRouter();
+  if (!storedId && usernameT) {
+    fetchFallbackTeacher();
+  }
+
+  // 🧹 Remove userId when route changes away from profile
+  return () => {
+    console.log("🧹 Cleaning up: removing userId from localStorage");
+    localStorage.removeItem("user_id");
+  };
+}, [storedId, usernameT]);
 
 const handleSettingsClick = () => {
   router.push("/settings", {
@@ -85,13 +99,7 @@ const handleSettingsClick = () => {
     }
     router.push(`/categories?userId=${userId}&teacherId=${teacherDetails.id}`);
   };
-  const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setOpen(false); // close dialog
-    toast.success("Profile link copied successfully!");
-  };
 
-  // Calculate average rating and number of filled stars
   const ratings = teacherDetails?.rating ?? [];
   const averageRating = ratings.length > 0
     ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
@@ -103,27 +111,42 @@ const handleSettingsClick = () => {
     }
   }, [dataLoading, dataError, profile, router]);
 
-  if (dataLoading) {
+ const displayTeacher = storedId ? teacherDetails : fallbackTeacher;
+  const displayProfile = storedId ? profile : fallbackProfile;
+  const displayCategories = storedId ? categories : fallbackCategories;
+
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+
+  const [open, setOpen] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setOpen(false);
+    toast.success("Profile link copied successfully!");
+  };
+
+  if (dataLoading || loadingFallback) {
     return (
-      <div className="bg-secondary min-h-screen py-8 px-4 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your profile...</p>
+      <div className="bg-secondary min-h-screen flex items-center justify-center">
+        <div className="text-center text-gray-600">
+          <div className="animate-spin h-12 w-12 border-b-2 border-primary mx-auto mb-4 rounded-full"></div>
+          Loading profile...
         </div>
       </div>
     );
   }
 
-  // useEffect(() => {
-  //   if (dataError || !profile) {
-  //     // Redirect to create-profile page
-  //     router.push('/create-profile');
-  //   }
-  // }, [dataError, profile, router]);
+  if (!displayTeacher && !displayProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-secondary">
+        <p className="text-gray-700 text-lg">No teacher found for this username.</p>
+      </div>
+    );
+  }
+
 
   if (dataError || !profile) {
     console.log("dfsf", dataError)
-    // Optionally, show a loading spinner while redirecting
     return (
       <div className="flex items-center justify-center min-h-screen bg-secondary">
         <p className="text-gray-700 text-lg">Redirecting to profile setup...</p>
@@ -142,7 +165,7 @@ const handleSettingsClick = () => {
       <div className="relative">
         <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
         <Image
-          src={profile.photo_url || "/profile.photo_url"}
+          src={profile.photo_url || user}
           alt="profile"
           width={160}
           height={160}

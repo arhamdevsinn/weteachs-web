@@ -10,9 +10,7 @@ import {
 } from "firebase/firestore";
 
 export const UserProfileAPI = {
-  // =============================
-  // 🔹 Get User Profile by UID
-  // =============================
+
   getProfile: async (uid: string) => {
     const userDocRef = doc(db, "LimboUserMode", uid);
     const userSnap = await getDoc(userDocRef);
@@ -125,76 +123,90 @@ export const UserProfileAPI = {
     };
   },
 
-  // =====================================
-  // 🔹 Get Teacher Details by usernameT
-  // =====================================
-  getTeacherByUsername: async (usernameT: string) => {
-    try {
-      const teacherQuery = query(
-        collection(db, "TeacherDetails"),
-        where("usernameT", "==", usernameT)
-      );
+async getTeacherByUsername(usernameT: string) {
+  const teacherQuery = query(
+    collection(db, "TeacherDetails"),
+    where("usernameT", "==", usernameT)
+  );
 
-      const querySnapshot = await getDocs(teacherQuery);
+  const querySnapshot = await getDocs(teacherQuery);
+  if (querySnapshot.empty) throw new Error("No teacher found");
 
-      if (querySnapshot.empty) {
-        throw new Error("No teacher found with this username");
-      }
+  const teacherDoc = querySnapshot.docs[0];
+  const teacherData = { id: teacherDoc.id, ...teacherDoc.data() };
 
-      // ✅ Return first matching teacher (assuming usernames are unique)
-      const teacherDoc = querySnapshot.docs[0];
-      const teacherData = { id: teacherDoc.id, ...teacherDoc.data() };
-
-      // 🔹 Fetch linked LimboUserMode document (via limbo_ref)
-      let userProfile = null;
-      if (teacherData.limbo_ref) {
-        const limboRef =
-          typeof teacherData.limbo_ref === "string"
-            ? doc(
-                db,
-                teacherData.limbo_ref.startsWith("/")
-                  ? teacherData.limbo_ref.slice(1)
-                  : teacherData.limbo_ref
-              )
-            : teacherData.limbo_ref;
-
-        const limboSnap = await getDoc(limboRef);
-        if (limboSnap.exists()) {
-          userProfile = { id: limboRef.id, ...limboSnap.data() };
-        }
-      }
-
-      // 🔹 Fetch categories
-      let categories: [] = [];
-      if (Array.isArray(teacherData.cat_refs)) {
-        const catDocs = await Promise.all(
-          teacherData.cat_refs.map(async (catRefPath) => {
-            const catRef =
-              typeof catRefPath === "string"
-                ? doc(
-                    db,
-                    catRefPath.startsWith("/")
-                      ? catRefPath.slice(1)
-                      : catRefPath
-                  )
-                : catRefPath;
-            const catSnap = await getDoc(catRef);
-            return catSnap.exists()
-              ? { id: catRef.id, ...catSnap.data() }
-              : null;
-          })
-        );
-        categories = catDocs.filter(Boolean);
-      }
-
-      return {
-        teacher: teacherData,
-        userProfile,
-        categories,
-      };
-    } catch (error) {
-      console.error("Error fetching teacher by username:", error);
-      throw error;
+  // ---------- Profile (limbo_ref) ----------
+  let userProfile = null;
+  if (teacherData.limbo_ref) {
+    let limboRef;
+    if (typeof teacherData.limbo_ref === "string") {
+      limboRef = doc(db, teacherData.limbo_ref.replace(/^\//, ""));
+    } else if (
+      typeof teacherData.limbo_ref === "object" &&
+      "path" in teacherData.limbo_ref
+    ) {
+      limboRef = teacherData.limbo_ref;
     }
-  },
+
+    if (limboRef) {
+      const limboSnap = await getDoc(limboRef);
+      if (limboSnap.exists()) {
+        userProfile = { id: limboRef.id, ...limboSnap.data() };
+      }
+    }
+  }
+
+  // ---------- Categories ----------
+  let categories: [] = [];
+  if (Array.isArray(teacherData.cat_refs)) {
+    const catDocs = await Promise.all(
+      teacherData.cat_refs.map(async (refPath) => {
+        let ref;
+        if (typeof refPath === "string") {
+          ref = doc(db, refPath.replace(/^\//, ""));
+        } else if (typeof refPath === "object" && "path" in refPath) {
+          ref = refPath;
+        } else return null;
+
+        const snap = await getDoc(ref);
+        return snap.exists() ? { id: ref.id, ...snap.data() } : null;
+      })
+    );
+    categories = catDocs.filter(Boolean);
+  }
+
+  // ---------- Subcollections ----------
+  const teacherDocRef = doc(db, "TeacherDetails", teacherData.id);
+
+  const [videoSnap, reviewSnap, gallerySnap, expertSnap] = await Promise.all([
+    getDocs(collection(teacherDocRef, "TeacherVideoCollection")),
+    getDocs(collection(teacherDocRef, "TeacherReviews")),
+    getDocs(collection(teacherDocRef, "TeacherGalleryCollection")),
+    getDocs(collection(teacherDocRef, "Expert_Text_collection")),
+  ]);
+
+  const teacherVideos = videoSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const teacherReviews = reviewSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const teacherGalleryCollection = gallerySnap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+  const teacherExpertTexts = expertSnap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+
+  return {
+    teacher: teacherData,
+    userProfile,
+    categories,
+    subcollections: {
+      videos: teacherVideos,
+      reviews: teacherReviews,
+      galleryCollection: teacherGalleryCollection,
+      expertTexts: teacherExpertTexts,
+    },
+  };
+}
+
 };

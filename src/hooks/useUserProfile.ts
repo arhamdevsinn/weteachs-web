@@ -185,51 +185,54 @@ console.log("ndjnsa", uid)
     }
   };
 
-  // getTeacherByUsername = async (usernameT: string) => {
-  //   try {
-  //     const teacherRef = collection(db, "TeacherDetails");
-  //     const q = query(teacherRef, where("usernameT", "==", usernameT));
-  //     const snap = await getDocs(q);
+const getTeacherByUsername = async (usernameT: string) => {
+  try {
+    const teacherRef = collection(db, "TeacherDetails");
+    console.log("teacherRef", teacherRef)
+    const q = query(teacherRef, where("usernameT", "==", usernameT));
+    const snap = await getDocs(q);
 
-  //     if (snap.empty) {
-  //       throw new Error("Teacher not found");
-  //     }
+    if (snap.empty) {
+      throw new Error("Teacher not found");
+    }
 
-  //     // take the first match
-  //     const teacherDoc = snap.docs[0];
-  //     const teacherData = { id: teacherDoc.id, ...teacherDoc.data() };
+    const teacherDoc = snap.docs[0];
+    const teacherData = { id: teacherDoc.id, ...teacherDoc.data() };
 
-  //     // get linked LimboUserMode profile from teacherData.limbo_ref
-  //     let profileData = null;
-  //     if (teacherData.limbo_ref) {
-  //       const limboDocRef = doc(db, teacherData.limbo_ref);
-  //       const limboSnap = await getDoc(limboDocRef);
-  //       if (limboSnap.exists()) {
-  //         profileData = { id: limboDocRef.id, ...limboSnap.data() };
-  //       }
-  //     }
+    let profileData = null;
+    if (teacherData.limbo_ref) {
+      const limboDocRef = doc(db, teacherData.limbo_ref);
+      const limboSnap = await getDoc(limboDocRef);
+      if (limboSnap.exists()) {
+        profileData = { id: limboDocRef.id, ...limboSnap.data() };
+      }
+    }
 
-  //     return { teacherDetails: teacherData, profile: profileData };
-  //   } catch (error) {
-  //     console.error("Error fetching teacher by username:", error);
-  //     throw error;
-  //   }
-  // },
-
+    return { teacherDetails: teacherData, profile: profileData };
+  } catch (error) {
+    console.error("Error fetching teacher by username:", error);
+    throw error;
+  }
+}
   useEffect(() => {
     fetchProfile();
   }, [uid]);
+// useEffect(() => {
+//   console.log("Profile fetch state:", { uid, loading, error, profile });
+// }, [uid, loading, error, profile]);
 
-  return {
-    profile,
-    teacherDetails,
-    gallery,
-    categories,
-    subcollections,
-    loading,
-    error,
-    createTeacherProfile,
-    createCategory,
-    refreshData: fetchProfile,
-  };
+
+ return {
+  profile,
+  teacherDetails,
+  gallery,
+  categories,
+  subcollections,
+  loading,
+  error,
+  createTeacherProfile,
+  createCategory,
+  refreshData: fetchProfile,
+  getTeacherByUsername, // ✅ include here
+};
 };

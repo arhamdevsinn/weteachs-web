@@ -16,11 +16,16 @@ export const useAuth = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // ✅ Extract username from URL like `/profile?Isaiah`
+  // ✅ Extract username from URL like `/profile=Isaiah`
   useEffect(() => {
-    if (pathname === "/profile" && typeof window !== "undefined") {
-      const rawParam = decodeURIComponent(window.location.search.replace("?", "").trim());
-      if (rawParam) setUsernameT(rawParam);
+    if (typeof window !== "undefined") {
+      const urlPath = window.location.pathname;
+      // match /profile=username
+      const match = urlPath.match(/^\/profile=([^/]+)/);
+      if (match && match[1]) {
+        const decodedUsername = decodeURIComponent(match[1].trim());
+        setUsernameT(decodedUsername);
+      }
     }
   }, [pathname]);
 
@@ -54,14 +59,16 @@ export const useAuth = () => {
   // ✅ Rewrite URL if teacher logged in
   useEffect(() => {
     if (
-      pathname === "/profile" &&
+      pathname.startsWith("/profile") &&
       profile?.isTeacher &&
       teacherDetails?.usernameT &&
       typeof window !== "undefined"
     ) {
-      const currentParam = window.location.search.replace("?", "");
+      const currentMatch = window.location.pathname.match(/^\/profile=([^/]+)/);
+      const currentParam = currentMatch ? currentMatch[1] : null;
+
       if (currentParam !== teacherDetails.usernameT) {
-        router.replace(`/profile?${teacherDetails.usernameT}`, { scroll: false });
+        router.replace(`/profile?username=${teacherDetails.usernameT}`, { scroll: false });
       }
     }
   }, [pathname, profile, teacherDetails, router]);
@@ -70,7 +77,7 @@ export const useAuth = () => {
     user,
     loading,
     userId,
-    usernameT, // for when no UID is found
+    usernameT, // extracted from /profile=username
     teacherDetails,
     profile,
   };
