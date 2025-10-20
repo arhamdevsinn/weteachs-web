@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/src/lib/firebase/auth';
+import { Button } from '../ui/button';
+import { Eye, EyeOff } from "lucide-react";
 import Image from 'next/image';
 import { Suspense } from 'react';
 
@@ -18,6 +20,7 @@ const isErrorWithMessage = (error: unknown): error is { message: string } => {
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -85,19 +88,30 @@ function LoginForm() {
           </div>
 
           {/* Password */}
-          <div className="mb-4">
+          <div className="mb-4 ">
             <div className="flex justify-between items-center mb-1">
               <label className="text-sm font-medium text-primary">Password</label>
               <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">Forgot Password?</a>
             </div>
-            <input
-              type="password"
+          <div className='relative'>
+              <input
+                type={showPassword ? "text" : "password"}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary/20"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </Button>
+          </div>
           </div>
 
           {/* Remember Me */}

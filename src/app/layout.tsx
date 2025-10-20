@@ -30,9 +30,8 @@ export default function RootLayout({
       <body
        className={`${ubuntu.className} w-screen min-h-screen`}
       >
+          <Header/>
          <Suspense fallback={<div>Loading...</div>}>
-        <Header/>
-       
         {children}
        <Toaster/>
         </Suspense>

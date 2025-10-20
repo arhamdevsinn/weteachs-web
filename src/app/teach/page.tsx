@@ -1,12 +1,17 @@
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
 import { Button } from "@/src/components/ui/button";
+import { useAuth } from "@/src/hooks/useAuth";
 
 const Page: React.FC = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+      const { user } = useAuth();
+    
+  
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white text-gray-800">
       <section className="px-6 md:px-16 py-20 text-center">
@@ -134,6 +139,10 @@ const Page: React.FC = () => {
         </p>
         <Button
           size="lg"
+           onClick={() => {
+                    setMenuOpen(false);
+                    window.location.href = "/auth/signup";
+                  }}
           variant="secondary"
           className="font-semibold text-primary bg-white hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl"
         >

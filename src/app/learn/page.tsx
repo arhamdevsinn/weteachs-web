@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Users, Clock, DollarSign, Video, Star } from "lucide-react";
 
@@ -15,6 +15,8 @@ const fadeUp = {
 };
 
 const Page = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-800">
       <section className="relative flex flex-col items-center justify-center text-center px-6 py-20 bg-gradient-to-r from-primary/90 to-primary text-white">
@@ -210,6 +212,11 @@ const Page = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+               size="lg"
+           onClick={() => {
+                    setMenuOpen(false);
+                    window.location.href = "/auth/signup";
+                  }}
           className="bg-white text-primary font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
         >
           Sign Up & Find Your Expert

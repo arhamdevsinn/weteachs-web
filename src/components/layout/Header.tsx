@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { AuthService } from "@/src/lib/firebase/auth";
 import { useAuth } from "@/src/hooks/useAuth";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, LogIn, UserPlus } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -34,25 +36,28 @@ const Header = () => {
     }
   };
 
-  if (!user) return null;
-
+  // ✅ Conditionally include "Profile" only if logged in
   const navigationItems = [
-    { href: "/profile", label: "Profile" },
-    { href: "/home", label: "Home" },
+    { href: "/", label: "Home" },
     { href: "/teach", label: "Teach" },
     { href: "/learn", label: "Learn" },
-    // { href: "/contact", label: "Contact" },
     { href: "/community", label: "Community" },
-    { href: "/categories", label: "Explore" },
+    ...(user ? [{ href: "/categories", label: "Explore" }] : []),
+    ...(user ? [{ href: "/profile", label: "Profile" }] : []),
   ];
 
   return (
     <>
       <header className="w-full px-6 py-4 flex items-center justify-between bg-gradient-to-r from-white via-blue-50 to-white shadow-md border-b border-gray-200 sticky top-0 z-50 backdrop-blur-md">
         {/* Logo */}
-        <div className="text-3xl font-bold text-primary tracking-tight">
-          WeTeachs
-        </div>
+        <Link href="/">
+       <div className="flex items-center gap-2">
+                    <Image src="/logo.png" width={40} height={40} alt="logo" />
+                    <h3 className="text-3xl font-bold text-primary">WeTeachs</h3>
+                  </div>
+                  </Link>
+
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           {navigationItems.map((item) => (
             <a
@@ -68,33 +73,59 @@ const Header = () => {
             </a>
           ))}
         </nav>
-        <div className="hidden md:flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-gray-700">
-            <div className="bg-primary/10 text-primary rounded-full p-2">
-              <User size={16} />
-            </div>
-            <span className="text-sm font-medium">
-              {user.email ? user.email.split("@")[0] : "User"}
-            </span>
-          </div>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            className="flex items-center gap-2 bg-primary"
-            onClick={() => setShowConfirm(true)}
-            disabled={loading}
-          >
-            <LogOut size={16} />
-            {loading ? "..." : "Sign Out"}
-          </Button>
+        {/* Desktop Auth Buttons */}
+        <div className="hidden md:flex items-center space-x-4">
+          {user ? (
+            <>
+              <div className="flex items-center space-x-2 text-gray-700">
+                <div className="bg-primary/10 text-primary rounded-full p-2">
+                  <User size={16} />
+                </div>
+              </div>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="flex items-center gap-2 bg-primary"
+                onClick={() => setShowConfirm(true)}
+                disabled={loading}
+              >
+                <LogOut size={16} />
+                {loading ? "..." : "Sign Out"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => (window.location.href = "/auth/login")}
+                className="flex items-center gap-2"
+              >
+                <LogIn size={16} />
+                Login
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => (window.location.href = "/auth/signup")}
+                className="flex items-center gap-2 bg-primary text-white"
+              >
+                <UserPlus size={16} />
+                Signup
+              </Button>
+            </>
+          )}
         </div>
+
+        {/* Mobile Menu Button */}
         <button
           className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
+
+        {/* Mobile Dropdown */}
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -115,29 +146,60 @@ const Header = () => {
                 {item.label}
               </a>
             ))}
+
             <hr className="my-2" />
-            <div className="flex items-center gap-2 text-gray-700">
-              <User size={16} className="text-primary" />
-              <span className="text-sm">
-                {user.email ? user.email.split("@")[0] : "User"}
-              </span>
-            </div>
-            <Button
-              onClick={() => {
-                setMenuOpen(false);
-                setShowConfirm(true);
-              }}
-              variant="destructive"
-              size="sm"
-              disabled={loading}
-              className="mt-2 flex items-center gap-2"
-            >
-              <LogOut size={16} />
-              {loading ? "..." : "Sign Out"}
-            </Button>
+
+            {user ? (
+              <>
+                <div className="flex items-center gap-2 text-gray-700">
+                  <User size={16} className="text-primary" />
+                </div>
+                <Button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setShowConfirm(true);
+                  }}
+                  variant="destructive"
+                  size="sm"
+                  disabled={loading}
+                  className="mt-2 flex items-center gap-2"
+                >
+                  <LogOut size={16} />
+                  {loading ? "..." : "Sign Out"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    window.location.href = "/auth/login";
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <LogIn size={16} />
+                  Login
+                </Button>
+                <Button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    window.location.href = "/auth/signup";
+                  }}
+                  size="sm"
+                  className="flex items-center gap-2 bg-primary text-white"
+                >
+                  <UserPlus size={16} />
+                  Signup
+                </Button>
+              </>
+            )}
           </motion.div>
         )}
       </header>
+
+      {/* Logout Confirmation Dialog */}
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
