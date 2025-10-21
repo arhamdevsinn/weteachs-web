@@ -3,139 +3,73 @@ import React from "react";
 import Image from "next/image";
 
 const Footer = () => {
-   const socialLinks = [
+  const socialLinks = [
     {
       name: "facebook",
       url: "https://www.facebook.com/people/WeTeach/61561924566303/#",
-      path: (
+      icon: (
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M22 12c0-5.523-4.477-10-10-10S2 6.477 
-          2 12c0 4.991 3.657 9.128 8.438 
-          9.878v-6.987h-2.54V12h2.54V9.797
-          c0-2.506 1.492-3.89 3.777-3.89 
-          1.094 0 2.238.195 2.238.195v2.46h-1.26
-          c-1.243 0-1.63.771-1.63 1.562V12h2.773
-          l-.443 2.89h-2.33v6.988
-          C18.343 21.128 22 16.991 22 12z"
+          fill="currentColor"
+          d="M18.896 2H5.104A3.104 3.104 0 002 5.104v13.792A3.104 3.104 0 005.104 22H12v-7h-2v-2h2v-1.5C12 8.57 13.57 7 15.5 7H18v2h-2c-.55 0-1 .45-1 1V13h3l-.5 2H15v7h3.896A3.104 3.104 0 0022 18.896V5.104A3.104 3.104 0 0018.896 2z"
         />
       ),
     },
     {
       name: "twitter",
       url: "https://x.com/weteachs",
-      path: (
+      icon: (
         <path
-          d="M8.29 20.251c7.547 0 11.675-6.253 
-          11.675-11.675 0-.178 0-.355-.012-.53A8.348 
-          8.348 0 0022 5.92a8.19 8.19 0 
-          01-2.357.646 4.118 4.118 0 
-          001.804-2.27 8.224 8.224 0 
-          01-2.605.996A4.107 4.107 0 
-          0011.69 8.9 11.65 11.65 0 
-          013.233 4.613a4.106 4.106 0 
-          001.27 5.477 4.072 4.072 0 
-          01-1.205-.37v.052a4.105 
-          4.105 0 003.292 4.022 4.095 4.095 0 
-          01-1.853.07 4.108 4.108 0 
-          003.834 2.85A8.233 8.233 0 
-          012 18.407a11.616 11.616 0 
-          006.29 1.84"
+          fill="currentColor"
+          d="M22.46 6c-.77.35-1.6.58-2.46.69a4.28 4.28 0 001.88-2.37 8.61 8.61 0 01-2.73 1.05A4.27 4.27 0 0011 8.09a12.12 12.12 0 01-8.8-4.46A4.22 4.22 0 003.1 9c-.68-.02-1.32-.21-1.88-.52v.05A4.27 4.27 0 004.26 13a4.27 4.27 0 01-1.92.07A4.28 4.28 0 006.7 16a8.56 8.56 0 01-5.3 1.82A9 9 0 002 18a12.08 12.08 0 006.55 1.92c7.87 0 12.17-6.52 12.17-12.17v-.56A8.67 8.67 0 0022.46 6z"
         />
       ),
     },
     {
       name: "instagram",
       url: "https://www.instagram.com/weteachs/#",
-      path: (
+      icon: (
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M12.315 2c2.43 0 2.784.013 
-          3.808.06 1.064.049 1.791.218 
-          2.427.465a4.902 4.902 0 011.772 1.153 
-          4.902 4.902 0 011.153 1.772c.247.636.416 
-          1.363.465 2.427.048 1.067.06 1.407.06 
-          4.123v.08c0 2.643-.012 2.987-.06 
-          4.043-.049 1.064-.218 1.791-.465 
-          2.427a4.902 4.902 0 01-1.153 
-          1.772 4.902 4.902 0 01-1.772 1.153
-          c-.636.247-1.363.416-2.427.465
-          -1.067.048-1.407.06-4.123.06h-.08
-          c-2.643 0-2.987-.012-4.043-.06
-          -1.064-.049-1.791-.218-2.427-.465
-          a4.902 4.902 0 01-1.772-1.153 
-          4.902 4.902 0 01-1.153-1.772
-          c-.247-.636-.416-1.363-.465-2.427
-          -.047-1.024-.06-1.379-.06-3.808v-.63
-          c0-2.43.013-2.784.06-3.808
-          .049-1.064.218-1.791.465-2.427
-          a4.902 4.902 0 011.153-1.772
-          A4.902 4.902 0 015.45 2.525
-          c.636-.247 1.363-.416 2.427-.465
-          C8.901 2.013 9.256 2 11.685 2h.63z"
+      fill="currentColor"
+      d="M7.5 2A5.5 5.5 0 002 7.5v9A5.5 5.5 0 007.5 22h9a5.5 5.5 0 005.5-5.5v-9A5.5 5.5 0 0016.5 2h-9zm9 2A3.5 3.5 0 0120 7.5v9A3.5 3.5 0 0116.5 20h-9A3.5 3.5 0 014 16.5v-9A3.5 3.5 0 017.5 4h9zM12 7a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.75-.5a.75.75 0 110-1.5.75.75 0 010 1.5z"
         />
       ),
     },
     {
       name: "github",
       url: "https://github.com/",
-      path: (
+      icon: (
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M12 2C6.477 2 2 6.484 
-          2 12.017c0 4.425 2.865 8.18 
-          6.839 9.504.5.092.682-.217.682-.483 
-          0-.237-.008-.868-.013-1.703
-          -2.782.605-3.369-1.343-3.369-1.343
-          -.454-1.158-1.11-1.466-1.11-1.466
-          -.908-.62.069-.608.069-.608
-          1.003.07 1.531 1.032 1.531 
-          1.032.892 1.53 2.341 1.088 2.91.832
-          .092-.647.35-1.088.636-1.338
-          -2.22-.253-4.555-1.113-4.555-4.951
-          0-1.093.39-1.988 1.029-2.688
-          -.103-.253-.446-1.272.098-2.65 
-          0 0 .84-.27 2.75 1.026A9.564 
-          9.564 0 0112 6.844c.85.004 1.705.115 
-          2.504.337 1.909-1.296 
-          2.747-1.027 2.747-1.027.546 
-          1.379.202 2.398.1 2.651.64.7 
-          1.028 1.595 1.028 2.688 
-          0 3.848-2.339 4.695-4.566 
-          4.943.359.309.678.92.678 
-          1.855 0 1.338-.012 2.419-.012 
-          2.747 0 .268.18.58.688.482A10.019 
-          10.019 0 0022 12.017C22 6.484 
-          17.522 2 12 2z"
+          fill="currentColor"
+          d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.12-1.47-1.12-1.47-.93-.63.07-.61.07-.61 1.02.07 1.53 1.03 1.53 1.03.88 1.52 2.34 1.09 2.9.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.12-4.56-4.95 0-1.09.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.57 9.57 0 0112 6.85a9.6 9.6 0 012.5.34c1.9-1.29 2.75-1.02 2.75-1.02.56 1.38.2 2.4.1 2.65.64.7 1.03 1.6 1.03 2.69 0 3.84-2.34 4.7-4.57 4.95.36.31.68.92.68 1.85v2.75c0 .26.18.58.69.48A10 10 0 0012 2z"
         />
       ),
     },
   ];
+
   return (
-    <footer className="bg-[var(--primary)] text-white">
-      <div className="container mx-auto px-4 py-12">
-        {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          {/* Brand */}
-          <div className="lg:pr-4">
-            <div className="flex items-center mb-4 gap-2">
+    <footer className="bg-gradient-to-br from-[#111827] via-[#1f2937] to-[#111827] text-gray-300 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+
+      <div className="container mx-auto px-6 py-16 relative z-10">
+        <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-10">
+          {/* Column 1 */}
+          <div>
+            <div className="flex items-center mb-5 gap-2">
               <Image src="/logo.png" width={40} height={40} alt="logo" />
-              <h3 className="text-xl font-bold text-[var(--secondary)]">WeTeachs</h3>
+              <h3 className="text-xl font-bold text-white">WeTeachs</h3>
             </div>
-            <p className="text-gray-100/80 mb-4">
-              Connecting learners and experts through interactive sessions and community building.
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Connecting learners and experts through interactive sessions,
+              personalized growth, and a thriving global community.
             </p>
           </div>
 
-          {/* Links Section */}
+          {/* Column 2 */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 border-b border-[var(--secondary)]/40 pb-2">
+            <h4 className="text-white text-lg font-semibold mb-4 border-b border-gray-600 pb-2">
               Company
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-3 text-gray-400">
               {[
                 { href: "/about", label: "About Us" },
                 { href: "/contact", label: "Contact" },
@@ -144,90 +78,88 @@ const Footer = () => {
                 <li key={i}>
                   <a
                     href={link.href}
-                    className="text-[var(--secondary)] hover:text-white transition-colors flex items-start"
+                    className="hover:text-white transition-colors"
                   >
-                    <svg
-                      className="h-5 w-5 mr-2 mt-0.5 text-[var(--secondary)]/80"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={
-                          i === 0
-                            ? "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            : i === 1
-                            ? "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            : "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        }
-                      />
-                    </svg>
                     {link.label}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
-            <div>
-      <h4 className="text-lg font-semibold mb-4 border-b border-[var(--secondary)]/40 pb-2">
-        Social Media
-      </h4>
-      <div className="flex space-x-4">
-        {socialLinks.map((item, idx) => (
-          <a
-            key={idx}
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--secondary)] hover:text-white transition-colors"
-          >
-            <svg
-              className="h-6 w-6"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              {item.path}
-            </svg>
-          </a>
-        ))}
-      </div>
-    </div>
-           <div>
-            <h4 className="text-lg font-semibold mb-4 border-b border-[var(--secondary)]/40 pb-2">
-              Download Now
+
+          {/* Column 3 */}
+          <div>
+            <h4 className="text-white text-lg font-semibold mb-4 border-b border-gray-600 pb-2">
+              Follow Us
             </h4>
-         <div className="grid md:grid-cols-2 grid-cols-1">
-            <a href="https://play.google.com/store/apps/details?id=com.weteachappneww.app">
-              <Image
-            src="/play-store.png"
-            width={130}
-            height={50}
-            alt="play"
-            />
-            </a>
-            <a href="https://apps.apple.com/us/app/weteachs/id6502515880"> <Image
-            src="/app-store.png"
-            width={120}
-            height={12}
-            alt="play"
-            /></a>
-         </div>
+            <div className="flex space-x-4 mt-2">
+              {socialLinks.map((item, i) => (
+                <a
+                  key={i}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full bg-gray-800 hover:bg-[var(--primary)] transition-colors"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    {item.icon}
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 4 */}
+          <div>
+            <h4 className="text-white text-lg font-semibold mb-4 border-b border-gray-600 pb-2">
+              Get the App
+            </h4>
+<div className="flex gap-2">
+  <a
+    href="https://play.google.com/store/apps/details?id=com.weteachappneww.app"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <Image
+      src="/play-store.png"
+      width={110}
+      height={50}
+      alt="Play Store"
+      className="hover:scale-105 transition-transform"
+    />
+  </a>
+
+  <a
+    href="https://apps.apple.com/us/app/weteachs/id6502515880"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <Image
+      src="/app-store.png"
+      width={110}
+      height={50}
+      alt="App Store"
+      className="hover:scale-105 transition-transform"
+    />
+  </a>
+</div>
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="flex flex-col md:flex-row justify-center items-center pt-8 border-t border-[var(--secondary)]/30">
-          <p className="text-[var(--secondary)]/80 text-sm">
-            © 2025 WeTeachs — All Rights Reserved.
+        {/* Divider */}
+        <div className="border-t border-gray-700 mt-12 pt-6 text-center">
+          <p className="text-gray-500 text-sm">
+            © {new Date().getFullYear()}{" "}
+            <span className="text-white font-semibold">WeTeachs</span> — All
+            Rights Reserved.
           </p>
         </div>
       </div>
     </footer>
   );
 };
-
 export default Footer;

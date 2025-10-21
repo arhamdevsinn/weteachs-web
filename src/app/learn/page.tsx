@@ -4,6 +4,7 @@
 import React, {useState} from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Users, Clock, DollarSign, Video, Star } from "lucide-react";
+import { useAuth } from "@/src/hooks/useAuth";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -16,6 +17,8 @@ const fadeUp = {
 
 const Page = () => {
     const [menuOpen, setMenuOpen] = useState(false);
+          const { user } = useAuth();
+    
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-800">
@@ -190,6 +193,8 @@ const Page = () => {
           ))}
         </div>
       </section>
+      {!user && (
+  <>
       <section className="py-20 px-6 text-center bg-gradient-to-r from-primary to-primary/80 text-white">
         <motion.h2
           initial="hidden"
@@ -222,6 +227,8 @@ const Page = () => {
           Sign Up & Find Your Expert
         </motion.button>
       </section>
+        </>
+)}
     </div>
   );
 };

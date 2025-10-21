@@ -31,19 +31,34 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <Button 
-              onClick={() => (window.location.href = "https://play.google.com/store/apps/details?id=com.weteachappneww.app")}
-            className="bg-primary text-white hover:bg-green-800 rounded-full px-8 py-6 text-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105">
-              Download for Android
-            </Button>
-            <Button
-              variant="outline"
-                onClick={() => (window.location.href = "https://apps.apple.com/us/app/weteachs/id6502515880")}
-              className="border-green-700 text-green-800 hover:bg-green-100 rounded-full px-8 py-6 text-lg shadow-sm hover:shadow-md transition-transform transform hover:scale-105"
-            >
-              Get on iOS
-            </Button>
-          </div>
+  <Button
+    onClick={() =>
+      window.open(
+        "https://play.google.com/store/apps/details?id=com.weteachappneww.app",
+        "_blank",
+        "noopener,noreferrer"
+      )
+    }
+    className="bg-primary text-white hover:bg-green-800 rounded-full px-8 py-6 text-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
+  >
+    Download for Android
+  </Button>
+
+  <Button
+    variant="outline"
+    onClick={() =>
+      window.open(
+        "https://apps.apple.com/us/app/weteachs/id6502515880",
+        "_blank",
+        "noopener,noreferrer"
+      )
+    }
+    className="border-green-700 text-green-800 hover:bg-green-100 rounded-full px-8 py-6 text-lg shadow-sm hover:shadow-md transition-transform transform hover:scale-105"
+  >
+    Get on iOS
+  </Button>
+</div>
+
         </motion.div>
 
         {/* ==== IMAGE SECTION ==== */}

@@ -122,33 +122,37 @@ const Page: React.FC = () => {
         </p>
       </section>
 
-      <Separator className="my-10 max-w-4xl mx-auto" />
-      <section className="px-6 md:px-16 py-20 text-center bg-primary text-white rounded-t-3xl">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl md:text-4xl font-extrabold mb-4"
-        >
-          Start Teaching Today
-        </motion.h2>
-        <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">
-          Weteachs gives you the tools to share your skills, earn money, and
-          build your reputation. Whether you’re looking for a side hustle or a
-          full-time business — this is the place to start.
-        </p>
-        <Button
-          size="lg"
-           onClick={() => {
-                    setMenuOpen(false);
-                    window.location.href = "/auth/signup";
-                  }}
-          variant="secondary"
-          className="font-semibold text-primary bg-white hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl"
-        >
-          👉 Sign Up & Start Teaching
-        </Button>
-      </section>
+{!user && (
+  <>
+    <Separator className="my-10 max-w-4xl mx-auto" />
+    <section className="px-6 md:px-16 py-20 text-center bg-primary text-white rounded-t-3xl">
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-3xl md:text-4xl font-extrabold mb-4"
+      >
+        Start Teaching Today
+      </motion.h2>
+      <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">
+        Weteachs gives you the tools to share your skills, earn money, and
+        build your reputation. Whether you’re looking for a side hustle or a
+        full-time business — this is the place to start.
+      </p>
+      <Button
+        size="lg"
+        onClick={() => {
+          setMenuOpen(false);
+          window.location.href = "/auth/signup";
+        }}
+        variant="secondary"
+        className="font-semibold text-primary bg-white hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl"
+      >
+        👉 Sign Up & Start Teaching
+      </Button>
+    </section>
+  </>
+)}
     </div>
   );
 };

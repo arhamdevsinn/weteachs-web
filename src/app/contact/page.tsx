@@ -64,14 +64,14 @@ const Page = () => {
                 <Mail className="text-primary" />
                 <span>weteachchat@gmail.com</span>
               </div>
-              <div className="flex items-center gap-3 text-gray-700">
+              {/* <div className="flex items-center gap-3 text-gray-700">
                 <Phone className="text-primary" />
                 <span>00000000000</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <MapPin className="text-primary" />
                 <span>Usa, USA</span>
-              </div>
+              </div> */}
             </div>
           </motion.div>
         </div>

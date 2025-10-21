@@ -1,10 +1,19 @@
+// @ts-nocheck
 "use client";
 
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { AuthService } from "@/src/lib/firebase/auth";
 import { useAuth } from "@/src/hooks/useAuth";
-import { Menu, X, LogOut, User, LogIn, UserPlus } from "lucide-react";
+import {
+  Menu,
+  X,
+  LogOut,
+  LogIn,
+  UserPlus,
+  User,
+  GraduationCap,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -36,7 +45,6 @@ const Header = () => {
     }
   };
 
-  // ✅ Conditionally include "Profile" only if logged in
   const navigationItems = [
     { href: "/", label: "Home" },
     { href: "/teach", label: "Teach" },
@@ -48,124 +56,140 @@ const Header = () => {
 
   return (
     <>
-      <header className="w-full px-6 py-4 flex items-center justify-between bg-gradient-to-r from-white via-blue-50 to-white shadow-md border-b border-gray-200 sticky top-0 z-50 backdrop-blur-md">
-        {/* Logo */}
-        <Link href="/">
-       <div className="flex items-center gap-2">
-                    <Image src="/logo.png" width={40} height={40} alt="logo" />
-                    <h3 className="text-3xl font-bold text-primary">WeTeachs</h3>
-                  </div>
-                  </Link>
+      {/* 🌈 Modern Glass Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-white/60 backdrop-blur-xl shadow-[0_1px_10px_rgba(0,0,0,0.05)] transition-all">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between h-16">
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          {navigationItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`relative text-sm font-medium transition-all px-2 py-1 rounded-md ${
-                pathname === item.href
-                  ? "text-primary font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary"
-                  : "text-gray-600 hover:text-primary hover:bg-gray-100"
-              }`}
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <motion.div
+              whileHover={{ rotate: 10, scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              {item.label}
-            </a>
-          ))}
-        </nav>
+              <Image
+                src="/logo.png"
+                alt="logo"
+                width={36}
+                height={36}
+                className="rounded-lg shadow-sm"
+              />
+            </motion.div>
+            <h1 className="text-2xl font-bold bg-primary text-transparent bg-clip-text">
+              WeTeachs
+            </h1>
+          </Link>
 
-        {/* Desktop Auth Buttons */}
-        <div className="hidden md:flex items-center space-x-4">
-          {user ? (
-            <>
-              <div className="flex items-center space-x-2 text-gray-700">
-                <div className="bg-primary/10 text-primary rounded-full p-2">
+          {/* Middle: Navigation */}
+          <nav className="hidden md:flex items-center gap-6">
+            {navigationItems.map((item) => {
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative text-sm font-medium transition-all ${
+                    active
+                      ? "text-primary after:absolute after:left-0 after:bottom-[-6px] after:w-full after:h-[2px] after:bg-primary"
+                      : "text-black hover:text-primary hover:after:absolute hover:after:left-0 hover:after:bottom-[-6px] hover:after:w-full hover:after:h-[2px] hover:after:bg-primaary"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Right: Auth / User */}
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <>
+                <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full text-primary text-sm font-medium">
                   <User size={16} />
+                  <span>{user?.email?.split("@")[0] || "User"}</span>
                 </div>
-              </div>
-              <Button
-                variant="destructive"
-                size="sm"
-                className="flex items-center gap-2 bg-primary"
-                onClick={() => setShowConfirm(true)}
-                disabled={loading}
-              >
-                <LogOut size={16} />
-                {loading ? "..." : "Sign Out"}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => (window.location.href = "/auth/login")}
-                className="flex items-center gap-2"
-              >
-                <LogIn size={16} />
-                Login
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => (window.location.href = "/auth/signup")}
-                className="flex items-center gap-2 bg-primary text-white"
-              >
-                <UserPlus size={16} />
-                Signup
-              </Button>
-            </>
-          )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm flex items-center gap-2 hover:bg-red-50 hover:text-red-600"
+                  onClick={() => setShowConfirm(true)}
+                  disabled={loading}
+                >
+                  <LogOut size={15} />
+                  {loading ? "..." : "Logout"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => (window.location.href = "/auth/login")}
+                  className="flex items-center gap-2 hover:text-primary"
+                >
+                  <LogIn size={15} />
+                  Login
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => (window.location.href = "/auth/signup")}
+                  className="flex items-center gap-2 bg-primary text-white hover:opacity-90"
+                >
+                  <UserPlus size={15} />
+                  Sign up
+                </Button>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
-        {/* Mobile Dropdown */}
+        {/* 📱 Mobile Navigation */}
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute top-16 right-4 bg-white/90 backdrop-blur-md shadow-lg rounded-lg w-56 p-5 flex flex-col space-y-3 md:hidden z-50 border border-gray-100"
+            className="md:hidden bg-white/90 backdrop-blur-xl border-t border-gray-100 shadow-lg py-4 px-6 space-y-2"
           >
             {navigationItems.map((item) => (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`block px-3 py-2 rounded-md text-sm font-medium transition ${
                   pathname === item.href
-                    ? "bg-primary text-white"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                    ? "bg-blue-100 text-primary"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-primary"
                 }`}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
 
-            <hr className="my-2" />
+            <hr className="my-3 border-gray-200" />
 
             {user ? (
               <>
-                <div className="flex items-center gap-2 text-gray-700">
-                  <User size={16} className="text-primary" />
+                <div className="flex items-center gap-2 text-gray-700 px-3">
+                  <User size={16} />
+                  <span className="text-sm">{user?.email}</span>
                 </div>
                 <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-3 w-full text-red-600 hover:bg-red-50"
                   onClick={() => {
                     setMenuOpen(false);
                     setShowConfirm(true);
                   }}
-                  variant="destructive"
-                  size="sm"
-                  disabled={loading}
-                  className="mt-2 flex items-center gap-2"
                 >
-                  <LogOut size={16} />
-                  {loading ? "..." : "Sign Out"}
+                  <LogOut size={15} className="mr-1" /> Logout
                 </Button>
               </>
             ) : (
@@ -177,10 +201,9 @@ const Header = () => {
                   }}
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="w-full"
                 >
-                  <LogIn size={16} />
-                  Login
+                  <LogIn size={15} className="mr-1" /> Login
                 </Button>
                 <Button
                   onClick={() => {
@@ -188,10 +211,9 @@ const Header = () => {
                     window.location.href = "/auth/signup";
                   }}
                   size="sm"
-                  className="flex items-center gap-2 bg-primary text-white"
+                  className="w-full bg-gradient-to-r from-primary to-indigo-500 text-white"
                 >
-                  <UserPlus size={16} />
-                  Signup
+                  <UserPlus size={15} className="mr-1" /> Sign up
                 </Button>
               </>
             )}
@@ -199,13 +221,13 @@ const Header = () => {
         )}
       </header>
 
-      {/* Logout Confirmation Dialog */}
+      {/* 🧩 Logout Confirmation Dialog */}
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirm Sign Out</DialogTitle>
+            <DialogTitle>Sign out?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to sign out? You’ll be redirected to the login page.
+              You’ll be redirected to the login page after signing out.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2">
@@ -220,9 +242,9 @@ const Header = () => {
               variant="destructive"
               onClick={handleSignOut}
               disabled={loading}
-              className="px-4 bg-primary"
+              className="px-4 bg-red-500 hover:bg-red-600"
             >
-              {loading ? "Signing Out..." : "Confirm"}
+              {loading ? "Signing out..." : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>

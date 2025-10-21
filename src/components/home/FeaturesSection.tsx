@@ -12,9 +12,10 @@ const features = [
       "Monetize your expertise with freedom. Offer personalized 1-on-1 sessions via video, voice, or chat — and earn instantly for every minute you teach.",
     image: "/expert.png",
     buttonText: "Start Freelancing",
-    gradient: "from-emerald-100/60 via-white to-green-50",
-    accent: "from-primary to-emerald-400",
+    accent: "from-primary to-primary",
     reverse: false,
+    onClick: () =>
+      window.open("/auth/signup", "_blank", "noopener,noreferrer"),
   },
   {
     id: 2,
@@ -23,9 +24,10 @@ const features = [
       "Find verified experts, book flexible sessions, and gain real-world insights that accelerate your learning journey — anytime, anywhere.",
     image: "/student.png",
     buttonText: "Start Learning",
-    gradient: "from-green-50 via-white to-emerald-100/70",
-    accent: "from-primary to-green-400",
+    accent: "from-primary to-primary",
     reverse: true,
+    onClick: () =>
+      window.open("/auth/signup", "_blank", "noopener,noreferrer"),
   },
   {
     id: 3,
@@ -34,21 +36,16 @@ const features = [
       "Unify all your online presence — YouTube, TikTok, Instagram — into a professional digital portfolio to grow and engage your audience seamlessly.",
     image: "/creator.png",
     buttonText: "Create Now",
-    gradient: "from-emerald-50 via-white to-green-100",
-    accent: "from-primary to-emerald-400",
+    accent: "from-primary to-primary",
     reverse: false,
+    onClick: () =>
+      window.open("/auth/signup", "_blank", "noopener,noreferrer"),
   },
 ];
 
 const FeaturesSection = () => {
   return (
     <section className="relative overflow-hidden bg-white">
-      {/* Decorative blurred background */}
-      {/* <div className="absolute inset-0 overflow-hidden -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-200/30 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-green-300/40 blur-[140px] rounded-full" />
-      </div> */}
-
       {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -72,11 +69,11 @@ const FeaturesSection = () => {
       {features.map((feature, index) => (
         <div
           key={feature.id}
-          className={`relative py-20 md:py-28 bg-gradient-to-br ${feature.gradient} ${
-            index !== features.length - 1 ? "border-b border-gray-200/50" : ""
+          className={`relative py-20 md:py-28 bg-secondary  ${
+            index !== features.length - 1 ? "border-b border-gray-700" : ""
           }`}
         >
-          {/* Floating glow */}
+          {/* Floating Glow */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <motion.div
               animate={{ y: [0, 20, 0], opacity: [0.3, 0.6, 0.3] }}
@@ -90,7 +87,7 @@ const FeaturesSection = () => {
               feature.reverse ? "md:flex-row-reverse" : ""
             }`}
           >
-            {/* ==== IMAGE SIDE ==== */}
+            {/* IMAGE SIDE */}
             <motion.div
               initial={{ opacity: 0, x: feature.reverse ? 100 : -100 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -116,7 +113,7 @@ const FeaturesSection = () => {
               </motion.div>
             </motion.div>
 
-            {/* ==== TEXT SIDE ==== */}
+            {/* TEXT SIDE */}
             <motion.div
               initial={{ opacity: 0, x: feature.reverse ? -100 : 100 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -140,7 +137,10 @@ const FeaturesSection = () => {
               </p>
 
               <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
-                <Button className="rounded-full px-10 py-6 text-lg font-semibold bg-gradient-to-r from-primary to-emerald-500 text-white shadow-lg hover:shadow-emerald-300/50 transition-all">
+                <Button
+                  onClick={feature.onClick}
+                  className="rounded-full px-10 py-6 text-lg font-semibold bg-primary text-white shadow-lg hover:shadow-emerald-300/50 transition-all"
+                >
                   {feature.buttonText}
                 </Button>
               </motion.div>
