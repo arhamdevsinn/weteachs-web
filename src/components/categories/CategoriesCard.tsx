@@ -21,6 +21,7 @@ const SkeletonCard = () => (
 const CategoriesCard = () => {
   const searchParams = useSearchParams();
   const uid = searchParams.get("userId") || undefined;
+  console.log("uid", uid)
   const router = useRouter();
   const { userId } = useUserIdFromUrl();
 

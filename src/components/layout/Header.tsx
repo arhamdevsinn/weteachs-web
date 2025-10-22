@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AuthService } from "@/src/lib/firebase/auth";
 import { useAuth } from "@/src/hooks/useAuth";
 import {
@@ -24,15 +24,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/src/components/ui/dropdown-menu";
 import { Button } from "@/src/components/ui/button";
 import { motion } from "framer-motion";
 
 const Header = () => {
+   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleNavigate = (path: string) => {
+    router.push(path);
+  };
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -50,11 +61,12 @@ const Header = () => {
     { href: "/teach", label: "Teach" },
     { href: "/learn", label: "Learn" },
     { href: "/community", label: "Community" },
-    ...(user ? [{ href: "/categories", label: "Explore" }] : []),
-    ...(user ? [{ href: "/profile", label: "Profile" }] : []),
+    // ...(user ? [{ href: "/categories", label: "Explore" }] : []),
+    // ...(user ? [{ href: "/profile", label: "Profile" }] : []),
   ];
 
   return (
+
     <>
       {/* 🌈 Modern Glass Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-white/60 backdrop-blur-xl shadow-[0_1px_10px_rgba(0,0,0,0.05)] transition-all">
@@ -66,6 +78,7 @@ const Header = () => {
               whileHover={{ rotate: 10, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
+              
               <Image
                 src="/logo.png"
                 alt="logo"
@@ -101,44 +114,54 @@ const Header = () => {
 
           {/* Right: Auth / User */}
           <div className="hidden md:flex items-center gap-3">
-            {user ? (
-              <>
-                <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full text-primary text-sm font-medium">
-                  <User size={16} />
-                  <span>{user?.email?.split("@")[0] || "User"}</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-sm flex items-center gap-2 hover:bg-red-50 hover:text-red-600"
-                  onClick={() => setShowConfirm(true)}
-                  disabled={loading}
-                >
-                  <LogOut size={15} />
-                  {loading ? "..." : "Logout"}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => (window.location.href = "/auth/login")}
-                  className="flex items-center gap-2 hover:text-primary"
-                >
-                  <LogIn size={15} />
-                  Login
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => (window.location.href = "/auth/signup")}
-                  className="flex items-center gap-2 bg-primary text-white hover:opacity-90"
-                >
-                  <UserPlus size={15} />
-                  Sign up
-                </Button>
-              </>
-            )}
+       {user ? (
+  <>
+    <DropdownMenu>
+   <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-primary text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
+  <User size={16} />
+  <span>{user?.email?.split("@")[0] || "User"}</span>
+</DropdownMenuTrigger>
+
+
+      <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuItem
+          onClick={() => handleNavigate("/profile")}
+          className="cursor-pointer"
+        >
+          My Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleNavigate("/edit-profile")}
+          className="cursor-pointer"
+        >
+          Edit Profile
+        </DropdownMenuItem>
+        
+      </DropdownMenuContent>
+    </DropdownMenu>
+    <Button variant="ghost" size="sm" className="text-sm flex items-center bg-primary text-white gap-2 hover:bg-red-50 hover:text-red-600" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
+  </>
+) : (
+  <>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => (window.location.href = "/auth/login")}
+      className="flex items-center gap-2 hover:text-primary"
+    >
+      <LogIn size={15} />
+      Login
+    </Button>
+    <Button
+      size="sm"
+      onClick={() => (window.location.href = "/auth/signup")}
+      className="flex items-center gap-2 bg-primary text-white hover:opacity-90"
+    >
+      <UserPlus size={15} />
+      Sign up
+    </Button>
+  </>
+)}
           </div>
 
           {/* Mobile Menu Button */}
@@ -176,10 +199,28 @@ const Header = () => {
 
             {user ? (
               <>
-                <div className="flex items-center gap-2 text-gray-700 px-3">
-                  <User size={16} />
-                  <span className="text-sm">{user?.email}</span>
-                </div>
+               <DropdownMenu>
+      <DropdownMenuTrigger asChild className="flex items-center gap-2 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer">
+       
+          <User size={16} />
+          <span className="text-sm">{user?.email || "Account"}</span>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuItem
+          onClick={() => handleNavigate("/profile")}
+          className="cursor-pointer"
+        >
+          My Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleNavigate("/edit-profile")}
+          className="cursor-pointer"
+        >
+          Edit Profile
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
                 <Button
                   variant="ghost"
                   size="sm"

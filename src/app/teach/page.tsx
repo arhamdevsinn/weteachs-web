@@ -140,10 +140,11 @@ const Page: React.FC = () => {
         full-time business — this is the place to start.
       </p>
       <Button
+     
         size="lg"
         onClick={() => {
           setMenuOpen(false);
-          window.location.href = "/auth/signup";
+          window.open("/auth/signup", "_blank");
         }}
         variant="secondary"
         className="font-semibold text-primary bg-white hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl"

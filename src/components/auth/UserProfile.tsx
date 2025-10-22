@@ -7,6 +7,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { UserProfileAPI } from "@/src/lib/api/userProfile";
+import { useAuth } from "@/src/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ const UserProfile = () => {
   const [fallbackProfile, setFallbackProfile] = useState(null);
   const [fallbackCategories, setFallbackCategories] = useState([]);
   const [loadingFallback, setLoadingFallback] = useState(false);
+  const { user } = useAuth();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,22 +53,28 @@ useEffect(() => {
   const fetchFallbackTeacher = async () => {
     try {
       setLoadingFallback(true);
+
       const { teacher, userProfile, categories, subcollections } =
         await UserProfileAPI.getTeacherByUsername(usernameT);
 
       console.log("Fetched public teacher:", teacher, userProfile, categories, subcollections);
-
       setFallbackTeacher(teacher);
       setFallbackProfile(userProfile);
       setFallbackCategories(categories);
 
-      // ✅ Temporarily store userId
-      if (userProfile?.uid) {
-        localStorage.setItem("user_id", userProfile.uid);
-        console.log("✅ Stored uid:", userProfile.uid);
-      } else if (userProfile?.id) {
-        localStorage.setItem("user_id", userProfile.id);
-        console.log("✅ Stored uid (from id):", userProfile.id);
+      // ✅ Temporarily store userId (only if user authenticated)
+      if (user) {
+        if (userProfile?.uid) {
+          localStorage.setItem("user_id", userProfile.uid);
+          console.log("✅ Stored uid:", userProfile.uid);
+        } else if (userProfile?.id) {
+          localStorage.setItem("user_id", userProfile.id);
+          console.log("✅ Stored uid (from id):", userProfile.id);
+        }
+      } else {
+        console.log("🧹 No authenticated user — clearing stored user_id");
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("userId");
       }
     } catch (err) {
       console.error("❌ Error fetching fallback teacher:", err);
@@ -76,16 +84,17 @@ useEffect(() => {
     }
   };
 
+  // ✅ Fetch only if no stored ID but a username is present
   if (!storedId && usernameT) {
     fetchFallbackTeacher();
   }
 
-  // 🧹 Remove userId when route changes away from profile
+  // 🧹 Cleanup when route changes or component unmounts
   return () => {
     console.log("🧹 Cleaning up: removing userId from localStorage");
     localStorage.removeItem("user_id");
   };
-}, [storedId, usernameT]);
+}, [storedId, usernameT, user]);
 
 const handleSettingsClick = () => {
   router.push("/settings", {
@@ -97,9 +106,8 @@ const handleSettingsClick = () => {
       console.error("Teacher ID not available");
       return;
     }
-    router.push(`/categories?userId=${userId}&teacherId=${teacherDetails.id}`);
+    router.push(`/categories?userId=${storedId}&teacherId=${teacherDetails.id}`);
   };
-
   const ratings = teacherDetails?.rating ?? [];
   const averageRating = ratings.length > 0
     ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
@@ -116,9 +124,7 @@ const handleSettingsClick = () => {
   const displayCategories = storedId ? categories : fallbackCategories;
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-
   const [open, setOpen] = useState(false);
-
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
     setOpen(false);

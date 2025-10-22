@@ -215,17 +215,18 @@ const Page = () => {
           Weteachs makes it easy, affordable, and fun to learn anything, anywhere.
         </motion.p>
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-               size="lg"
-           onClick={() => {
-                    setMenuOpen(false);
-                    window.location.href = "/auth/signup";
-                  }}
-          className="bg-white text-primary font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-        >
-          Sign Up & Find Your Expert
-        </motion.button>
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  size="lg"
+  onClick={() => {
+    setMenuOpen(false);
+    window.open("/auth/signup", "_blank"); 
+  }}
+  className="bg-white text-primary font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+>
+  Sign Up & Find Your Expert
+</motion.button>
+
       </section>
         </>
 )}

@@ -1,9 +1,10 @@
 // @ts-nocheck
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Button } from "@/src/components/ui/button";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,6 +16,8 @@ const fadeUp = {
 };
 
 const Page = () => {
+      const [menuOpen, setMenuOpen] = useState(false);
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="relative w-full h-[70vh] flex items-center justify-center overflow-hidden">
@@ -181,13 +184,14 @@ const Page = () => {
               take your next step — we’re here every step of the way.
             </p>
 
-            <motion.button
-              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get in Touch
-            </motion.button>
+              <Button
+     
+        size="lg"
+        onClick={() => {
+          setMenuOpen(false);
+          window.open("/contact", "_blank");
+        }}
+        >  Get in Touch</Button>
           </motion.div>
         </div>
       </div>
