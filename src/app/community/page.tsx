@@ -303,7 +303,7 @@ const CommunityPage = () => {
                 <p className="mb-6">
                   Our platform brings together creators and learners in a vibrant
                   community where knowledge is shared through video, audio, and
-                  chat sessions. Whether you're looking to learn new skills or
+                  chat sessions. Whether you&apos;re looking to learn new skills or
                   share your expertise, we provide the tools you need to succeed.
                 </p>
                 <Button

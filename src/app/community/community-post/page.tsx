@@ -15,10 +15,10 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 const CommunityPost = () => {
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
-  const [comments, setComments] = useState<Record<string, any[]>>({});
+  const [comments, setComments] = useState<Record<string, []>>({});
   const [loadingComments, setLoadingComments] = useState<string | null>(null);
   const [newComments, setNewComments] = useState<Record<string, string>>({});
   const [postingComment, setPostingComment] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const CommunityPost = () => {
 
 
   // 🆕 Reply State
-  const [replies, setReplies] = useState<Record<string, any[]>>({});
+  const [replies, setReplies] = useState<Record<string,[]>>({});
   const [newReplies, setNewReplies] = useState<Record<string, string>>({});
   const [loadingReplies, setLoadingReplies] = useState<Record<string, boolean>>({});
   const [postingReply, setPostingReply] = useState<Record<string, boolean>>({});
@@ -35,7 +35,7 @@ const CommunityPost = () => {
   const { user } = useAuth();
 
   // 🕓 Convert timestamp → "x ago"
-  function timeAgo(timestamp: any) {
+  function timeAgo(timestamp) {
     if (!timestamp) return "";
     const date =
       timestamp?.toDate?.() instanceof Date

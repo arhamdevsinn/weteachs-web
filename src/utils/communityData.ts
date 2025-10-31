@@ -59,7 +59,7 @@ export async function fetchCommentsForQuestion(questionId: string) {
   );
   const snap = await getDocs(q);
 
-  let results: any[] = [];
+  let results: [] = [];
   if (!snap.empty) {
     results = await Promise.all(
       snap.docs.map(async (docSnap) => {
@@ -78,11 +78,11 @@ export async function fetchCommentsForQuestion(questionId: string) {
         }
 
         // Fetch liked users
-        let likedUsers: any[] = [];
+        let likedUsers: [] = [];
         if (Array.isArray(data.Liked_user_ref)) {
           likedUsers = await Promise.all(
             data.Liked_user_ref.map(
-              (ref: any) => fetchUserByRef(ref.path || ref)
+              (ref) => fetchUserByRef(ref.path || ref)
             )
           );
         }
@@ -279,7 +279,7 @@ export async function addCommentToQuestion(
     image = await getDownloadURL(snapshot.ref);
   }
 
-  const payload: any = {
+  const payload = {
     comment_text: text?.trim() || "",
     com_post_ref: questionRef,
     Limbo_ref: userRef,
