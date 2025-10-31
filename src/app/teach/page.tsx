@@ -19,7 +19,7 @@ const Page: React.FC = () => {
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl font-extrabold text-primary mb-4"
+          className="text-4xl md:text-5xl font-extrabold bg-primary text-primary mb-4"
         >
         Become an Expert on Weteachs
         </motion.h1>

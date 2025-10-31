@@ -1,5 +1,6 @@
 import React from 'react';
 import ExpertDialog from '@/src/components/profile/ExpertProfile';
+import StudentDialog from '../profile/StudentProfile';
 
 const SelectedCategory = () => {
   return (
@@ -29,9 +30,8 @@ const SelectedCategory = () => {
           category to get exactly the help you need for quick short sessions.
         </p>
         <div className="flex justify-center">
-          <button className="bg-green-800 text-white font-medium px-8 py-2 rounded-full shadow-md hover:bg-green-700 transition">
-            Student
-          </button>
+         
+            <StudentDialog/>
         </div>
       </div>
     </div>

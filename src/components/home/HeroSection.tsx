@@ -43,7 +43,6 @@ const HeroSection = () => {
   >
     Download for Android
   </Button>
-
   <Button
     variant="outline"
     onClick={() =>

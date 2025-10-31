@@ -208,5 +208,4 @@ async getTeacherByUsername(usernameT: string) {
     },
   };
 }
-
 };

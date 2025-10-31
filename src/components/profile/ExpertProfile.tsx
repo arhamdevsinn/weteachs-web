@@ -17,6 +17,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/src/components/ui/select";
+import { Upload, User } from "lucide-react";
 import {
   getFirestore,
   doc,
@@ -88,8 +89,8 @@ const handleProfileSubmit = async () => {
 
     const teacherRef = doc(db, "TeacherDetails", userId);
     const teacherData = {
-      Language: "Eng",
-      Live_Chat_rate: 25,
+      Language: categoryData.Language || "Eng",
+      Live_Chat_rate: categoryData.category_rate || 0,
       Number_of_completed_jobs: [0, 0],
       Total_amount_earned: [0, 0],
       bio_T: formData.bio_T || "",
@@ -100,7 +101,7 @@ const handleProfileSubmit = async () => {
       limbo_ref: `/LimboUserMode/${userId}`,
       teacher: true,
       teacher_profile_picture: photoURL,
-      usernameT: formData.display_name, // ✅ synced
+      usernameT: formData.display_name, 
     };
 
     await setDoc(teacherRef, teacherData, { merge: true });
@@ -190,7 +191,7 @@ const handleProfileSubmit = async () => {
     <>
       <Button
         onClick={() => setOpenProfile(true)}
-        className="bg-blue-600 text-white font-semibold px-6 py-2 rounded-full hover:bg-blue-700 transition"
+        className="bg-primary text-white font-semibold px-6 py-2 rounded-full  transition"
       >
         Become an Expert
       </Button>
@@ -206,16 +207,43 @@ const handleProfileSubmit = async () => {
               Fill your details to become an expert.
             </DialogDescription>
           </DialogHeader>
-
-          <div className="flex flex-col items-center mt-4">
-            <div className="relative w-28 h-28 border rounded-full overflow-hidden">
-              <img src={preview} alt="Profile" className="object-cover w-full h-full" />
-              <label className="absolute bottom-0 bg-blue-600 text-white text-xs py-1 px-3 rounded-t cursor-pointer">
-                Upload
-                <input type="file" accept="image/*" className="hidden" onChange={handleImage} />
-              </label>
-            </div>
-          </div>
+<div className="flex flex-col items-center mt-6 space-y-3">
+  <label
+    htmlFor="profile-upload"
+    className="relative group w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-primary/40 shadow-md flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-lg"
+    tabIndex={0}
+    aria-label="Upload profile picture"
+  >
+    {preview && preview !== "/placeholder-avatar.png" ? (
+      <img
+        src={preview}
+        alt="Profile"
+        className="object-cover w-full h-full rounded-full transition-transform duration-300 group-hover:scale-105"
+      />
+    ) : (
+      <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
+        <User className="w-14 h-14 text-gray-400 mb-2" /> {/* Show User icon */}
+      </div>
+    )}
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity duration-300">
+      <Upload className="text-white w-6 h-6 mb-1 animate-bounce" />
+      <span className="bg-primary text-white text-xs px-3 py-1 rounded-full shadow-md mt-1">
+        Change Photo
+      </span>
+    </div>
+    <input
+      id="profile-upload"
+      type="file"
+      accept="image/*"
+      className="hidden"
+      onChange={handleImage}
+    />
+  </label>
+  <p className="text-xs text-gray-500 text-center">
+    Click or drag to upload your profile picture
+  </p>
+</div>
 
           <div className="space-y-3 mt-4">
             <Input
@@ -252,7 +280,7 @@ const handleProfileSubmit = async () => {
           </div>
 
           <Button
-            className="w-full mt-5 bg-blue-600 text-white"
+            className="w-full mt-5 bg-primary text-white"
             onClick={handleProfileSubmit}
             disabled={loading}
           >
@@ -312,7 +340,7 @@ const handleProfileSubmit = async () => {
           </div>
 
           <Button
-            className="w-full mt-5 bg-blue-600 text-white"
+            className="w-full mt-5 bg-primary text-white"
             onClick={handleCategorySubmit}
             disabled={loading}
           >
