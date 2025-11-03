@@ -5,6 +5,7 @@ import React, {useState} from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/src/components/ui/button";
+import Partners from "@/src/components/we-teachs/Partner";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -169,6 +170,7 @@ const Page = () => {
               </motion.div>
             ))}
           </div>
+        <Partners/>
           <motion.div
             className="mt-20"
             initial="hidden"

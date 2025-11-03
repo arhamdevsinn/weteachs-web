@@ -15,7 +15,7 @@ const features = [
     accent: "from-primary to-primary",
     reverse: false,
     onClick: () =>
-      window.open("/auth/signup", "_blank", "noopener,noreferrer"),
+      window.open("/teach", "_blank", "noopener,noreferrer"),
   },
   {
     id: 2,
@@ -27,7 +27,7 @@ const features = [
     accent: "from-primary to-primary",
     reverse: true,
     onClick: () =>
-      window.open("/auth/signup", "_blank", "noopener,noreferrer"),
+      window.open("/learn", "_blank", "noopener,noreferrer"),
   },
   {
     id: 3,
@@ -39,7 +39,7 @@ const features = [
     accent: "from-primary to-primary",
     reverse: false,
     onClick: () =>
-      window.open("/auth/signup", "_blank", "noopener,noreferrer"),
+      window.open("/how-to-weteachs", "_blank", "noopener,noreferrer"),
   },
 ];
 

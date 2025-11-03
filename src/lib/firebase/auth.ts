@@ -2,45 +2,62 @@
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  updateProfile, 
-  User, 
-  signOut,
+  sendEmailVerification, 
+  updateProfile, User,
+  signOut, 
   UserCredential,
-  signOut as firebaseSignOut
+   signOut as firebaseSignOut
 } from 'firebase/auth';
 import { auth, db } from "@/src/lib/firebase/config";
 import { doc, setDoc } from "firebase/firestore";
 
-
 export class AuthService {
+  // 🔹 LOGIN - block unverified users
   static async login(email: string, password: string): Promise<UserCredential> {
-    return signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    if (!user.emailVerified) {
+      await signOut(auth);
+      throw new Error("Please verify your email before logging in.");
+    }
+
+    return userCredential;
   }
+
+  // 🔹 SIGNUP - send verification email
   static async signup(email: string, password: string, teacherData = {}) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const uid = userCredential.user.uid;
+      const user = userCredential.user;
+      const uid = user.uid;
 
-      // ✅ Store teacher details
+      // Save teacher details in Firestore
       await setDoc(doc(db, "TeacherDetails", uid), {
         email,
         ...teacherData,
         uid,
         createdAt: new Date().toISOString(),
+        emailVerified: false,
       });
 
-      console.log("✅ Teacher registered and details stored!");
+      // Send verification email
+      await sendEmailVerification(user);
 
-      // ✅ Immediately sign out user so they must log in manually
+      console.log("📧 Verification email sent to:", email);
+
+      // Immediately sign out so they can’t access the app yet
       await signOut(auth);
 
-      return { success: true };
+      return {
+        success: true,
+        message: "Signup successful! Go to your email and verify your account before logging in.",
+      };
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
     }
   }
-
 
   static async logout(redirectTo: string = '/auth/login'): Promise<void> {
     try {

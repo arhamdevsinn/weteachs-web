@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   getFirestore,
   doc,
   setDoc,
-  updateDoc,
+  getDoc,
   serverTimestamp,
   collection,
   addDoc,
@@ -30,7 +30,8 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { checkIfProfileExists } from "@/src/lib/api/userProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 
 const ExpertDialog = () => {
@@ -38,11 +39,9 @@ const ExpertDialog = () => {
   const [openCategory, setOpenCategory] = useState(false);
   const [preview, setPreview] = useState("/placeholder-avatar.png");
   const [loading, setLoading] = useState(false);
-  // const { userId } = useUserIdFromUrl();
-
+const router = useRouter();
   const db = getFirestore();
   const storage = getStorage();
-
 
   const [formData, setFormData] = useState({
     display_name: "",
@@ -63,7 +62,9 @@ const ExpertDialog = () => {
     imageFile: null as File | null,
   });
 
-  // === Preview upload ===
+  const { userId } = useUserIdFromUrl();
+
+  // === Image Preview ===
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>, forCategory = false) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -72,75 +73,127 @@ const ExpertDialog = () => {
       setPreview(URL.createObjectURL(file));
     }
   };
-  const { userId, usernameT, isTeacher } = useUserIdFromUrl();
-  // === Submit teacher profile ===
-const handleProfileSubmit = async () => {
-  if (!userId) return toast.error("User ID not found. Please log in.");
 
-  try {
-    setLoading(true);
-    let photoURL = preview;
+  // === Validation Helpers ===
+  const validateProfile = () => {
+    if (!formData.display_name.trim()) return "Display name is required.";
+    if (!formData.bio_T.trim()) return "Bio is required.";
+    if (!formData.birthday.trim()) return "Birthday is required.";
+    if (!formData.Howd_you_here_of_us) return "Please select how you heard about us.";
+    if (!formData.imageFile) return "Please upload a profile picture.";
+    return null;
+  };
 
-    if (formData.imageFile) {
-      const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
-      await uploadBytes(storageRef, formData.imageFile);
-      photoURL = await getDownloadURL(storageRef);
-    }
+  const validateCategory = () => {
+    if (!categoryData.title.trim()) return "Title is required.";
+    if (!categoryData.topic.trim()) return "Topic is required.";
+    if (!categoryData.description.trim()) return "Description is required.";
+    if (!categoryData.category_rate.trim()) return "Rate is required.";
+    if (!categoryData.ExperienceLevel) return "Please select an experience level.";
+    if (!categoryData.Language.trim()) return "Language is required.";
+    if (!categoryData.imageFile) return "Please upload a category image.";
+    return null;
+  };
 
-    const teacherRef = doc(db, "TeacherDetails", userId);
-    const teacherData = {
-      Language: categoryData.Language || "Eng",
-      Live_Chat_rate: categoryData.category_rate || 0,
-      Number_of_completed_jobs: [0, 0],
-      Total_amount_earned: [0, 0],
-      bio_T: formData.bio_T || "",
-      cat_refs: [],
-      created_time_t: serverTimestamp(),
-      iSAvailable: false,
-      isOnline: true,
-      limbo_ref: `/LimboUserMode/${userId}`,
-      teacher: true,
-      teacher_profile_picture: photoURL,
-      usernameT: formData.display_name, 
+   useEffect(() => {
+    const verifyProfileStatus = async () => {
+      if (!userId) return;
+
+      const exists = await checkIfProfileExists(userId);
+      if (exists) {
+        // ✅ Profile exists → Skip profile dialog, maybe go directly to category or close both
+        setOpenProfile(false);
+        setOpenCategory(false);
+        localStorage.setItem("profileCreated", "true");
+      } else {
+        // 🟢 No profile yet → Open profile creation dialog
+        setOpenProfile(true);
+      }
     };
 
-    await setDoc(teacherRef, teacherData, { merge: true });
+    verifyProfileStatus();
+  }, [userId]);
 
-    const limboRef = doc(db, "LimboUserMode", userId);
-    await setDoc(
-      limboRef,
-      {
-        Birthday: formData.birthday ? new Date(formData.birthday) : null,
-        Howd_you_here_of_us: formData.Howd_you_here_of_us,
-        Popup: false,
-        Pre_testers: false,
-        bio_set: true,
-        created_time: serverTimestamp(),
-        display_name: formData.display_name,
-        isTeacher: true,
-        photo_url: photoURL,
-        signupcomplete: true,
-        signupcompletepage2: true,
-        teacher_ref: teacherRef.path,
-        uid: userId,
-      },
-      { merge: true }
-    );
+  // === 🟣 Submit Teacher Profile ===
+  const handleProfileSubmit = async () => {
+    const validationError = validateProfile();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
 
-    toast.success("Profile created successfully!");
-    setOpenProfile(false);
-    setOpenCategory(true);
-  } catch (err) {
-    console.error("Error creating teacher profile:", err);
-    toast.error("Error creating teacher profile");
-  } finally {
-    setLoading(false);
-  }
-};
+    if (!userId) return toast.error("User ID not found. Please log in.");
 
+    try {
+      setLoading(true);
+      let photoURL = preview;
 
-  // === Submit category ===
+      if (formData.imageFile) {
+        const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
+        await uploadBytes(storageRef, formData.imageFile);
+        photoURL = await getDownloadURL(storageRef);
+      }
+
+      const teacherRef = doc(db, "TeacherDetails", userId);
+      const teacherData = {
+        Language: categoryData.Language || "Eng",
+        Live_Chat_rate: categoryData.category_rate || 0,
+        Number_of_completed_jobs: [0, 0],
+        Total_amount_earned: [0, 0],
+        bio_T: formData.bio_T,
+        cat_refs: [],
+        created_time_t: serverTimestamp(),
+        iSAvailable: false,
+        isOnline: true,
+        limbo_ref: `/LimboUserMode/${userId}`,
+        teacher: true,
+        teacher_profile_picture: photoURL,
+        usernameT: formData.display_name,
+      };
+
+      await setDoc(teacherRef, teacherData, { merge: true });
+
+      const limboRef = doc(db, "LimboUserMode", userId);
+      await setDoc(
+        limboRef,
+        {
+          Birthday: new Date(formData.birthday),
+          Howd_you_here_of_us: formData.Howd_you_here_of_us,
+          Popup: false,
+          Pre_testers: false,
+          bio_set: true,
+          created_time: serverTimestamp(),
+          display_name: formData.display_name,
+          isTeacher: true,
+          photo_url: photoURL,
+          signupcomplete: true,
+          signupcompletepage2: true,
+          teacher_ref: teacherRef.path,
+          uid: userId,
+        },
+        { merge: true }
+      );
+
+      localStorage.setItem("profileCreated", "true");
+      toast.success("Profile created successfully!");
+      setOpenProfile(false);
+      setOpenCategory(true);
+    } catch (err) {
+      console.error("Error creating teacher profile:", err);
+      toast.error("Error creating teacher profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // === 🟡 Submit Category ===
   const handleCategorySubmit = async () => {
+    const validationError = validateCategory();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     if (!userId) return toast.error("User ID missing");
 
     try {
@@ -153,7 +206,6 @@ const handleProfileSubmit = async () => {
         imageURL = await getDownloadURL(storageRef);
       }
 
-      // ✅ Create category doc
       const categoryRef = await addDoc(collection(db, "Categories"), {
         ExperienceLevel: categoryData.ExperienceLevel,
         Language: categoryData.Language,
@@ -168,17 +220,12 @@ const handleProfileSubmit = async () => {
         who_created_ref: `/LimboUserMode/${userId}`,
       });
 
-      // ✅ Append new category to TeacherDetails
       const teacherRef = doc(db, "TeacherDetails", userId);
-      await setDoc(
-        teacherRef,
-        { cat_refs: arrayUnion(categoryRef.path) },
-        { merge: true }
-      );
+      await setDoc(teacherRef, { cat_refs: arrayUnion(categoryRef.path) }, { merge: true });
 
       toast.success("Category created successfully!");
-      // router.push('/profile?{usernameT}')
       setOpenCategory(false);
+      router.push('/profile');
     } catch (err) {
       console.error("Failed to create category:", err);
       toast.error("Failed to create category");
@@ -191,7 +238,7 @@ const handleProfileSubmit = async () => {
     <>
       <Button
         onClick={() => setOpenProfile(true)}
-        className="bg-primary text-white font-semibold px-6 py-2 rounded-full  transition"
+        className="bg-primary text-white font-semibold px-6 py-2 rounded-full transition"
       >
         Become an Expert
       </Button>
@@ -207,68 +254,69 @@ const handleProfileSubmit = async () => {
               Fill your details to become an expert.
             </DialogDescription>
           </DialogHeader>
-<div className="flex flex-col items-center mt-6 space-y-3">
-  <label
-    htmlFor="profile-upload"
-    className="relative group w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-primary/40 shadow-md flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-lg"
-    tabIndex={0}
-    aria-label="Upload profile picture"
-  >
-    {preview && preview !== "/placeholder-avatar.png" ? (
-      <img
-        src={preview}
-        alt="Profile"
-        className="object-cover w-full h-full rounded-full transition-transform duration-300 group-hover:scale-105"
-      />
-    ) : (
-      <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
-        <User className="w-14 h-14 text-gray-400 mb-2" /> {/* Show User icon */}
-      </div>
-    )}
-    {/* Overlay */}
-    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity duration-300">
-      <Upload className="text-white w-6 h-6 mb-1 animate-bounce" />
-      <span className="bg-primary text-white text-xs px-3 py-1 rounded-full shadow-md mt-1">
-        Change Photo
-      </span>
-    </div>
-    <input
-      id="profile-upload"
-      type="file"
-      accept="image/*"
-      className="hidden"
-      onChange={handleImage}
-    />
-  </label>
-  <p className="text-xs text-gray-500 text-center">
-    Click or drag to upload your profile picture
-  </p>
-</div>
 
+          {/* Upload Image */}
+          <div className="flex flex-col items-center mt-6 space-y-3">
+            <label
+              htmlFor="profile-upload"
+              className="relative group w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-primary/40 shadow-md flex items-center justify-center cursor-pointer transition-all hover:border-primary"
+            >
+              {preview && preview !== "/placeholder-avatar.png" ? (
+                <img src={preview} alt="Profile" className="object-cover w-full h-full" />
+              ) : (
+                <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
+                  <User className="w-14 h-14 text-gray-400 mb-2" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+                <Upload className="text-white w-6 h-6 mb-1" />
+                <span className="bg-primary text-white text-xs px-3 py-1 rounded-full shadow-md">
+                  Change Photo
+                </span>
+              </div>
+              <input
+                id="profile-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImage(e)}
+              />
+            </label>
+            <p className="text-xs text-gray-500 text-center">
+              Click or drag to upload your profile picture
+            </p>
+          </div>
+
+          {/* Profile Fields */}
           <div className="space-y-3 mt-4">
+            <label className="text-sm font-medium text-gray-700">Display Name</label>
             <Input
-              placeholder="Display Name"
+              placeholder="Your display name"
               onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  display_name: e.target.value,
-                  usernameT: e.target.value, // ✅ auto-sync usernameT
-                })
+                setFormData({ ...formData, display_name: e.target.value, usernameT: e.target.value })
               }
             />
+
+            <label className="text-sm font-medium text-gray-700">Bio</label>
             <Input
-              placeholder="Bio"
+              placeholder="Write a short bio"
               onChange={(e) => setFormData({ ...formData, bio_T: e.target.value })}
             />
+
+            <label className="text-sm font-medium text-gray-700">Birthday</label>
             <Input
               type="date"
               onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
             />
+
+            <label className="text-sm font-medium text-gray-700">
+              How did you hear about us?
+            </label>
             <Select
               onValueChange={(val) => setFormData({ ...formData, Howd_you_here_of_us: val })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="How did you hear about us?" />
+                <SelectValue placeholder="Select an option" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Facebook">Facebook</SelectItem>
@@ -293,37 +341,46 @@ const handleProfileSubmit = async () => {
       <Dialog open={openCategory} onOpenChange={setOpenCategory}>
         <DialogContent className="max-w-md bg-white rounded-xl p-6">
           <DialogHeader>
-       <DialogTitle className="text-xl text-center font-semibold">
-        Create Category
-      </DialogTitle>
-      <DialogDescription className="text-center text-gray-500">
-        Fill in details to create a new category for your expert profile.
-      </DialogDescription>
+            <DialogTitle className="text-xl text-center font-semibold">
+              Create Category
+            </DialogTitle>
+            <DialogDescription className="text-center text-gray-500">
+              Fill in details to create a new category for your expert profile.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3 mt-4">
+            <label className="text-sm font-medium text-gray-700">Category Title</label>
             <Input
               placeholder="Title"
               onChange={(e) => setCategoryData({ ...categoryData, title: e.target.value })}
             />
+
+            <label className="text-sm font-medium text-gray-700">Topic</label>
             <Input
               placeholder="Topic"
               onChange={(e) => setCategoryData({ ...categoryData, topic: e.target.value })}
             />
+
+            <label className="text-sm font-medium text-gray-700">Description</label>
             <Input
               placeholder="Description"
               onChange={(e) => setCategoryData({ ...categoryData, description: e.target.value })}
             />
+
+            <label className="text-sm font-medium text-gray-700">Rate (USD)</label>
             <Input
-              placeholder="Rate (USD)"
               type="number"
+              placeholder="Rate"
               onChange={(e) => setCategoryData({ ...categoryData, category_rate: e.target.value })}
             />
+
+            <label className="text-sm font-medium text-gray-700">Experience Level</label>
             <Select
               onValueChange={(val) => setCategoryData({ ...categoryData, ExperienceLevel: val })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select Experience Level" />
+                <SelectValue placeholder="Select level" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Beginner">Beginner</SelectItem>
@@ -331,12 +388,20 @@ const handleProfileSubmit = async () => {
                 <SelectItem value="Advanced">Advanced</SelectItem>
               </SelectContent>
             </Select>
+
+            <label className="text-sm font-medium text-gray-700">Language</label>
             <Input
-              placeholder="Language"
+              placeholder="Language (e.g. English)"
               onChange={(e) => setCategoryData({ ...categoryData, Language: e.target.value })}
             />
-            <label className="text-sm font-medium text-gray-600">Upload Image</label>
-            <input type="file" accept="image/*" onChange={(e) => handleImage(e, true)} />
+
+            <label className="text-sm font-medium text-gray-700">Upload Category Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImage(e, true)}
+              className="text-sm"
+            />
           </div>
 
           <Button

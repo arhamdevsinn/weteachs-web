@@ -10,7 +10,7 @@ import {
   addCommentToQuestion,
   fetchRepliesForComment,
   addReplyToComment,
-} from "@/src/utils/communityData";
+} from "@/src/lib/api/communityData";
 import { toast } from "sonner";
 import Image from "next/image";
 

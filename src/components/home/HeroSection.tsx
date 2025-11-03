@@ -19,7 +19,7 @@ const HeroSection = () => {
           transition={{ duration: 0.9, ease: "easeOut" }}
           className="space-y-8"
         >
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight text-gray-900">
+          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight text-gray-900">
             Master Your <span className="text-primary">Skills</span>.<br />
             Build Your <span className="bg-primary bg-clip-text text-transparent">Future</span>.<br />
             All in One Place.

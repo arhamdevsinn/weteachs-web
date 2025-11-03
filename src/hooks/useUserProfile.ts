@@ -1,12 +1,25 @@
 // @ts-nocheck
 'use client';
 import { useEffect, useState } from 'react';
-import { getFirestore, doc, setDoc, serverTimestamp, getDoc, collection, addDoc, arrayUnion } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc,
+  collection,
+  addDoc,
+  arrayUnion,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth } from '@/src/lib/firebase/config';
 import { toast } from 'sonner';
 import { UserProfileAPI } from '@/src/lib/api/userProfile';
 import { UserProfileData, TeacherDetails, Category } from '@/src/types/firebase';
+import { useRouter } from 'next/navigation';
 
 export const useUserProfile = (uid?: string) => {
   const [profile, setProfile] = useState<UserProfileData | null>(null);
@@ -24,7 +37,7 @@ export const useUserProfile = (uid?: string) => {
 
   const db = getFirestore();
   const storage = getStorage();
-
+  const router = useRouter();
 
   // 🔹 Upload helper
   const uploadImage = async (file: File, userId: string): Promise<string> => {
@@ -36,7 +49,6 @@ export const useUserProfile = (uid?: string) => {
   // 🔹 Fetch Profile (existing)
   const fetchProfile = async () => {
     if (!uid) return;
-console.log("ndjnsa", uid)
     try {
       setLoading(true);
       const { profile, teacherDetails, gallery, categories, subcollections } =
@@ -77,6 +89,13 @@ console.log("ndjnsa", uid)
 
     try {
       setLoading(true);
+
+      // Check if profile already exists
+      const alreadyExists = await checkIfProfileExists(user.uid);
+      if (alreadyExists) {
+        toast.info("Profile already created — skipping form.");
+        return;
+      }
 
       let photoURL = "";
       if (data.imageFile) {
@@ -134,6 +153,13 @@ console.log("ndjnsa", uid)
     }
   };
 
+  // 🔹 Check if profile already exists
+  const checkIfProfileExists = async (userId: string) => {
+    const teacherRef = doc(db, "TeacherDetails", userId);
+    const teacherSnap = await getDoc(teacherRef);
+    return teacherSnap.exists(); // ✅ returns true if profile exists
+  };
+
   // 🔹 Create Category
   const createCategory = async (data: {
     title: string;
@@ -176,7 +202,7 @@ console.log("ndjnsa", uid)
 
       toast.success("Category created successfully!");
       await fetchProfile(); // Refresh after category creation
-           router.push('/profile');
+      router.push('/profile');
     } catch (err) {
       console.error("Error creating category:", err);
       toast.error("Failed to create category");
@@ -185,54 +211,51 @@ console.log("ndjnsa", uid)
     }
   };
 
-const getTeacherByUsername = async (usernameT: string) => {
-  try {
-    const teacherRef = collection(db, "TeacherDetails");
-    console.log("teacherRef", teacherRef)
-    const q = query(teacherRef, where("usernameT", "==", usernameT));
-    const snap = await getDocs(q);
+  // 🔹 Get teacher by username
+  const getTeacherByUsername = async (usernameT: string) => {
+    try {
+      const teacherRef = collection(db, "TeacherDetails");
+      const q = query(teacherRef, where("usernameT", "==", usernameT));
+      const snap = await getDocs(q);
 
-    if (snap.empty) {
-      throw new Error("Teacher not found");
-    }
+      if (snap.empty) throw new Error("Teacher not found");
 
-    const teacherDoc = snap.docs[0];
-    const teacherData = { id: teacherDoc.id, ...teacherDoc.data() };
+      const teacherDoc = snap.docs[0];
+      const teacherData = { id: teacherDoc.id, ...teacherDoc.data() };
 
-    let profileData = null;
-    if (teacherData.limbo_ref) {
-      const limboDocRef = doc(db, teacherData.limbo_ref);
-      const limboSnap = await getDoc(limboDocRef);
-      if (limboSnap.exists()) {
-        profileData = { id: limboDocRef.id, ...limboSnap.data() };
+      let profileData = null;
+      if (teacherData.limbo_ref) {
+        const limboDocRef = doc(db, teacherData.limbo_ref);
+        const limboSnap = await getDoc(limboDocRef);
+        if (limboSnap.exists()) {
+          profileData = { id: limboDocRef.id, ...limboSnap.data() };
+        }
       }
-    }
 
-    return { teacherDetails: teacherData, profile: profileData };
-  } catch (error) {
-    console.error("Error fetching teacher by username:", error);
-    throw error;
-  }
-}
+      return { teacherDetails: teacherData, profile: profileData };
+    } catch (error) {
+      console.error("Error fetching teacher by username:", error);
+      throw error;
+    }
+  };
+
+  // 🔹 Auto-fetch profile on mount
   useEffect(() => {
     fetchProfile();
   }, [uid]);
-// useEffect(() => {
-//   console.log("Profile fetch state:", { uid, loading, error, profile });
-// }, [uid, loading, error, profile]);
 
-
- return {
-  profile,
-  teacherDetails,
-  gallery,
-  categories,
-  subcollections,
-  loading,
-  error,
-  createTeacherProfile,
-  createCategory,
-  refreshData: fetchProfile,
-  getTeacherByUsername, // ✅ include here
-};
+  return {
+    profile,
+    teacherDetails,
+    gallery,
+    categories,
+    subcollections,
+    loading,
+    error,
+    createTeacherProfile,
+    createCategory,
+    checkIfProfileExists, 
+    refreshData: fetchProfile,
+    getTeacherByUsername,
+  };
 };

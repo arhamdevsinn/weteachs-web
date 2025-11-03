@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/src/lib/firebase/auth';
 import { Button } from '../ui/button';
 import { Eye, EyeOff } from "lucide-react";
 import Image from 'next/image';
-import { Suspense } from 'react';
+import { toast } from "sonner";
 
 const isErrorWithMessage = (error: unknown): error is { message: string } => {
   return (
@@ -26,24 +26,56 @@ function LoginForm() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  // ✅ Simple email validation
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+
+    // ✅ Frontend validation
+    if (!email) {
+      toast.error("Email is required!");
+      setError("Email is required.");
+      return;
+    }
+    if (!isValidEmail(email)) {
+      toast.error("Please enter a valid email address!");
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!password) {
+      toast.error("Password is required!");
+      setError("Password is required.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters!");
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const userCredential = await AuthService.login(email, password);
       const userId = userCredential.user.uid;
 
       // ✅ Save userId to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('userId', userId);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("userId", userId);
       }
 
-      // ✅ Redirect to profile (no userId in URL)
-      router.push('/profile');
-    } catch (err: unknown) {
-      setError(isErrorWithMessage(err) ? err.message : 'An unexpected error occurred.');
+      toast.success("Login successful!");
+      router.push("/profile");
+    } catch (err: any) {
+      if (err.message?.includes("verify your email")) {
+        toast.error("Please verify your email before logging in!");
+        router.push("/auth/verify-email");
+      } else {
+        toast.error(err.message || "Login failed!");
+      }
+      setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
@@ -83,35 +115,35 @@ function LoginForm() {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
 
           {/* Password */}
-          <div className="mb-4 ">
+          <div className="mb-4">
             <div className="flex justify-between items-center mb-1">
               <label className="text-sm font-medium text-primary">Password</label>
-              <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">Forgot Password?</a>
+              <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+                Forgot Password?
+              </a>
             </div>
-          <div className='relative'>
+            <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary/20"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </Button>
-          </div>
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary/20"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
+            </div>
           </div>
 
           {/* Remember Me */}
