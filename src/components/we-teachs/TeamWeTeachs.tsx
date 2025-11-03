@@ -1,6 +1,7 @@
 "use client";
+import router from "next/dist/shared/lib/router/router";
 import React from "react";
-
+import { useRouter } from "next/navigation";
 const team = [
   {
     name: "Isaiah Joseph",
@@ -27,12 +28,15 @@ const team = [
   },
 ];
 
-const TeamWeTeachs = () => (
-  <section className="max-w-6xl mx-auto py-12 px-4">
-    <h2 className="text-lg font-semibold tracking-wide text-gray-700 mb-6 uppercase">
-      Team
-    </h2>
-    <div className="border-t border-gray-300 mb-8" />
+const TeamWeTeachs = () => {
+  const router = useRouter();
+
+  return (
+    <section className="max-w-6xl mx-auto py-12 px-4">
+      <h2 className="text-lg font-semibold tracking-wide text-gray-700 mb-6 uppercase">
+        Team
+      </h2>
+      <div className="border-t border-gray-300 mb-8" />
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
       {team.map((member, idx) => (
         <div key={idx} className="flex flex-col items-center text-center">
@@ -75,12 +79,14 @@ const TeamWeTeachs = () => (
     <div className="flex justify-center">
       <button
         className="bg-primary text-white px-10 py-3 rounded-full font-medium text-lg shadow hover:bg-green-900 transition"
-        onClick={() => window.open("mailto:weteachchat@gmail.com")}
+        onClick={() => router.push('/contact')}
+
       >
         Contact Us!
       </button>
     </div>
   </section>
 );
+}
 
 export default TeamWeTeachs;

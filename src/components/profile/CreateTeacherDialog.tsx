@@ -26,7 +26,7 @@ export const CreateTeacherDialog = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md bg-white rounded-xl p-6">
+      <DialogContent className="max-w-md bg-white rounded-xl p-6 max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl text-center font-semibold">
             Create Teacher Profile

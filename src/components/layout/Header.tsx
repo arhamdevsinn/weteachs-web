@@ -131,12 +131,12 @@ const Header = () => {
         >
           My Profile
         </DropdownMenuItem>
-        <DropdownMenuItem
+        {/* <DropdownMenuItem
           onClick={() => handleNavigate("/edit-profile")}
           className="cursor-pointer"
         >
           Edit Profile
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
         
       </DropdownMenuContent>
     </DropdownMenu>
