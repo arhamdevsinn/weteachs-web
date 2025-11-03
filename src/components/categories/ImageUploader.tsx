@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 
 const ImageUploader = () => {
   const [preview, setPreview] = useState<string | null>(null);
@@ -18,7 +19,7 @@ const ImageUploader = () => {
         className="h-40 w-full bg-gray-100 border-2 border-dashed border-primary rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-primary/5 transition relative overflow-hidden"
       >
         {preview ? (
-          <img
+          <Image
             src={preview}
             alt="Preview"
             className="h-full w-full object-cover rounded-lg"

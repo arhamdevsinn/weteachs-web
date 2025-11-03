@@ -33,7 +33,7 @@ const HowToWeTeachs = () => {
       <div className="max-w-3xl mx-auto text-center text-gray-700 leading-relaxed space-y-6 text-[15px]">
         <p>
           As an Expert you are signing up to help educate, teach, tutor or even assist anyone who may
-          need help. This isn't a job, you are a freelancer selling your knowledge through chat
+          need help. This isn&apos;t a job, you are a freelancer selling your knowledge through chat
           messaging or video calling to everyday people having small problems throughout their life.
         </p>
 

@@ -12,6 +12,7 @@ import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 import { Upload, User } from "lucide-react";
+import Image from "next/image";
 
 export const CreateTeacherDialog = ({
   open,
@@ -42,7 +43,7 @@ export const CreateTeacherDialog = ({
             className="relative group w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-primary/40 shadow-md flex items-center justify-center cursor-pointer transition-all hover:border-primary"
           >
             {preview && preview !== "/placeholder-avatar.png" ? (
-              <img src={preview} alt="Profile" className="object-cover w-full h-full" />
+              <Image src={preview} alt="Profile" className="object-cover w-full h-full" />
             ) : (
               <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
                 <User className="w-14 h-14 text-gray-400 mb-2" />

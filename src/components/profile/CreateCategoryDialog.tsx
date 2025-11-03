@@ -11,6 +11,7 @@ import {
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/src/components/ui/select";
+import Image from "next/image";
 
 export const CreateCategoryDialog = ({
   open,
@@ -92,7 +93,7 @@ export const CreateCategoryDialog = ({
           {previewImage && (
             <div className="mt-3 flex justify-center">
               <div className="relative group">
-                <img
+                <Image
                   src={previewImage}
                   alt="Preview"
                   className="w-40 h-40 object-cover rounded-lg border border-gray-200 shadow-sm"

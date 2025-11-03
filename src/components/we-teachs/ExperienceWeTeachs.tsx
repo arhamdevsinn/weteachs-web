@@ -16,7 +16,7 @@ const ExperienceWeTeachs = () => (
           What is WeTeachs?
         </h3>
         <p className="text-gray-700 mb-6">
-          The ultimate learning and teaching Mobile App, that's what we are!
+          The ultimate learning and teaching Mobile App, that&apos;s what we are!
         </p>
         <button className="bg-primary text-white px-6 py-2 rounded-full font-medium text-sm"
           onClick={() => window.open("/faq", "_blank", "noopener,noreferrer")}
@@ -30,7 +30,7 @@ const ExperienceWeTeachs = () => (
           How can WeTeachs help you?
         </h3>
         <p className="text-gray-700 mb-6">
-          For Experts, who doesn't need some extra cash? Maybe you just like sharing your knowledge!<br />
+          For Experts, who doesn&apos;t need some extra cash? Maybe you just like sharing your knowledge!<br />
           <span className="italic">
             The Students is just a general term for anyone who needs help! Which is basically anyone anywhere! From not knowing why your computer is turning on to why you cookies are dry, the learning options are boundless
           </span>
@@ -42,7 +42,7 @@ const ExperienceWeTeachs = () => (
           Who is WeTeachs for?
         </h3>
         <p className="text-gray-700 mb-6">
-          Whether you're a freelancer, small business owner, or just looking to be more productive in your personal life, WeTeachs is the perfect <span className="font-semibold">solution</span>. Our app is customizable and adaptable to your specific needs, making it a valuable tool for anyone who wants to achieve more.
+          Whether you&apos;re a freelancer, small business owner, or just looking to be more productive in your personal life, WeTeachs is the perfect <span className="font-semibold">solution</span>. Our app is customizable and adaptable to your specific needs, making it a valuable tool for anyone who wants to achieve more.
         </p>
         <button className="bg-primary text-white px-6 py-2 rounded-full font-medium text-sm"
         onClick={() => window.open("/auth/signup", "_blank", "noopener,noreferrer")}
