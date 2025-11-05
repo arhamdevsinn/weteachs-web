@@ -19,6 +19,7 @@ import {
 import { usePathname } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
+import { Skeleton } from "@/src/components/ui/skeleton";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("images");
@@ -31,11 +32,11 @@ const UserProfile = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-const storedId =
-  typeof window !== "undefined"
-    ? localStorage.getItem("user_id") || localStorage.getItem("userId")
-    : null;
-  
+  const storedId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("user_id") || localStorage.getItem("userId")
+      : null;
+
   const {
     profile,
     teacherDetails,
@@ -47,60 +48,60 @@ const storedId =
   } = useUserProfile(storedId);
   console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
 
-  const usernameT = searchParams.get("name"); 
+  const usernameT = searchParams.get("name");
   console.log(usernameT)
-useEffect(() => {
-  const fetchFallbackTeacher = async () => {
-    try {
-      setLoadingFallback(true);
+  useEffect(() => {
+    const fetchFallbackTeacher = async () => {
+      try {
+        setLoadingFallback(true);
 
-      const { teacher, userProfile, categories, subcollections } =
-        await UserProfileAPI.getTeacherByUsername(usernameT);
+        const { teacher, userProfile, categories, subcollections } =
+          await UserProfileAPI.getTeacherByUsername(usernameT);
 
-      console.log("Fetched public teacher:", teacher, userProfile, categories, subcollections);
-      setFallbackTeacher(teacher);
-      setFallbackProfile(userProfile);
-      setFallbackCategories(categories);
+        console.log("Fetched public teacher:", teacher, userProfile, categories, subcollections);
+        setFallbackTeacher(teacher);
+        setFallbackProfile(userProfile);
+        setFallbackCategories(categories);
 
-      // ✅ Temporarily store userId (only if user authenticated)
-      if (user) {
-        if (userProfile?.uid) {
-          localStorage.setItem("user_id", userProfile.uid);
-          console.log("✅ Stored uid:", userProfile.uid);
-        } else if (userProfile?.id) {
-          localStorage.setItem("user_id", userProfile.id);
-          console.log("✅ Stored uid (from id):", userProfile.id);
+        // ✅ Temporarily store userId (only if user authenticated)
+        if (user) {
+          if (userProfile?.uid) {
+            localStorage.setItem("user_id", userProfile.uid);
+            console.log("✅ Stored uid:", userProfile.uid);
+          } else if (userProfile?.id) {
+            localStorage.setItem("user_id", userProfile.id);
+            console.log("✅ Stored uid (from id):", userProfile.id);
+          }
+        } else {
+          console.log("🧹 No authenticated user — clearing stored user_id");
+          localStorage.removeItem("user_id");
+          localStorage.removeItem("userId");
         }
-      } else {
-        console.log("🧹 No authenticated user — clearing stored user_id");
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("userId");
+      } catch (err) {
+        console.error("❌ Error fetching fallback teacher:", err);
+        toast.error("No teacher found for this username.");
+      } finally {
+        setLoadingFallback(false);
       }
-    } catch (err) {
-      console.error("❌ Error fetching fallback teacher:", err);
-      toast.error("No teacher found for this username.");
-    } finally {
-      setLoadingFallback(false);
+    };
+
+    // ✅ Fetch only if no stored ID but a username is present
+    if (!storedId && usernameT) {
+      fetchFallbackTeacher();
     }
+
+    // 🧹 Cleanup when route changes or component unmounts
+    return () => {
+      console.log("🧹 Cleaning up: removing userId from localStorage");
+      localStorage.removeItem("user_id");
+    };
+  }, [storedId, usernameT, user]);
+
+  const handleSettingsClick = () => {
+    router.push("/settings", {
+      state: { userImg: profile.photo_url || "/profile.photo_url" },
+    });
   };
-
-  // ✅ Fetch only if no stored ID but a username is present
-  if (!storedId && usernameT) {
-    fetchFallbackTeacher();
-  }
-
-  // 🧹 Cleanup when route changes or component unmounts
-  return () => {
-    console.log("🧹 Cleaning up: removing userId from localStorage");
-    localStorage.removeItem("user_id");
-  };
-}, [storedId, usernameT, user]);
-
-const handleSettingsClick = () => {
-  router.push("/settings", {
-    state: { userImg: profile.photo_url || "/profile.photo_url" },
-  });
-};
   const handleClick = () => {
     if (!teacherDetails?.id) {
       console.error("Teacher ID not available");
@@ -113,13 +114,13 @@ const handleSettingsClick = () => {
     ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
     : 0;
   const filledStars = Math.round(averageRating);
-   useEffect(() => {
+  useEffect(() => {
     if (!dataLoading && (dataError || !profile)) {
       router.push("/create-profile");
     }
   }, [dataLoading, dataError, profile, router]);
 
- const displayTeacher = storedId ? teacherDetails : fallbackTeacher;
+  const displayTeacher = storedId ? teacherDetails : fallbackTeacher;
   const displayProfile = storedId ? profile : fallbackProfile;
   const displayCategories = storedId ? categories : fallbackCategories;
 
@@ -133,10 +134,43 @@ const handleSettingsClick = () => {
 
   if (dataLoading || loadingFallback) {
     return (
-      <div className="bg-secondary min-h-screen flex items-center justify-center">
-        <div className="text-center text-gray-600">
-          <div className="animate-spin h-12 w-12 border-b-2 border-primary mx-auto mb-4 rounded-full"></div>
-          Loading profile...
+      <div className="bg-secondary min-h-screen py-8 px-4">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 max-w-7xl mx-auto animate-pulse">
+          <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
+            <div className="relative">
+              <Skeleton className="h-40 w-40 rounded-full" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <Skeleton className="h-6 w-1/3 rounded-md" />
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-4 w-24 rounded-md" />
+                <Skeleton className="h-4 w-16 rounded-md" />
+              </div>
+              <Skeleton className="h-4 w-1/4 rounded-md" />
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
+            <Skeleton className="h-28 w-full md:h-28 md:w-full rounded-lg" />
+            <Skeleton className="h-28 w-full md:h-28 md:w-full rounded-lg" />
+            <Skeleton className="h-28 w-full md:h-28 md:w-full rounded-lg" />
+          </div>
+
+          <div className="mt-6 p-4 bg-secondary rounded-xl">
+            <Skeleton className="h-5 w-1/4 rounded-md mb-3" />
+            <Skeleton className="h-4 w-full rounded-md mb-2" />
+            <Skeleton className="h-4 w-5/6 rounded-md mb-2" />
+            <Skeleton className="h-4 w-3/4 rounded-md" />
+          </div>
+
+          <div className="mt-8">
+            <Skeleton className="h-6 w-1/3 rounded-md mb-6" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-36 w-full rounded-md" />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -163,190 +197,190 @@ const handleSettingsClick = () => {
 
   return (
     <div className="bg-secondary min-h-screen py-8 px-4">
-  {/* Profile Card */}
-  <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 max-w-7xl mx-auto">
-    
-    {/* Profile Header */}
-    <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
-      <div className="relative">
-        <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
-        <Image
-          src={profile.photo_url || user}
-          alt="profile"
-          width={160}
-          height={160}
-          className="rounded-full border-4 border-secondary shadow-lg relative"
-        />
-      </div>
-      <div className="text-center md:text-left">
-        <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
-          {profile.display_name || "Your Name"}
-        {profile.isTeacher && (
-          <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Teacher</span>
-        )}
-          {profile.isStudent && (
-          <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Student</span>
-        )}
-         
-        </div>
-        {/* <div className='text-gray-600'>
+      {/* Profile Card */}
+      <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 max-w-7xl mx-auto">
+
+        {/* Profile Header */}
+        <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
+          <div className="relative">
+            <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
+            <Image
+              src={profile.photo_url || user}
+              alt="profile"
+              width={160}
+              height={160}
+              className="rounded-full border-4 border-secondary shadow-lg relative"
+            />
+          </div>
+          <div className="text-center md:text-left">
+            <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
+              {profile.display_name || "Your Name"}
+              {profile.isTeacher && (
+                <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Teacher</span>
+              )}
+              {profile.isStudent && (
+                <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Student</span>
+              )}
+
+            </div>
+            {/* <div className='text-gray-600'>
           {profile.email}
         </div> */}
-        <div className="text-gray-600 mb-1 flex items-center justify-center md:justify-start">
-          <span className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-          Available now
-          {profile.isTeacher && (
-            <span className="text-gray-600"> (${teacherDetails?.Live_Chat_rate})</span>
-          )}
-        </div>
-        <div className="text-gray-600 mb-1">Languages: English</div>
-        <div className="bg-secondary text-primary text-sm px-3 py-1 rounded-full inline-block mt-2">
-<span className='font-semibold'>  Joining Date:</span> {profile.created_time?.seconds
-    ? new Date(profile.created_time.seconds * 1000).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : "Unknown"}
-</div>
+            <div className="text-gray-600 mb-1 flex items-center justify-center md:justify-start">
+              <span className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+              Available now
+              {profile.isTeacher && (
+                <span className="text-gray-600"> (${teacherDetails?.Live_Chat_rate})</span>
+              )}
+            </div>
+            <div className="text-gray-600 mb-1">Languages: English</div>
+            <div className="bg-secondary text-primary text-sm px-3 py-1 rounded-full inline-block mt-2">
+              <span className='font-semibold'>  Joining Date:</span> {profile.created_time?.seconds
+                ? new Date(profile.created_time.seconds * 1000).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+                : "Unknown"}
+            </div>
 
-        {/* )} */}
-      </div>
-    </div>
-
-    {/* Stats / Settings */}
-    {profile.isTeacher && (
-    <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
-      <div className="flex flex-col items-center">
-       <Link
-        href={{
-          pathname: "/settings",
-          query: { userImg: profile.photo_url || "/profile.photo_url" },
-        }}
-      >
-        <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
-          Profile Settings
-        </button>
-      </Link>
-        <div className="flex gap-1 mt-4 text-amber-400 text-xl">
-          {'★'.repeat(filledStars)}
-          <span className="text-gray-300">{'★'.repeat(5 - filledStars)}</span>
-          <span className="text-gray-600 text-sm ml-1 self-center">
-            {averageRating.toFixed(1)}
-          </span>
-        </div>
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <div className="relative">
-          <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-            <span className="text-2xl">{teacherDetails?.Number_of_completed_jobs || 42}</span>
+            {/* )} */}
           </div>
-          {/* <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full h-7 w-7 flex items-center justify-center shadow-md">
+        </div>
+
+        {/* Stats / Settings */}
+        {profile.isTeacher && (
+          <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
+            <div className="flex flex-col items-center">
+              <Link
+                href={{
+                  pathname: "/settings",
+                  query: { userImg: profile.photo_url || "/profile.photo_url" },
+                }}
+              >
+                <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
+                  Profile Settings
+                </button>
+              </Link>
+              <div className="flex gap-1 mt-4 text-amber-400 text-xl">
+                {'★'.repeat(filledStars)}
+                <span className="text-gray-300">{'★'.repeat(5 - filledStars)}</span>
+                <span className="text-gray-600 text-sm ml-1 self-center">
+                  {averageRating.toFixed(1)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div className="relative">
+                <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  <span className="text-2xl">{teacherDetails?.Number_of_completed_jobs || 42}</span>
+                </div>
+                {/* <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full h-7 w-7 flex items-center justify-center shadow-md">
             +5
           </div> */}
-        </div>
-        <div className="text-md mt-3 text-gray-700 font-medium">Completed Jobs</div>
-      </div>
-      
-      <div className="flex flex-col items-center">
-        <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-          <span className="text-xl">${teacherDetails?.Total_amount_earned || '248.50'}</span>
-        </div>
-        <div className="text-md mt-3 text-gray-700 font-medium">Total Earned</div>
-      </div>
-      
-    </div>
-      )}
-
-    {/* Socials */}
-       {profile.isTeacher && (
-   <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 mt-6 text-sm">
-  <div className="text-gray-700 font-medium mb-2 sm:mb-0">Connect with me:</div>
-  <div className="flex gap-4 text-2xl">
-    {teacherDetails?.Instagram && (
-      <Link
-        href={`https://www.instagram.com/${teacherDetails.Instagram}`}
-      >
-        <Image src="/instagram.png" alt="instagram" width={24} height={24} />
-      </Link>
-    )}
-
-    {teacherDetails?.Facebook && (
-      <Link
-        href={`https://www.facebook.com/${teacherDetails.Facebook}`}
-      >
-        <Image src="/facebook.png" alt="facebook" width={24} height={24} />
-      </Link>
-    )}
-
-    {teacherDetails?.Tiktok && (
-      <Link
-        href={`https://www.tiktok.com/${teacherDetails.Tiktok}`}
-      >
-        <Image src="/social-media.png" alt="tiktok" width={24} height={24} />
-      </Link>
-    )}
-
-    {teacherDetails?.youtube && (
-      <Link
-        href={`https://www.youtube.com/${teacherDetails.youtube}`}
-      >
-        <Image src="/youtube.png" alt="youtube" width={24} height={24} />
-      </Link>
-    )}
-  </div>
-</div>
-)}
-
-    {/* Website and Heart */}
-       {profile.isTeacher && (
-    <div className="flex justify-between items-center mt-6 p-3 bg-gray-50 rounded-lg">
-      <div className="flex items-center">
-        <span className="text-black font-bold mr-2">{teacherDetails?.website || 'https://yourwebsite.com'}</span>
-        <span className="text-blue-500 text-xs bg-blue-100 px-2 py-1 rounded">Verified</span>
-      </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <button className="text-xl transition-transform hover:scale-110 active:scale-95">
-              <Image src="/share.png" alt="share" width={20} height={20} />
-            </button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Share Profile</DialogTitle>
-              <DialogDescription>
-                Copy the link below and share it with others.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex items-center space-x-2">
-              <Input value={shareUrl} readOnly />
-              <Button onClick={handleCopy}>Copy</Button>
+              </div>
+              <div className="text-md mt-3 text-gray-700 font-medium">Completed Jobs</div>
             </div>
-          </DialogContent>
-        </Dialog>
-    </div>
-       )}
-       {profile.isTeacher && (
+
+            <div className="flex flex-col items-center">
+              <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                <span className="text-xl">${teacherDetails?.Total_amount_earned || '248.50'}</span>
+              </div>
+              <div className="text-md mt-3 text-gray-700 font-medium">Total Earned</div>
+            </div>
+
+          </div>
+        )}
+
+        {/* Socials */}
+        {profile.isTeacher && (
+          <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 mt-6 text-sm">
+            <div className="text-gray-700 font-medium mb-2 sm:mb-0">Connect with me:</div>
+            <div className="flex gap-4 text-2xl">
+              {teacherDetails?.Instagram && (
+                <Link
+                  href={`https://www.instagram.com/${teacherDetails.Instagram}`}
+                >
+                  <Image src="/instagram.png" alt="instagram" width={24} height={24} />
+                </Link>
+              )}
+
+              {teacherDetails?.Facebook && (
+                <Link
+                  href={`https://www.facebook.com/${teacherDetails.Facebook}`}
+                >
+                  <Image src="/facebook.png" alt="facebook" width={24} height={24} />
+                </Link>
+              )}
+
+              {teacherDetails?.Tiktok && (
+                <Link
+                  href={`https://www.tiktok.com/${teacherDetails.Tiktok}`}
+                >
+                  <Image src="/social-media.png" alt="tiktok" width={24} height={24} />
+                </Link>
+              )}
+
+              {teacherDetails?.youtube && (
+                <Link
+                  href={`https://www.youtube.com/${teacherDetails.youtube}`}
+                >
+                  <Image src="/youtube.png" alt="youtube" width={24} height={24} />
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Website and Heart */}
+        {profile.isTeacher && (
+          <div className="flex justify-between items-center mt-6 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center">
+              <span className="text-black font-bold mr-2">{teacherDetails?.website || 'https://yourwebsite.com'}</span>
+              <span className="text-blue-500 text-xs bg-blue-100 px-2 py-1 rounded">Verified</span>
+            </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <button className="text-xl transition-transform hover:scale-110 active:scale-95">
+                  <Image src="/share.png" alt="share" width={20} height={20} />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Share Profile</DialogTitle>
+                  <DialogDescription>
+                    Copy the link below and share it with others.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex items-center space-x-2">
+                  <Input value={shareUrl} readOnly />
+                  <Button onClick={handleCopy}>Copy</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
+        {/* {profile.isTeacher && (
 <div>
    <Button className="my-5" onClick={handleClick}>
       Categories
     </Button>
 </div>  
-       )}
-    {/* About Me */}
-    <div className="mt-6 p-4 bg-secondary rounded-xl">
-      <div className="font-bold text-lg text-gray-800 mb-2">About Me</div>
-      <div className="text-gray-700">
-        {teacherDetails?.bio_T || "No bio set yet. Add your expertise and experience!"}
-      </div>
-      {/* <div className="text-primary font-semibold cursor-pointer mt-2 inline-block hover:underline">
+       )} */}
+        {/* About Me */}
+        <div className="mt-6 p-4 bg-secondary rounded-xl">
+          <div className="font-bold text-lg text-gray-800 mb-2">About Me</div>
+          <div className="text-gray-700">
+            {teacherDetails?.bio_T || "No bio set yet. Add your expertise and experience!"}
+          </div>
+          {/* <div className="text-primary font-semibold cursor-pointer mt-2 inline-block hover:underline">
         Read more
       </div> */}
-    </div>
+        </div>
 
-    {/* Sections */}
-    {/* <div className="mt-6 flex flex-wrap gap-3 justify-start">
+        {/* Sections */}
+        {/* <div className="mt-6 flex flex-wrap gap-3 justify-start">
         <a 
           href="#" 
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
@@ -375,234 +409,232 @@ const handleSettingsClick = () => {
     </div> */}
 
 
-     {profile.isTeacher && (
-<div className="text-sm py-8 h-fit">
-  <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-    <span className="text-primary text-3xl">✨</span> Recent Work Samples
-  </h2>
+        {profile.isTeacher && (
+          <div className="text-sm py-8 h-fit">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <span className="text-primary text-3xl">✨</span> Recent Work Samples
+            </h2>
 
-  {/* Section & Tabs Header */}
-  <div className=" border-gray-200 pt-2">
-    {/* Section Filter */}
-    <div className="flex flex-wrap gap-3 justify-start mb-6">
-      {[
-        { key: "all", label: "All" },
-        { key: "section_1", label: teacherDetails?.section_1_name },
-        { key: "section_2", label: teacherDetails?.section_2_name },
-        { key: "section_3", label: teacherDetails?.section_3_name },
-        { key: "section_4", label: teacherDetails?.section_4_name },
-        { key: "section_5", label: teacherDetails?.section_5_name },
-      ]
-        .filter((s) => s.label)
-        .map((section) => (
-          <button
-            key={section.key}
-            onClick={() => setSelectedSection(section.key)}
-            className={`px-5 py-2.5 rounded-full border text-sm font-medium shadow-sm transition-all duration-300 ${
-              selectedSection === section.key
-                ? "bg-primary text-white shadow-md scale-105"
-                : "bg-white text-primary border-primary hover:bg-primary/5"
-            }`}
-          >
-            {section.label}
-          </button>
-        ))}
-    </div>
+            {/* Section & Tabs Header */}
+            <div className=" border-gray-200 pt-2">
+              {/* Section Filter */}
+              <div className="flex flex-wrap gap-3 justify-start mb-6">
+                {[
+                  { key: "all", label: "All" },
+                  { key: "section_1", label: teacherDetails?.section_1_name },
+                  { key: "section_2", label: teacherDetails?.section_2_name },
+                  { key: "section_3", label: teacherDetails?.section_3_name },
+                  { key: "section_4", label: teacherDetails?.section_4_name },
+                  { key: "section_5", label: teacherDetails?.section_5_name },
+                ]
+                  .filter((s) => s.label)
+                  .map((section) => (
+                    <button
+                      key={section.key}
+                      onClick={() => setSelectedSection(section.key)}
+                      className={`px-5 py-2.5 rounded-full border text-sm font-medium shadow-sm transition-all duration-300 ${selectedSection === section.key
+                          ? "bg-primary text-white shadow-md scale-105"
+                          : "bg-white text-primary border-primary hover:bg-primary/5"
+                        }`}
+                    >
+                      {section.label}
+                    </button>
+                  ))}
+              </div>
 
-    {/* Tabs (Images, Videos, Info) */}
-    <div className="flex w-full justify-center mb-6 border-b border-gray-100">
-      {[
-        { key: "images", label: "Images" },
-        { key: "videos", label: "Videos" },
-        { key: "info", label: "Info" },
-      ].map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => setActiveTab(tab.key)}
-          className={`relative w-full pb-2 px-2 font-semibold transition-all ${
-            activeTab === tab.key
-              ? "text-primary after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-primary"
-              : "text-gray-400 hover:text-gray-600"
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-
-    {/* === IMAGES TAB === */}
-    {activeTab === "images" && (
-      <div className="animate-fadeIn">
-        {gallery && gallery.length > 0 ? (
-          (() => {
-            const filtered = gallery.filter((img) =>
-              selectedSection === "all" ? true : img[selectedSection]
-            );
-            return filtered.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {filtered.map((url, i) => (
-                  <div
-                    key={i}
-                    className="relative group rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300"
+              {/* Tabs (Images, Videos, Info) */}
+              <div className="flex w-full justify-center mb-6 border-b border-gray-100">
+                {[
+                  { key: "images", label: "Images" },
+                  { key: "videos", label: "Videos" },
+                  { key: "info", label: "Info" },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`relative w-full pb-2 p-2 font-semibold transition-all ${activeTab === tab.key
+                        ? "text-primary  after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-primary"
+                        : "text-gray-400 hover:text-gray-600"
+                      }`}
                   >
-                    <Image
-                      src={url.image_url || url}
-                      alt={`Gallery ${i + 1}`}
-                      width={500}
-                      height={500}
-                      className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
-                      View Image
-                    </div>
-                  </div>
+                    {tab.label}
+                  </button>
                 ))}
               </div>
-            ) : (
-              <p className="text-gray-500 text-center py-10">No images found.</p>
-            );
-          })()
-        ) : (
-          <p className="text-gray-500 text-center py-10">No images uploaded yet.</p>
-        )}
-      </div>
-    )}
 
-    {/* === VIDEOS TAB === */}
-    {activeTab === "videos" && (
-      <div className="space-y-6 animate-fadeIn">
-        {subcollections.videos?.length ? (
-          (() => {
-            const filtered = subcollections.videos.filter((v) =>
-              selectedSection === "all" ? true : v[selectedSection]
-            );
-            return filtered.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {filtered.map((video, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
-                  >
-                    <video
-                      src={video.video_gallery}
-                      poster={video.thumbnail_url || "/video-placeholder.png"}
-                      controls
-                      className="w-full h-48 object-cover rounded-t-xl"
-                    />
-                    <div className="p-4">
-                      <p className="font-semibold text-gray-900">
-                        {video.Title || "Untitled Video"}
-                      </p>
-                      {video.Description && (
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                          {video.Description}
+              {/* === IMAGES TAB === */}
+              {activeTab === "images" && (
+                <div className="animate-fadeIn">
+                  {gallery && gallery.length > 0 ? (
+                    (() => {
+                      const filtered = gallery.filter((img) =>
+                        selectedSection === "all" ? true : img[selectedSection]
+                      );
+                      return filtered.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                          {filtered.map((url, i) => (
+                            <div
+                              key={i}
+                              className="relative group rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300"
+                            >
+                              <Image
+                                src={url.image_url || url}
+                                alt={`Gallery ${i + 1}`}
+                                width={500}
+                                height={500}
+                                className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
+                                View Image
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-10">No images found.</p>
+                      );
+                    })()
+                  ) : (
+                    <p className="text-gray-500 text-center py-10">No images uploaded yet.</p>
+                  )}
+                </div>
+              )}
+
+              {/* === VIDEOS TAB === */}
+              {activeTab === "videos" && (
+                <div className="space-y-6 animate-fadeIn">
+                  {subcollections.videos?.length ? (
+                    (() => {
+                      const filtered = subcollections.videos.filter((v) =>
+                        selectedSection === "all" ? true : v[selectedSection]
+                      );
+                      return filtered.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                          {filtered.map((video, i) => (
+                            <div
+                              key={i}
+                              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+                            >
+                              <video
+                                src={video.video_gallery}
+                                poster={video.thumbnail_url || "/video-placeholder.png"}
+                                controls
+                                className="w-full h-48 object-cover rounded-t-xl"
+                              />
+                              <div className="p-4">
+                                <p className="font-semibold text-gray-900">
+                                  {video.Title || "Untitled Video"}
+                                </p>
+                                {video.Description && (
+                                  <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                                    {video.Description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-10">
+                          No videos found for this section.
                         </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-10">
-                No videos found for this section.
-              </p>
-            );
-          })()
-        ) : (
-          <p className="text-gray-500 text-center py-10">No videos uploaded yet.</p>
-        )}
-      </div>
-    )}
+                      );
+                    })()
+                  ) : (
+                    <p className="text-gray-500 text-center py-10">No videos uploaded yet.</p>
+                  )}
+                </div>
+              )}
 
-    {/* === INFO TAB === */}
-    {activeTab === "info" && (
-      <div className="text-gray-700 space-y-6 animate-fadeIn">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          🧠 Expert Texts
-        </h3>
+              {/* === INFO TAB === */}
+              {activeTab === "info" && (
+                <div className="text-gray-700 space-y-6 animate-fadeIn">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    🧠 Expert Texts
+                  </h3>
 
-        {subcollections?.expertTexts?.length ? (
-          (() => {
-            const filtered = subcollections.expertTexts.filter((t) =>
-              selectedSection === "all" ? true : t[selectedSection]
-            );
-            return filtered.length > 0 ? (
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filtered.map((text, i) => (
-                  <li
-                    key={i}
-                    className="bg-white border border-gray-100 p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-                  >
-                    <p className="font-semibold text-lg text-gray-900 mb-2">
-                      {text.Title || "Untitled"}
+                  {subcollections?.expertTexts?.length ? (
+                    (() => {
+                      const filtered = subcollections.expertTexts.filter((t) =>
+                        selectedSection === "all" ? true : t[selectedSection]
+                      );
+                      return filtered.length > 0 ? (
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {filtered.map((text, i) => (
+                            <li
+                              key={i}
+                              className="bg-white border border-gray-100 p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+                            >
+                              <p className="font-semibold text-lg text-gray-900 mb-2">
+                                {text.Title || "Untitled"}
+                              </p>
+                              {text.Description && (
+                                <p className="text-sm text-gray-600 mb-2 line-clamp-3">
+                                  {text.Description}
+                                </p>
+                              )}
+                              {text.Link && (
+                                <a
+                                  href={
+                                    text.Link.startsWith("http")
+                                      ? text.Link
+                                      : `https://${text.Link}`
+                                  }
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline"
+                                >
+                                  🔗 Visit Link
+                                </a>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-500 text-center py-10">
+                          No expert texts found for this section.
+                        </p>
+                      );
+                    })()
+                  ) : (
+                    <p className="text-gray-500 text-center py-10">
+                      No expert texts available.
                     </p>
-                    {text.Description && (
-                      <p className="text-sm text-gray-600 mb-2 line-clamp-3">
-                        {text.Description}
-                      </p>
-                    )}
-                    {text.Link && (
-                      <a
-                        href={
-                          text.Link.startsWith("http")
-                            ? text.Link
-                            : `https://${text.Link}`
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline"
-                      >
-                        🔗 Visit Link
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500 text-center py-10">
-                No expert texts found for this section.
-              </p>
-            );
-          })()
-        ) : (
-          <p className="text-gray-500 text-center py-10">
-            No expert texts available.
-          </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
-    )}
-  </div>
-</div>
-     )}
-  </div>
-  {profile.isStudent && !user && (
-  <div className="flex flex-col items-center justify-center w-full py-10 px-6 mt-8 bg-gradient-to-br from-blue-50 via-white to-green-50 rounded-2xl shadow-lg border border-gray-100">
-    {/* Title */}
-    <h2 className="text-3xl font-extrabold text-primary text-center mb-3 tracking-tight">
-      Get More Features on Our Mobile App!
-    </h2>
-    <p className="text-gray-600 text-center max-w-md mb-8">
-      Learn anytime, anywhere. Stay connected with teachers and classmates on the go with our official mobile app.
-    </p>
+      {profile.isStudent && !user && (
+        <div className="flex flex-col items-center justify-center w-full py-10 px-6 mt-8 bg-gradient-to-br from-blue-50 via-white to-green-50 rounded-2xl shadow-lg border border-gray-100">
+          {/* Title */}
+          <h2 className="text-3xl font-extrabold text-primary text-center mb-3 tracking-tight">
+            Get More Features on Our Mobile App!
+          </h2>
+          <p className="text-gray-600 text-center max-w-md mb-8">
+            Learn anytime, anywhere. Stay connected with teachers and classmates on the go with our official mobile app.
+          </p>
 
-    {/* Store Buttons */}
-    <div className="flex flex-wrap justify-center items-center gap-6">
-      {/* Android */}
-      <div className="flex flex-col items-center gap-3">
-        <a
-          href="https://play.google.com/store/apps/details?id=com.weteachappneww.app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            src="/play-store.png"
-            width={140}
-            height={60}
-            alt="Play Store"
-            className="hover:scale-105 transition-transform drop-shadow-md"
-          />
-        </a>
-{/* 
+          {/* Store Buttons */}
+          <div className="flex flex-wrap justify-center items-center gap-6">
+            {/* Android */}
+            <div className="flex flex-col items-center gap-3">
+              <a
+                href="https://play.google.com/store/apps/details?id=com.weteachappneww.app"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/play-store.png"
+                  width={140}
+                  height={60}
+                  alt="Play Store"
+                  className="hover:scale-105 transition-transform drop-shadow-md"
+                />
+              </a>
+              {/* 
         <Button
           onClick={() =>
             window.open(
@@ -623,25 +655,25 @@ const handleSettingsClick = () => {
           </svg>
           Download for Android
         </Button> */}
-      </div>
+            </div>
 
-      {/* iOS */}
-      <div className="flex flex-col items-center gap-3">
-        <a
-          href="https://apps.apple.com/us/app/weteachs/id6502515880"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            src="/app-store.png"
-            width={140}
-            height={60}
-            alt="App Store"
-            className="hover:scale-105 transition-transform drop-shadow-md"
-          />
-        </a>
+            {/* iOS */}
+            <div className="flex flex-col items-center gap-3">
+              <a
+                href="https://apps.apple.com/us/app/weteachs/id6502515880"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/app-store.png"
+                  width={140}
+                  height={60}
+                  alt="App Store"
+                  className="hover:scale-105 transition-transform drop-shadow-md"
+                />
+              </a>
 
-        {/* <Button
+              {/* <Button
           variant="outline"
           onClick={() =>
             window.open(
@@ -662,17 +694,17 @@ const handleSettingsClick = () => {
           </svg>
           Get on iOS
         </Button> */}
-      </div>
+            </div>
+          </div>
+
+          {/* Decorative line */}
+          <div className="w-24 h-[3px] bg-gradient-to-r from-primary to-blue-600 mt-8 rounded-full"></div>
+        </div>
+      )}
+
     </div>
 
-    {/* Decorative line */}
-    <div className="w-24 h-[3px] bg-gradient-to-r from-primary to-blue-600 mt-8 rounded-full"></div>
-  </div>
-)}
 
-        </div>
-
-  
   );
 };
 

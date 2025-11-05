@@ -20,8 +20,12 @@ const SkeletonCard = () => (
 
 const CategoriesCard = () => {
   const searchParams = useSearchParams();
-  const uid = searchParams.get("userId") || undefined;
-  console.log("uid", uid)
+  // get uid safely from localStorage (works in browser only)
+  const uid =
+    typeof window !== "undefined"
+      ? localStorage.getItem("userId") || localStorage.getItem("user_id") || undefined
+      : undefined;
+  console.log("uid", uid);
   const router = useRouter();
   const { userId } = useUserIdFromUrl();
 
@@ -32,14 +36,14 @@ const CategoriesCard = () => {
     teacherDetails,
     loading,
     error,
-  } = useUserProfile(userId);
+  } = useUserProfile(uid);
 
   // Redirect to profile page once data is fetched successfully
-  React.useEffect(() => {
-    if (!loading && teacherDetails && Object.keys(teacherDetails).length > 0) {
-      router.push(`/profile?teacherId=${teacherDetails.id}`);
-    }
-  }, [loading, teacherDetails, router]);
+  // React.useEffect(() => {
+  //   if (!loading && teacherDetails && Object.keys(teacherDetails).length > 0) {
+  //     router.push(`/profile?teacherId=${teacherDetails.id}`);
+  //   }
+  // }, [loading, teacherDetails, router]);
 
   if (error) {
     return (
@@ -61,7 +65,7 @@ const CategoriesCard = () => {
 
   const handleCreate = () => {
     if (!teacherDetails?.id) {
-      console.error("Teacher ID not found");
+      console.log("Teacher ID not found");
       return;
     }
     router.push(`/upload?teacherId=${teacherDetails.id}`);

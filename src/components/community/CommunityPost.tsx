@@ -13,6 +13,7 @@ import {
 } from "@/src/lib/api/communityData";
 import { toast } from "sonner";
 import Image from "next/image";
+import { Skeleton } from "@/src/components/ui/skeleton";
 
 const CommunityPost = () => {
   const [questions, setQuestions] = useState<[]>([]);
@@ -26,7 +27,7 @@ const CommunityPost = () => {
 
 
   // 🆕 Reply State
-  const [replies, setReplies] = useState<Record<string,[]>>({});
+  const [replies, setReplies] = useState<Record<string, []>>({});
   const [newReplies, setNewReplies] = useState<Record<string, string>>({});
   const [loadingReplies, setLoadingReplies] = useState<Record<string, boolean>>({});
   const [postingReply, setPostingReply] = useState<Record<string, boolean>>({});
@@ -63,21 +64,30 @@ const CommunityPost = () => {
       setLoading(true);
       const data = await fetchCommunityQuestions();
       setQuestions(data || []);
+      // Auto-open first question and load its comments (if any)
+      const firstId = data?.[0]?.id;
+      if (firstId) {
+        setActiveQuestionId(firstId);
+        setLoadingComments(firstId);
+        const firstComments = await fetchCommentsForQuestion(firstId);
+        setComments((prev) => ({ ...prev, [firstId]: firstComments }));
+        setLoadingComments(null);
+      }
       setLoading(false);
     };
     loadQuestions();
   }, []);
 
   // 🔹 Load comments for question
-  const handleQuestionClick = async (questionId: string) => {
-    if (activeQuestionId === questionId) return setActiveQuestionId(null);
-    setActiveQuestionId(questionId);
-    if (comments[questionId]) return;
-    setLoadingComments(questionId);
-    const data = await fetchCommentsForQuestion(questionId);
-    setComments((prev) => ({ ...prev, [questionId]: data }));
-    setLoadingComments(null);
-  };
+  // const handleQuestionClick = async (questionId: string) => {
+  //   if (activeQuestionId === questionId) return setActiveQuestionId(null);
+  //   setActiveQuestionId(questionId);
+  //   if (comments[questionId]) return;
+  //   setLoadingComments(questionId);
+  //   const data = await fetchCommentsForQuestion(questionId);
+  //   setComments((prev) => ({ ...prev, [questionId]: data }));
+  //   setLoadingComments(null);
+  // };
 
   // 🆕 Load replies for comment
   const handleLoadReplies = async (commentId: string) => {
@@ -134,34 +144,34 @@ const CommunityPost = () => {
   };
 
   // Post comment
-const handlePostComment = async (questionId: string) => {
-  const uid = user?.uid;
-  if (!uid) {
-    router.push("/auth/login");
-    return;
-  }
+  const handlePostComment = async (questionId: string) => {
+    const uid = user?.uid;
+    if (!uid) {
+      router.push("/auth/login");
+      return;
+    }
 
-  const text = (newComments[questionId] || "").trim();
-  const file = selectedFiles[questionId];
+    const text = (newComments[questionId] || "").trim();
+    const file = selectedFiles[questionId];
 
-  if (!text && !file) {
-    toast.error("Please write a comment or attach an image/video");
-    return;
-  }
+    if (!text && !file) {
+      toast.error("Please write a comment or attach an image/video");
+      return;
+    }
 
-  setPostingComment(questionId);
-  try {
-    const created = await addCommentToQuestion(questionId, text, uid, file);
-    setNewComments((prev) => ({ ...prev, [questionId]: "" }));
-    setSelectedFiles((prev) => ({ ...prev, [questionId]: null }));
-    toast.success("Comment posted successfully");
-  } catch (err) {
-    console.error("Error posting comment:", err);
-    toast.error("Failed to post comment");
-  } finally {
-    setPostingComment(null);
-  }
-};
+    setPostingComment(questionId);
+    try {
+      const created = await addCommentToQuestion(questionId, text, uid, file);
+      setNewComments((prev) => ({ ...prev, [questionId]: "" }));
+      setSelectedFiles((prev) => ({ ...prev, [questionId]: null }));
+      toast.success("Comment posted successfully");
+    } catch (err) {
+      console.error("Error posting comment:", err);
+      toast.error("Failed to post comment");
+    } finally {
+      setPostingComment(null);
+    }
+  };
 
 
   // Like comment
@@ -188,10 +198,21 @@ const handlePostComment = async (questionId: string) => {
   // 🔹 Loading UI
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p>Loading community posts...</p>
+      <div className="min-h-screen flex items-start justify-center py-12 px-4">
+        <div className="w-full max-w-4xl space-y-6">
+          <Skeleton className="h-8 w-1/3 rounded-md" />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-gray-200 p-5">
+              <div className="flex items-start gap-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-3">
+                  <Skeleton className="h-4 w-2/3 rounded-md" />
+                  <Skeleton className="h-3 w-1/2 rounded-md" />
+                  <Skeleton className="h-10 w-full rounded-full" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -200,9 +221,9 @@ const handlePostComment = async (questionId: string) => {
   // 🔹 UI
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-center text-green-900 mb-8">
+      {/* <h1 className="text-3xl font-bold text-center text-green-900 mb-8">
         🌿 Community Discussions
-      </h1>
+      </h1> */}
 
       {questions.length === 0 ? (
         <p className="text-gray-500 text-center">No community questions found.</p>
@@ -213,116 +234,124 @@ const handlePostComment = async (questionId: string) => {
               <div className="p-5 space-y-3">
                 <div
                   className="cursor-pointer"
-                  onClick={() => handleQuestionClick(q.id)}
+                // onClick={() => handleQuestionClick(q.id)}
                 >
                   <h3 className="font-semibold text-lg text-primary">
                     {q.Question}
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">{q.Description}</p>
-                  <button className="text-green-700 text-sm font-medium hover:underline mt-2">
-                    {activeQuestionId === q.id ? "Hide" : "View"}
-                  </button>
+                  {/* View/Hide removed — question expands automatically */}
                 </div>
 
-   {/* 💬 Comment Input Section */}
-<div className="mt-4 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl shadow-sm p-3 transition-all duration-200 hover:shadow-md">
-  <div className="flex items-center gap-2">
-    <input
-      type="text"
-      placeholder="Write a comment..."
-      value={newComments[q.id] || ""}
-      onChange={(e) =>
-        setNewComments((prev) => ({
-          ...prev,
-          [q.id]: e.target.value,
-        }))
-      }
-      className="flex-1 bg-gray-50 focus:bg-white border border-gray-300 focus:border-primary/60 rounded-full px-4 py-2 text-sm outline-none transition-all"
-    />
+                {/* 💬 Comment Input Section */}
+                <div className="mt-4 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl shadow-sm p-3 transition-all duration-200 hover:shadow-md">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="Write a comment..."
+                      value={newComments[q.id] || ""}
+                      onChange={(e) =>
+                        setNewComments((prev) => ({
+                          ...prev,
+                          [q.id]: e.target.value,
+                        }))
+                      }
+                      className="flex-1 bg-gray-50 focus:bg-white border border-gray-300 focus:border-primary/60 rounded-full px-4 py-2 text-sm outline-none transition-all"
+                    />
 
-    {/* 📎 File Upload Button */}
-    <label className="cursor-pointer flex items-center justify-center w-9 h-9 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-full transition-all duration-150">
-      📎
-      <input
-        type="file"
-        accept="image/*,video/*"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          setSelectedFiles((prev) => ({
-            ...prev,
-            [q.id]: file || null,
-          }));
-        }}
-        className="hidden"
-      />
-    </label>
+                    {/* 📎 File Upload Button */}
+                    <label className="cursor-pointer flex items-center justify-center w-9 h-9 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-full transition-all duration-150">
+                      📎
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          setSelectedFiles((prev) => ({
+                            ...prev,
+                            [q.id]: file || null,
+                          }));
+                        }}
+                        className="hidden"
+                      />
+                    </label>
 
-    {/* 🚀 Post Button */}
-    <button
-      onClick={() => handlePostComment(q.id)}
-      disabled={postingComment === q.id}
-      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-        postingComment === q.id
-          ? "bg-primary/60 text-white cursor-not-allowed"
-          : "bg-primary text-white hover:bg-primary/90 shadow-sm"
-      }`}
-    >
-      {postingComment === q.id ? "Posting..." : "Post"}
-    </button>
-  </div>
+                    {/* 🚀 Post Button */}
+                    <button
+                      onClick={() => handlePostComment(q.id)}
+                      disabled={postingComment === q.id}
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${postingComment === q.id
+                          ? "bg-primary/60 text-white cursor-not-allowed"
+                          : "bg-primary text-white hover:bg-primary/90 shadow-sm"
+                        }`}
+                    >
+                      {postingComment === q.id ? "Posting..." : "Post"}
+                    </button>
+                  </div>
 
-  {/* 🖼️ Preview Selected File */}
-  {selectedFiles[q.id] && (
-    <div className="flex items-center gap-3 mt-3 bg-gray-50 border border-gray-200 rounded-lg p-2">
-      <div className="relative">
-        {selectedFiles[q.id].type.startsWith("image/") ? (
-          <Image
-            src={URL.createObjectURL(selectedFiles[q.id])}
-            alt="preview"
-            className="w-20 h-20 object-cover rounded-md border border-gray-300"
-          />
-        ) : (
-          <video
-            src={URL.createObjectURL(selectedFiles[q.id])}
-            className="w-28 h-20 rounded-md border border-gray-300"
-            controls
-          />
-        )}
+                  {/* 🖼️ Preview Selected File */}
+                  {selectedFiles[q.id] && (
+                    <div className="flex items-center gap-3 mt-3 bg-gray-50 border border-gray-200 rounded-lg p-2">
+                      <div className="relative">
+                        {selectedFiles[q.id].type.startsWith("image/") ? (
+                          <img
+                            src={URL.createObjectURL(selectedFiles[q.id])}
+                            alt="preview"
+                            className="w-20 h-20 object-cover rounded-md border border-gray-300"
+                          />
+                        ) : (
+                          <video
+                            src={URL.createObjectURL(selectedFiles[q.id])}
+                            className="w-28 h-20 rounded-md border border-gray-300"
+                            controls
+                          />
+                        )}
 
-        {/* ❌ Remove Button */}
-        <button
-          className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-600 shadow-sm"
-          onClick={() =>
-            setSelectedFiles((prev) => ({
-              ...prev,
-              [q.id]: null,
-            }))
-          }
-        >
-          ✕
-        </button>
-      </div>
+                        {/* ❌ Remove Button */}
+                        <button
+                          className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full text-xs hover:bg-red-600 shadow-sm"
+                          onClick={() =>
+                            setSelectedFiles((prev) => ({
+                              ...prev,
+                              [q.id]: null,
+                            }))
+                          }
+                        >
+                          ✕
+                        </button>
+                      </div>
 
-      {/* 📄 File Info */}
-      <div className="flex flex-col text-xs text-gray-600">
-        <span className="font-medium">
-          {selectedFiles[q.id]?.name?.slice(0, 20) || "File selected"}
-        </span>
-        <span>
-          {(selectedFiles[q.id]?.size / 1024).toFixed(1)} KB
-        </span>
-      </div>
-    </div>
-  )}
-</div>
+                      {/* 📄 File Info */}
+                      <div className="flex flex-col text-xs text-gray-600">
+                        <span className="font-medium">
+                          {selectedFiles[q.id]?.name?.slice(0, 20) || "File selected"}
+                        </span>
+                        <span>
+                          {(selectedFiles[q.id]?.size / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Comments */}
               {activeQuestionId === q.id && (
                 <div className="bg-gray-50 border-t border-gray-200 rounded-b-2xl p-4">
                   {loadingComments === q.id ? (
-                    <div className="flex justify-center py-4">
-                      <div className="w-6 h-6 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+                    <div className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="p-3 mb-3 bg-white border border-gray-200 rounded-xl">
+                          <div className="flex gap-3 items-start">
+                            <Skeleton className="h-9 w-9 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-1/3" />
+                              <Skeleton className="h-3 w-full" />
+                              <Skeleton className="h-3 w-2/3" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ) : comments[q.id]?.length > 0 ? (
                     comments[q.id].map((c) => {
@@ -335,7 +364,7 @@ const handlePostComment = async (questionId: string) => {
                           className="p-3 mb-3 bg-white border border-gray-200 rounded-xl"
                         >
                           <div className="flex gap-3">
-                            <Image
+                            <img
                               src={c.LimboUser?.photo_url || "/logo.png"}
                               alt={c.LimboUser?.display_name || "User"}
                               className="w-9 h-9 rounded-full border object-cover"
@@ -350,14 +379,14 @@ const handlePostComment = async (questionId: string) => {
                                 </span>
                               </div>
                               <p className="text-sm mt-1">{c.comment_text}</p>
-                              {c.image && ( <Image src={c.image} alt="Comment media" width={200} height={200} className="mt-2 rounded-lg max-w-xs border border-gray-300" /> )} {c.video && c.video !== "" && ( <video src={c.video} controls width={200} className="mt-2 rounded-lg max-w-xs border border-gray-300" /> )}
+                              {c.image && (<Image src={c.image} alt="Comment media" width={200} height={200} className="mt-2 rounded-lg max-w-xs border border-gray-300" />)} {c.video && c.video !== "" && (<video src={c.video} controls width={200} className="mt-2 rounded-lg max-w-xs border border-gray-300" />)}
                               <div className="flex items-center gap-2 mt-2">
-                       <button 
-                       onClick={() => handleLike(q.id, c.id)} 
-                       className={`flex items-center gap-1 text-sm ${isLiked ? "text-red-600" : "text-gray-500 hover:text-red-600"} transition`} >
-                         <span>Like{isLiked ? "❤️" : "🤍"}</span> 
-                         <span>{likeCount}</span> 
-                         </button> 
+                                <button
+                                  onClick={() => handleLike(q.id, c.id)}
+                                  className={`flex items-center gap-1 text-sm ${isLiked ? "text-red-600" : "text-gray-500 hover:text-red-600"} transition`} >
+                                  <span>Like{isLiked ? "❤️" : "🤍"}</span>
+                                  <span>{likeCount}</span>
+                                </button>
                                 <button
                                   className="text-xs text-primary hover:underline"
                                   onClick={() => handleLoadReplies(c.id)}
@@ -384,10 +413,10 @@ const handlePostComment = async (questionId: string) => {
                                         key={r.id}
                                         className="flex gap-2 bg-gray-100 p-2 rounded-lg"
                                       >
-                                        <Image
+                                        <img
                                           src={r.LimboUser?.photo_url || "/logo.png"}
                                           alt={r.LimboUser?.display_name}
-                                          className="w-7 h-7 rounded-full border"
+                                          className="w-7 h-7 rounded-full border object-cover"
                                         />
                                         <div>
                                           <p className="text-xs font-semibold text-gray-700">
