@@ -84,7 +84,7 @@ const SettingsPage: React.FC = () => {
 
       // update limbo user doc (assumes LimboUserMode collection)
       const limboDoc = doc(db, "LimboUserMode", storedId);
-      const limboPayload: any = {
+      const limboPayload = {
         display_name: displayName,
         email,
         photo_url: photoURL,
@@ -96,7 +96,7 @@ const SettingsPage: React.FC = () => {
 
       if (isTeacher) {
         const teacherDoc = doc(db, "TeacherDetails", teacherDetails?.id || storedId);
-        const teacherPayload: any = {
+        const teacherPayload = {
           bio_T: bio,
           website,
         };
@@ -185,12 +185,12 @@ const SettingsPage: React.FC = () => {
           <div className="flex-1 space-y-4">
             <div>
               <label className="block text-sm text-gray-700">Display Name</label>
-              <Input value={displayName} onChange={(e: any) => setDisplayName(e.target.value)} />
+              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
             </div>
 
             <div>
               <label className="block text-sm text-gray-700">Email</label>
-              <Input value={email} onChange={(e: any) => setEmail(e.target.value)} type="email" />
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
             </div>
 
             <div>
@@ -205,26 +205,26 @@ const SettingsPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm text-gray-700">Website</label>
-                <Input value={website} onChange={(e: any) => setWebsite(e.target.value)} />
+                <Input value={website} onChange={(e) => setWebsite(e.target.value)} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm text-gray-700">Instagram</label>
-                <Input value={instagram} onChange={(e: any) => setInstagram(e.target.value)} />
+                <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">Facebook</label>
-                <Input value={facebook} onChange={(e: any) => setFacebook(e.target.value)} />
+                <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">TikTok</label>
-                <Input value={tiktok} onChange={(e: any) => setTiktok(e.target.value)} />
+                <Input value={tiktok} onChange={(e) => setTiktok(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm text-gray-700">YouTube</label>
-                <Input value={youtube} onChange={(e: any) => setYoutube(e.target.value)} />
+                <Input value={youtube} onChange={(e) => setYoutube(e.target.value)} />
               </div>
             </div>
 

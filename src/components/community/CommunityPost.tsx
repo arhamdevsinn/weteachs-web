@@ -294,7 +294,7 @@ const CommunityPost = () => {
                     <div className="flex items-center gap-3 mt-3 bg-gray-50 border border-gray-200 rounded-lg p-2">
                       <div className="relative">
                         {selectedFiles[q.id].type.startsWith("image/") ? (
-                          <img
+                          <Image
                             src={URL.createObjectURL(selectedFiles[q.id])}
                             alt="preview"
                             className="w-20 h-20 object-cover rounded-md border border-gray-300"
@@ -364,7 +364,7 @@ const CommunityPost = () => {
                           className="p-3 mb-3 bg-white border border-gray-200 rounded-xl"
                         >
                           <div className="flex gap-3">
-                            <img
+                            <Image
                               src={c.LimboUser?.photo_url || "/logo.png"}
                               alt={c.LimboUser?.display_name || "User"}
                               className="w-9 h-9 rounded-full border object-cover"
@@ -413,7 +413,7 @@ const CommunityPost = () => {
                                         key={r.id}
                                         className="flex gap-2 bg-gray-100 p-2 rounded-lg"
                                       >
-                                        <img
+                                        <Image
                                           src={r.LimboUser?.photo_url || "/logo.png"}
                                           alt={r.LimboUser?.display_name}
                                           className="w-7 h-7 rounded-full border object-cover"
