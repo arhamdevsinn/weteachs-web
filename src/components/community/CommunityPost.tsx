@@ -24,6 +24,12 @@ const CommunityPost = () => {
   const [newComments, setNewComments] = useState<Record<string, string>>({});
   const [postingComment, setPostingComment] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
+  // Media modal state
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
+  const [mediaSrc, setMediaSrc] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<"image" | "video" | null>(null);
+  const [mediaAlt, setMediaAlt] = useState<string | null>(null);
+  const [mediaLoading, setMediaLoading] = useState<boolean>(false);
 
 
   // 🆕 Reply State
@@ -58,6 +64,23 @@ const CommunityPost = () => {
     return "just now";
   }
 
+  // Sort comments by create_when (newest first). Handles Firestore Timestamp or Date/string.
+  const sortCommentsByCreateWhen = (arr = []) => {
+    return (arr || []).slice().sort((a, b) => {
+      const getTime = (t) => {
+        try {
+          if (!t) return 0;
+          if (typeof t?.toDate === "function") return t.toDate().getTime();
+          const d = new Date(t);
+          return isNaN(d.getTime()) ? 0 : d.getTime();
+        } catch {
+          return 0;
+        }
+      };
+      return getTime(b.create_when) - getTime(a.create_when);
+    });
+  };
+  
   // 🔹 Load questions
   useEffect(() => {
     const loadQuestions = async () => {
@@ -70,7 +93,7 @@ const CommunityPost = () => {
         setActiveQuestionId(firstId);
         setLoadingComments(firstId);
         const firstComments = await fetchCommentsForQuestion(firstId);
-        setComments((prev) => ({ ...prev, [firstId]: firstComments }));
+        setComments((prev) => ({ ...prev, [firstId]: sortCommentsByCreateWhen(firstComments) }));
         setLoadingComments(null);
       }
       setLoading(false);
@@ -162,6 +185,11 @@ const CommunityPost = () => {
     setPostingComment(questionId);
     try {
       const created = await addCommentToQuestion(questionId, text, uid, file);
+      // append and re-sort comments so newest appear first
+      setComments((prev) => ({
+        ...prev,
+        [questionId]: sortCommentsByCreateWhen([...(prev[questionId] || []), created]),
+      }));
       setNewComments((prev) => ({ ...prev, [questionId]: "" }));
       setSelectedFiles((prev) => ({ ...prev, [questionId]: null }));
       toast.success("Comment posted successfully");
@@ -193,6 +221,22 @@ const CommunityPost = () => {
     } catch (err) {
       console.error("Error liking comment:", err);
     }
+  };
+
+  const openMediaModal = (src: string, type: "image" | "video", alt?: string) => {
+    setMediaLoading(true);
+    setMediaSrc(src);
+    setMediaType(type);
+    setMediaAlt(alt || null);
+    setMediaModalOpen(true);
+  };
+
+  const closeMediaModal = () => {
+    setMediaModalOpen(false);
+    setMediaSrc(null);
+    setMediaType(null);
+    setMediaAlt(null);
+    setMediaLoading(false);
   };
 
   // 🔹 Loading UI
@@ -297,6 +341,8 @@ const CommunityPost = () => {
                           <Image
                             src={URL.createObjectURL(selectedFiles[q.id])}
                             alt="preview"
+                            width={80}
+                            height={80}
                             className="w-20 h-20 object-cover rounded-md border border-gray-300"
                           />
                         ) : (
@@ -367,6 +413,8 @@ const CommunityPost = () => {
                             <Image
                               src={c.LimboUser?.photo_url || "/logo.png"}
                               alt={c.LimboUser?.display_name || "User"}
+                            width={36}
+                            height={36}
                               className="w-9 h-9 rounded-full border object-cover"
                             />
                             <div className="flex-1">
@@ -379,7 +427,29 @@ const CommunityPost = () => {
                                 </span>
                               </div>
                               <p className="text-sm mt-1">{c.comment_text}</p>
-                              {c.image && (<Image src={c.image} alt="Comment media" width={200} height={200} className="mt-2 rounded-lg max-w-xs border border-gray-300" />)} {c.video && c.video !== "" && (<video src={c.video} controls width={200} className="mt-2 rounded-lg max-w-xs border border-gray-300" />)}
+                              {c.image && (
+                                <div className="mt-2">
+                                  <Image
+                                    src={c.image}
+                                    alt={c.comment_text || "Comment image"}
+                                    width={400}
+                                    height={400}
+                                    className="rounded-lg max-w-xs border border-gray-300 cursor-pointer object-cover"
+                                    onClick={() => openMediaModal(c.image, "image", c.comment_text)}
+                                  />
+                                </div>
+                              )}
+                              {c.video && c.video !== "" && (
+                                <div className="mt-2">
+                                  <video
+                                    src={c.video}
+                                    controls
+                                    width={400}
+                                    className="rounded-lg max-w-xs border border-gray-300 cursor-pointer"
+                                    onClick={() => openMediaModal(c.video, "video", c.comment_text)}
+                                  />
+                                </div>
+                              )}
                               <div className="flex items-center gap-2 mt-2">
                                 <button
                                   onClick={() => handleLike(q.id, c.id)}
@@ -413,7 +483,7 @@ const CommunityPost = () => {
                                         key={r.id}
                                         className="flex gap-2 bg-gray-100 p-2 rounded-lg"
                                       >
-                                        <Image
+                                        <img
                                           src={r.LimboUser?.photo_url || "/logo.png"}
                                           alt={r.LimboUser?.display_name}
                                           className="w-7 h-7 rounded-full border object-cover"
@@ -465,8 +535,59 @@ const CommunityPost = () => {
           ))}
         </div>
       )}
+
+      {/* === MEDIA PREVIEW MODAL === */}
+      {mediaModalOpen && mediaSrc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={closeMediaModal}
+          />
+          <div className="relative z-10 max-w-[90vw] max-h-[90vh] p-4">
+            <div className="bg-white rounded-lg overflow-hidden shadow-xl">
+              <div className="flex items-center justify-between p-3 border-b">
+                <div className="text-sm text-gray-700">{mediaAlt || ""}</div>
+                <button
+                  className="text-gray-600 hover:text-gray-900 px-2 py-1"
+                  onClick={closeMediaModal}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="p-4 flex items-center justify-center relative">
+                {/* Loading overlay */}
+                {mediaLoading && (
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30">
+                    <div className="w-12 h-12 border-4 border-white/90 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+                {mediaType === "image" ? (
+                  // use img for unconstrained external images
+                  <img
+                    src={mediaSrc}
+                    alt={mediaAlt || "Preview"}
+                    className="max-w-[80vw] max-h-[80vh] object-contain"
+                    onLoad={() => setMediaLoading(false)}
+                    onError={() => setMediaLoading(false)}
+                  />
+                ) : (
+                  <video
+                    src={mediaSrc}
+                    controls
+                    autoPlay
+                    className="max-w-[80vw] max-h-[80vh] object-contain"
+                    onLoadedData={() => setMediaLoading(false)}
+                    onCanPlay={() => setMediaLoading(false)}
+                    onError={() => setMediaLoading(false)}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 export default CommunityPost;

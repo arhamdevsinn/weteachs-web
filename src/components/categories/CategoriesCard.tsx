@@ -1,11 +1,18 @@
 // @ts-nocheck
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 import { motion } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/src/components/ui/dialog";
 
 // Skeleton Loader
 const SkeletonCard = () => (
@@ -37,6 +44,21 @@ const CategoriesCard = () => {
     loading,
     error,
   } = useUserProfile(uid);
+console.log("categories", categories, teacherDetails, profile);
+  // modal state for category detail (shadcn Dialog)
+  // moved here so hooks run before any early returns (fixes Hooks order error)
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const openCategoryModal = (cat) => {
+    setSelectedCategory(cat);
+    setOpen(true);
+  };
+
+  const closeCategoryModal = () => {
+    setOpen(false);
+    setSelectedCategory(null);
+  };
 
   // Redirect to profile page once data is fetched successfully
   // React.useEffect(() => {
@@ -129,7 +151,8 @@ const CategoriesCard = () => {
               transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
               whileHover={{ scale: 1.03, y: -5 }}
               className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition"
-            >
+              onClick={() => openCategoryModal(cat)}
+              >
               {cat.image ? (
                 <motion.img
                   src={cat.image}
@@ -172,6 +195,85 @@ const CategoriesCard = () => {
           </div>
         )}
       </div>
+
+      {/* Category Detail Dialog (shadcn) */}
+      {selectedCategory && (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>{selectedCategory.title}</DialogTitle>
+            </DialogHeader>
+
+            <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-1 flex items-center justify-center">
+                {selectedCategory.image ? (
+                  <img
+                    src={selectedCategory.image}
+                    alt={selectedCategory.title}
+                    className="w-full h-48 object-cover rounded-lg border"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-lg border">
+                    No image
+                  </div>
+                )}
+              </div>
+
+              <div className="md:col-span-2">
+                <div className="text-sm text-gray-500 mb-4">{selectedCategory.topic}</div>
+                <p className="text-gray-700 mb-4 whitespace-pre-line">
+                  {selectedCategory.description || "No description provided."}
+                </p>
+
+                <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                  <div>
+                    <div className="font-medium text-gray-800">Rate</div>
+                    <div>{selectedCategory.category_rate ?? "N/A"}</div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-800">Language</div>
+                    <div>{teacherDetails.Language || teacherDetails.language || "Any"}</div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-800">Experience</div>
+                    <div>{selectedCategory.ExperienceLevel || "—"}</div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-800">Teacher</div>
+                    <div>{selectedCategory.teacher_name || "Unknown"}</div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      if (selectedCategory.teacher_ref?.path) {
+                        router.push(
+                          `/profile?teacherId=${selectedCategory.teacher_ref.id || selectedCategory.teacher_ref.path.split("/").pop()}`
+                        );
+                      } else {
+                        closeCategoryModal();
+                      }
+                    }}
+                    className="bg-primary text-white px-4 py-2 rounded-md"
+                  >
+                    View Teacher
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <button
+                className="px-4 py-2 text-sm text-gray-600"
+                onClick={() => setOpen(false)}
+              >
+                Close
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
