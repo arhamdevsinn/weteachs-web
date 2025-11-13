@@ -30,7 +30,7 @@ export class AuthService {
 
         try {
           await sendEmailVerification(user);
-        } catch (err: any) {
+        } catch (err) {
           if (err.code === "auth/too-many-requests") {
             throw new Error("Too many verification attempts. Please wait a few minutes.");
           }
@@ -46,7 +46,7 @@ export class AuthService {
       localStorage.removeItem("pending_verification_password");
       localStorage.removeItem("pending_origin");
       return userCredential;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login error:", error);
       throw error;
     }
@@ -142,7 +142,7 @@ static async resendVerificationEmail(): Promise<void> {
       await sendEmailVerification(user);
       console.log("📧 Verification email re-sent to:", email);
       await signOut(auth);
-    } catch (error: any) {
+    } catch (error) {
       if (error.code === "auth/too-many-requests") {
         throw new Error("Too many resend attempts. Try again later.");
       }
