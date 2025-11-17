@@ -31,7 +31,7 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { checkIfProfileExists } from "@/src/lib/api/userProfile";
+// import { checkIfProfileExists } from "@/src/lib/api/userProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 
 const ExpertDialog = () => {

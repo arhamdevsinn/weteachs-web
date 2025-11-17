@@ -72,11 +72,12 @@ const UserProfile = () => {
             localStorage.setItem("user_id", userProfile.id);
             console.log("✅ Stored uid (from id):", userProfile.id);
           }
-        } else {
-          console.log("🧹 No authenticated user — clearing stored user_id");
-          localStorage.removeItem("user_id");
-          localStorage.removeItem("userId");
-        }
+        } 
+        // else {
+        //   console.log("🧹 No authenticated user — clearing stored user_id");
+        //   localStorage.removeItem("user_id");
+        //   localStorage.removeItem("userId");
+        // }
       } catch (err) {
         console.error("❌ Error fetching fallback teacher:", err);
         toast.error("No teacher found for this username.");
@@ -212,8 +213,9 @@ const UserProfile = () => {
               className="rounded-full border-4 border-secondary shadow-lg relative"
             />
           </div>
-          <div className="text-center md:text-left">
-            <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
+          <div className="text-center md:text-left  w-full">
+         <div className="md:flex md:justify-between flex-col w-full items-center ">
+              <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
               {profile.display_name || "Your Name"}
               {profile.isTeacher && (
                 <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Teacher</span>
@@ -223,14 +225,25 @@ const UserProfile = () => {
               )}
 
             </div>
+      {profile.isTeacher && (
+            <div className="mt-4">
+              <Button 
+              onClick={() => router.push('/download')}
+              className="px-12 py-3 "
+              >
+                Hire
+              </Button>
+            </div>
+                )}
+              </div>
             {/* <div className='text-gray-600'>
           {profile.email}
         </div> */}
             <div className="text-gray-600 mb-1 flex items-center justify-center md:justify-start">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-              Available now
+              Available now 
               {profile.isTeacher && (
-                <span className="text-gray-600"> (${teacherDetails?.Live_Chat_rate})</span>
+                <span className="text-gray-600 font-medium">.   ${teacherDetails?.Live_Chat_rate}/15 min</span>
               )}
             </div>
             <div className="text-gray-600 mb-1">Languages: English</div>
@@ -243,10 +256,10 @@ const UserProfile = () => {
                 })
                 : "Unknown"}
             </div>
-
             {/* )} */}
           </div>
         </div>
+
 
         {/* Stats / Settings */}
         {profile.isTeacher && (
@@ -465,10 +478,10 @@ const UserProfile = () => {
               {/* === IMAGES TAB === */}
               {activeTab === "images" && (
                 <div className="animate-fadeIn">
-                  {gallery && gallery.length > 0 ? (
+                  {subcollections?.galleryCollection && subcollections?.galleryCollection.length > 0 ? (
                     (() => {
-                      const filtered = gallery.filter((img) =>
-                        selectedSection === "all" ? true : img[selectedSection]
+                      const filtered = subcollections.galleryCollection.filter((Image) =>
+                        selectedSection === "all" ? true : Image[selectedSection]
                       );
                       return filtered.length > 0 ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -478,7 +491,7 @@ const UserProfile = () => {
                               className="relative group rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300"
                             >
                               <Image
-                                src={url.image_url || url}
+                                src={url.image_gallery || url}
                                 alt={`Gallery ${i + 1}`}
                                 width={500}
                                 height={500}

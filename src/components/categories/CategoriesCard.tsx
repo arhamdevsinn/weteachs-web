@@ -179,8 +179,17 @@ console.log("categories", categories, teacherDetails, profile);
                 <p className="text-sm text-gray-600 mt-2 line-clamp-3">
                   {cat.description || "No description available."}
                 </p>
+  <div className="flex justify-between items-center mt-2">
+    <p className="text-sm text-gray-600 font-bold mt-2 line-clamp-3">
+                 ${cat.category_rate || "No description available."}/ 15 mins
+                </p>
+                 <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+                  {cat.Language }
+                </p>
+  </div>
+               
 
-                <div className="mt-auto flex items-center justify-between pt-3 border-t text-xs text-gray-500">
+                <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
                   <span>❤️ {cat.category_rate || 0} likes</span>
                   <span className="text-primary font-medium">
                     {cat.teacher_name || "Unknown"}
@@ -227,8 +236,8 @@ console.log("categories", categories, teacherDetails, profile);
 
                 <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
                   <div>
-                    <div className="font-medium text-gray-800">Rate</div>
-                    <div>{selectedCategory.category_rate ?? "N/A"}</div>
+                    <div className="font-bold text-gray-800">Rate</div>
+                    <div>${selectedCategory.category_rate ?? "N/A"}/15 mins</div>
                   </div>
                   <div>
                     <div className="font-medium text-gray-800">Language</div>
