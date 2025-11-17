@@ -214,7 +214,7 @@ const UserProfile = () => {
             />
           </div>
           <div className="text-center md:text-left  w-full">
-         <div className="md:flex md:justify-between flex-col w-full items-center ">
+         <div className="md:flex-row  md:justify-between flex  flex-col w-full items-center ">
               <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
               {profile.display_name || "Your Name"}
               {profile.isTeacher && (
