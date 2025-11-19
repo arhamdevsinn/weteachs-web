@@ -72,7 +72,7 @@ const UserProfile = () => {
             localStorage.setItem("user_id", userProfile.id);
             console.log("✅ Stored uid (from id):", userProfile.id);
           }
-        } 
+        }
         // else {
         //   console.log("🧹 No authenticated user — clearing stored user_id");
         //   localStorage.removeItem("user_id");
@@ -214,34 +214,34 @@ const UserProfile = () => {
             />
           </div>
           <div className="text-center md:text-left  w-full">
-         <div className="md:flex-row  md:justify-between flex  flex-col w-full items-center ">
+            <div className="md:flex-row  md:justify-between flex  flex-col w-full items-center ">
               <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
-              {profile.display_name || "Your Name"}
-              {profile.isTeacher && (
-                <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Teacher</span>
-              )}
-              {profile.isStudent && (
-                <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Student</span>
-              )}
-
-            </div>
-      {profile.isTeacher && (
-            <div className="mt-4">
-              <Button 
-              onClick={() => router.push('/download')}
-              className="px-12 py-3 "
-              >
-                Hire
-              </Button>
-            </div>
+                {profile.display_name || "Your Name"}
+                {profile.isTeacher && (
+                  <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Teacher</span>
                 )}
+                {profile.isStudent && (
+                  <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Student</span>
+                )}
+
               </div>
+              {profile.isTeacher && (
+                <div className="mt-4">
+                  <Button
+                    onClick={() => router.push('/download')}
+                    className="px-12 py-3 "
+                  >
+                    Hire
+                  </Button>
+                </div>
+              )}
+            </div>
             {/* <div className='text-gray-600'>
           {profile.email}
         </div> */}
             <div className="text-gray-600 mb-1 flex items-center justify-center md:justify-start">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-              Available now 
+              Available now
               {profile.isTeacher && (
                 <span className="text-gray-600 font-medium">.   ${teacherDetails?.Live_Chat_rate}/15 min</span>
               )}
@@ -446,8 +446,8 @@ const UserProfile = () => {
                       key={section.key}
                       onClick={() => setSelectedSection(section.key)}
                       className={`px-5 py-2.5 rounded-full border text-sm font-medium shadow-sm transition-all duration-300 ${selectedSection === section.key
-                          ? "bg-primary text-white shadow-md scale-105"
-                          : "bg-white text-primary border-primary hover:bg-primary/5"
+                        ? "bg-primary text-white shadow-md scale-105"
+                        : "bg-white text-primary border-primary hover:bg-primary/5"
                         }`}
                     >
                       {section.label}
@@ -466,8 +466,8 @@ const UserProfile = () => {
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
                     className={`relative w-full pb-2 p-2 font-semibold transition-all ${activeTab === tab.key
-                        ? "text-primary  after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-primary"
-                        : "text-gray-400 hover:text-gray-600"
+                      ? "text-primary  after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-primary"
+                      : "text-gray-400 hover:text-gray-600"
                       }`}
                   >
                     {tab.label}
@@ -476,43 +476,68 @@ const UserProfile = () => {
               </div>
 
               {/* === IMAGES TAB === */}
-              {activeTab === "images" && (
-                <div className="animate-fadeIn">
-                  {subcollections?.galleryCollection && subcollections?.galleryCollection.length > 0 ? (
-                    (() => {
-                      const filtered = subcollections.galleryCollection.filter((Image) =>
-                        selectedSection === "all" ? true : Image[selectedSection]
-                      );
-                      return filtered.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                          {filtered.map((url, i) => (
-                            <div
-                              key={i}
-                              className="relative group rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300"
-                            >
-                              <Image
-                                src={url.image_gallery || url}
-                                alt={`Gallery ${i + 1}`}
-                                width={500}
-                                height={500}
-                                className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
-                              />
-                              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
-                                View Image
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-500 text-center py-10">No images found.</p>
-                      );
-                    })()
-                  ) : (
-                    <p className="text-gray-500 text-center py-10">No images uploaded yet.</p>
-                  )}
-                </div>
-              )}
+            {activeTab === "images" && (
+  <div className="animate-fadeIn">
+    {subcollections?.galleryCollection && subcollections.galleryCollection.length > 0 ? (
+      (() => {
+        const filtered = subcollections.galleryCollection.filter((item) => {
+          const hasImage = item?.image_gallery && item.image_gallery.trim() !== "";
+          if (!hasImage) return false;
 
+          return selectedSection === "all" ? true : item[selectedSection];
+        });
+
+        return filtered.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filtered.map((item, i) => {
+              const likeCount = Array.isArray(item.likes_ref) ? item.likes_ref.length : 0;
+
+              return (
+                <div
+                  key={i}
+                  className="rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300 border"
+                >
+                  {/* Image */}
+                  <div className="relative w-full h-48 overflow-hidden group">
+                    <Image
+                      src={item.image_gallery}
+                      alt={item.Title || `Gallery ${i + 1}`}
+                      width={300}
+                      height={300}
+                      className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="p-4">
+                    {/* Title */}
+                    <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
+                      {item.Title || "Untitled"}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                      {item.Description || "No description provided."}
+                    </p>
+
+                    {/* Likes */}
+                    <div className="flex items-center text-sm text-gray-700 font-medium">
+                      ❤️ {likeCount} Likes
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-center py-10">No images found.</p>
+        );
+      })()
+    ) : (
+      <p className="text-gray-500 text-center py-10">No images uploaded yet.</p>
+    )}
+  </div>
+)}
               {/* === VIDEOS TAB === */}
               {activeTab === "videos" && (
                 <div className="space-y-6 animate-fadeIn">
