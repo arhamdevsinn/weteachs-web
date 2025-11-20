@@ -49,7 +49,7 @@ const UserProfile = () => {
   console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
 
   const usernameT = searchParams.get("name");
-  console.log(usernameT)
+  console.log("usernameT:", usernameT);
   useEffect(() => {
     const fetchFallbackTeacher = async () => {
       try {
@@ -64,7 +64,7 @@ const UserProfile = () => {
         setFallbackCategories(categories);
 
         // ✅ Temporarily store userId (only if user authenticated)
-        if (user) {
+        if (!user) {
           if (userProfile?.uid) {
             localStorage.setItem("user_id", userProfile.uid);
             console.log("✅ Stored uid:", userProfile.uid);

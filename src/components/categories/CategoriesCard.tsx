@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
@@ -13,6 +13,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/src/components/ui/dialog";
+import { getAllCategories } from "@/src/lib/api/categories";
+import { Input } from "@/src/components/ui/input";
+import { Search } from "lucide-react";
 
 // Skeleton Loader
 const SkeletonCard = () => (
@@ -26,6 +29,7 @@ const SkeletonCard = () => (
 );
 
 const CategoriesCard = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
   // get uid safely from localStorage (works in browser only)
   const uid =
@@ -44,7 +48,35 @@ const CategoriesCard = () => {
     loading,
     error,
   } = useUserProfile(uid);
-console.log("categories", categories, teacherDetails, profile);
+  // local fetched list of all categories (fallback / global)
+  const [allCategories, setAllCategories] = useState<[] | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const cats = await getAllCategories();
+        console.log("Fetched all categories:", cats);
+        if (mounted) setAllCategories(cats);
+      } catch (err) {
+        console.error("Failed to load all categories:", err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Pagination state (client-side)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(12);
+
+  // reset page when source changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [allCategories, categories, searchQuery]);
+
+  console.log("categories", categories, teacherDetails, profile);
   // modal state for category detail (shadcn Dialog)
   // moved here so hooks run before any early returns (fixes Hooks order error)
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -141,44 +173,85 @@ console.log("categories", categories, teacherDetails, profile);
       </div>
 
       {/* Grid of Cards */}
-      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {categories?.length > 0 ? (
-          categories.map((cat, index) => (
-            <motion.div
-              key={cat.id}
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
-              whileHover={{ scale: 1.03, y: -5 }}
-              className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition"
-              onClick={() => openCategoryModal(cat)}
-              >
-              {cat.image ? (
-                <motion.img
-                  src={cat.image}
-                  alt={cat.title || "Category"}
-                  className="h-40 w-full object-cover"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                />
-              ) : (
-                <div className="bg-gray-200 h-40 w-full flex items-center justify-center text-gray-400">
-                  No Image
-                </div>
-              )}
+      <div className="p-6">
+        {(() => {
+          const rawSource = (allCategories && allCategories.length > 0) ? allCategories : (categories || []);
+          // filter by searchQuery (title, topic, description, teacher_name)
+          const source = searchQuery
+            ? rawSource.filter((cat) => {
+                const q = searchQuery.toLowerCase();
+                const hay =
+                  ((cat.title || "") + " " + (cat.topic || "") + " " + (cat.description || "") + " " + (cat.teacher_name || "")).toLowerCase();
+                return hay.includes(q);
+              })
+            : rawSource;
+           const total = source.length || 0;
+           const totalPages = Math.max(1, Math.ceil(total / perPage));
+           // clamp currentPage
+           const page = Math.min(Math.max(1, currentPage), totalPages);
+           const start = (page - 1) * perPage;
+           const end = start + perPage;
+           const pageItems = source.slice(start, end);
 
-              <div className="p-4 flex flex-col flex-1">
-                <div className="text-xs uppercase tracking-wide text-primary font-medium">
-                  {cat.topic || "No topic"}
-                </div>
+          if (total === 0) {
+            return (
+              <div className="col-span-full text-center text-gray-500">
+                No categories found.
+              </div>
+            );
+          }
 
-                <div className="text-lg font-semibold mt-1 text-gray-800">
-                  {cat.title || "Untitled"}
+          return (
+            <>
+              {/* Search */}
+              <div className="mb-4 flex justify-items-start w-[500px]  px-2">
+                <div className="flex items-center border-1 border-primary rounded-md px-2  gap-2">
+                  <Search className="text-gray-500" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search categories by title, topic, teacher..."
+                    className="border-0 focus:ring-0 outline-0 w-[400px] "
+                  />
                 </div>
+              </div>
+               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                 {pageItems.map((cat, index) => (
+                   <motion.div
+                     key={cat.id}
+                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                     animate={{ opacity: 1, scale: 1, y: 0 }}
+                     transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
+                     whileHover={{ scale: 1.03, y: -5 }}
+                     className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition"
+                     onClick={() => openCategoryModal(cat)}
+                     >
+                     {cat.image ? (
+                       <motion.img
+                         src={cat.image}
+                         alt={cat.title || "Category"}
+                         className="h-40 w-full object-cover"
+                         whileHover={{ scale: 1.05 }}
+                         transition={{ duration: 0.3 }}
+                       />
+                     ) : (
+                       <div className="bg-gray-200 h-40 w-full flex items-center justify-center text-gray-400">
+                         No Image
+                       </div>
+                     )}
 
-                <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-                  {cat.description || "No description available."}
-                </p>
+                     <div className="p-4 flex flex-col flex-1">
+                       <div className="text-xs uppercase tracking-wide text-primary font-medium">
+                         {cat.topic || "No topic"}
+                       </div>
+
+                       <div className="text-lg font-semibold mt-1 text-gray-800">
+                         {cat.title || "Untitled"}
+                       </div>
+
+                       <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+                         {cat.description || "No description available."}
+                       </p>
   <div className="flex justify-between items-center mt-2">
     <p className="text-sm text-gray-600 font-bold mt-2 line-clamp-3">
                  ${cat.category_rate || "No description available."}/ 15 mins
@@ -189,21 +262,63 @@ console.log("categories", categories, teacherDetails, profile);
   </div>
                
 
-                <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
-                  <span>❤️ {cat.category_rate || 0} likes</span>
-                  <span className="text-primary font-medium">
-                    {cat.teacher_name || "Unknown"}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <div className="col-span-full text-center text-gray-500">
-            No categories found.
-          </div>
-        )}
-      </div>
+                       <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
+                         <span>❤️ {cat.category_rate || 0} likes</span>
+                         <span className="text-primary font-medium">
+                           {cat.teacher_name || "Unknown"}
+                         </span>
+                       </div>
+                     </div>
+                   </motion.div>
+                 ))}
+               </div>
+
+               {/* Pagination controls */}
+               {total > perPage && (
+                 <div className="mt-6 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                     <button
+                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                       disabled={page <= 1}
+                       className="px-3 py-1 rounded-md border bg-white text-sm disabled:opacity-50"
+                     >
+                       Prev
+                     </button>
+                     <div className="text-sm text-gray-600">
+                       Page {page} of {totalPages}
+                     </div>
+                     <button
+                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                       disabled={page >= totalPages}
+                       className="px-3 py-1 rounded-md border bg-white text-sm disabled:opacity-50"
+                     >
+                       Next
+                     </button>
+                   </div>
+
+                   <div className="flex items-center gap-2">
+                     <label className="text-sm text-gray-600">Per page:</label>
+                     <select
+                       value={perPage}
+                       onChange={(e) => {
+                         setPerPage(Number(e.target.value));
+                         setCurrentPage(1);
+                       }}
+                       className="text-sm border rounded px-2 py-1"
+                     >
+                       {[8, 12, 24, 48].map((n) => (
+                         <option key={n} value={n}>
+                           {n}
+                         </option>
+                       ))}
+                     </select>
+                   </div>
+                 </div>
+               )}
+             </>
+           );
+         })()}
+       </div>
 
       {/* Category Detail Dialog (shadcn) */}
       {selectedCategory && (
@@ -256,19 +371,43 @@ console.log("categories", categories, teacherDetails, profile);
                 <div className="mt-6 flex items-center gap-3">
                   <button
                     onClick={() => {
-                      if (selectedCategory.teacher_ref?.path) {
-                        router.push(
-                          `/profile?teacherId=${selectedCategory.teacher_ref.id || selectedCategory.teacher_ref.path.split("/").pop()}`
-                        );
+                      // prefer already-resolved `teacher` object if present
+                      const teacherObj =
+                        selectedCategory.teacher ||
+                        selectedCategory.teacher_ref ||
+                        null;
+
+                      try {
+                        if (teacherObj) {
+                          // store short-lived teacher object in sessionStorage
+                          sessionStorage.setItem(
+                            "view_expert_teacher",
+                            JSON.stringify(teacherObj)
+                          );
+                        }
+                      } catch (e) {
+                        console.error("Failed to store teacher in sessionStorage", e);
+                      }
+
+                      // navigate with teacher id in query so page can fetch if needed
+                      const teacherId =
+                        (teacherObj && (teacherObj.id || teacherObj.uid)) ||
+                        // fallback: try to extract from DocumentReference path
+                        (selectedCategory.teacher_ref && selectedCategory.teacher_ref.id) ||
+                        "";
+
+                      if (teacherId) {
+                        router.push(`/view-expert?teacherId=${teacherId}`);
                       } else {
-                        closeCategoryModal();
+                        // open view-expert without id — page should handle missing id
+                        router.push(`/view-expert`);
                       }
                     }}
-                    className="bg-primary text-white px-4 py-2 rounded-md"
-                  >
-                    View Teacher
-                  </button>
-                </div>
+                     className="bg-primary text-white px-4 py-2 rounded-md"
+                   >
+                     View Teacher
+                   </button>
+                 </div>
               </div>
             </div>
 
