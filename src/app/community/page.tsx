@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import React, { useState, Suspense } from "react";
 import { Button } from "@/src/components/ui/button";

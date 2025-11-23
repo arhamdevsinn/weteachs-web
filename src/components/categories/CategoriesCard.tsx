@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
@@ -16,6 +16,7 @@ import {
 import { getAllCategories } from "@/src/lib/api/categories";
 import { Input } from "@/src/components/ui/input";
 import { Search } from "lucide-react";
+import algoliasearch from "algoliasearch/lite";
 
 // Skeleton Loader
 const SkeletonCard = () => (
@@ -76,6 +77,63 @@ const CategoriesCard = () => {
     setCurrentPage(1);
   }, [allCategories, categories, searchQuery]);
 
+  // Algolia state
+  const [algoliaHits, setAlgoliaHits] = useState<[] | null>(null);
+  const [algoliaTotal, setAlgoliaTotal] = useState<number | null>(null);
+  const [algoliaPages, setAlgoliaPages] = useState<number | null>(null);
+  const algoliaTimer = useRef<number | null>(null);
+  const algoliaClientRef = useRef< | null>(null);
+  const ALGOLIA_APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
+  const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY;
+  const ALGOLIA_INDEX = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_CATEGORIES || "Categories";
+
+  // initialize algolia client once (client-side only)
+  useEffect(() => {
+    if (!ALGOLIA_APP_ID || !ALGOLIA_SEARCH_KEY) return;
+    try {
+      algoliaClientRef.current = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY);
+    } catch (e) {
+      console.warn("Algolia init failed", e);
+    }
+  }, []);
+
+  // Perform Algolia search when query changes (debounced) or when paging changes while a query is active
+  useEffect(() => {
+    // only run Algolia search when query is non-empty and client configured
+    if (!searchQuery || !algoliaClientRef.current) {
+      setAlgoliaHits(null);
+      setAlgoliaTotal(null);
+      setAlgoliaPages(null);
+      return;
+    }
+
+    // debounce
+    if (algoliaTimer.current) {
+      clearTimeout(algoliaTimer.current);
+    }
+    algoliaTimer.current = window.setTimeout(async () => {
+      try {
+        const index = algoliaClientRef.current.initIndex(ALGOLIA_INDEX);
+        const res = await index.search(searchQuery, {
+          page: Math.max(0, currentPage - 1),
+          hitsPerPage: perPage,
+        });
+        setAlgoliaHits(res.hits || []);
+        setAlgoliaTotal(res.nbHits ?? 0);
+        setAlgoliaPages(res.nbPages ?? 1);
+      } catch (err) {
+        console.error("Algolia search failed:", err);
+        setAlgoliaHits([]);
+        setAlgoliaTotal(0);
+        setAlgoliaPages(1);
+      }
+    }, 300);
+
+    return () => {
+      if (algoliaTimer.current) clearTimeout(algoliaTimer.current);
+    };
+  }, [searchQuery, currentPage, perPage, ALGOLIA_INDEX]);
+
   console.log("categories", categories, teacherDetails, profile);
   // modal state for category detail (shadcn Dialog)
   // moved here so hooks run before any early returns (fixes Hooks order error)
@@ -110,7 +168,7 @@ const CategoriesCard = () => {
   if (loading) {
     return (
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {Array.from({ length: 8 }).map((_, index) => (
+        {Array.from({ length: 12 }).map((_, index) => (
           <SkeletonCard key={index} />
         ))}
       </div>
@@ -154,6 +212,22 @@ const CategoriesCard = () => {
           </div>
         </div>
 
+        {/* Search moved into header */}
+        <div className="flex-1 px-6 max-w-2xl">
+          <div className="flex items-center bg-white border rounded-md px-3 py-1 shadow-sm">
+            <Search className="text-gray-400 mr-2" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search categories by title, topic, teacher..."
+              className="border-0 focus:ring-0 outline-0 w-full"
+            />
+          </div>
+        </div>
+
         <button
           onClick={handleCreate}
           className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-transform transform hover:scale-105"
@@ -175,23 +249,28 @@ const CategoriesCard = () => {
       {/* Grid of Cards */}
       <div className="p-6">
         {(() => {
+          // if Algolia supplied results (search active), use them
+          const usingAlgolia = Array.isArray(algoliaHits);
           const rawSource = (allCategories && allCategories.length > 0) ? allCategories : (categories || []);
-          // filter by searchQuery (title, topic, description, teacher_name)
-          const source = searchQuery
+
+          // local filtering only applies when not using Algolia
+          const source = usingAlgolia
+            ? algoliaHits!
+            : searchQuery
             ? rawSource.filter((cat) => {
                 const q = searchQuery.toLowerCase();
                 const hay =
-                  ((cat.title || "") + " " + (cat.topic || "") + " " + (cat.description || "") + " " + (cat.teacher_name || "")).toLowerCase();
+                  ((cat.title || "") + " " + (cat.topic || "") + " " + (cat.description || "") + " " + (cat.teacher_name || "")+ " " + (cat.category_rate || "")).toLowerCase();
                 return hay.includes(q);
               })
             : rawSource;
-           const total = source.length || 0;
-           const totalPages = Math.max(1, Math.ceil(total / perPage));
-           // clamp currentPage
-           const page = Math.min(Math.max(1, currentPage), totalPages);
-           const start = (page - 1) * perPage;
-           const end = start + perPage;
-           const pageItems = source.slice(start, end);
+
+          const total = usingAlgolia ? (algoliaTotal ?? source.length) : (source.length || 0);
+          const totalPages = usingAlgolia ? Math.max(1, algoliaPages ?? 1) : Math.max(1, Math.ceil(total / perPage));
+          const page = Math.min(Math.max(1, currentPage), totalPages);
+          const start = (page - 1) * perPage;
+          const end = start + perPage;
+          const pageItems = usingAlgolia ? source : source.slice(start, end);
 
           if (total === 0) {
             return (
@@ -203,18 +282,6 @@ const CategoriesCard = () => {
 
           return (
             <>
-              {/* Search */}
-              <div className="mb-4 flex justify-items-start w-[500px]  px-2">
-                <div className="flex items-center border-1 border-primary rounded-md px-2  gap-2">
-                  <Search className="text-gray-500" />
-                  <Input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search categories by title, topic, teacher..."
-                    className="border-0 focus:ring-0 outline-0 w-[400px] "
-                  />
-                </div>
-              </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                  {pageItems.map((cat, index) => (
                    <motion.div
@@ -356,7 +423,7 @@ const CategoriesCard = () => {
                   </div>
                   <div>
                     <div className="font-medium text-gray-800">Language</div>
-                    <div>{teacherDetails.Language || teacherDetails.language || "Any"}</div>
+                    <div>{selectedCategory.Language || teacherDetails.language || "Any"}</div>
                   </div>
                   <div>
                     <div className="font-medium text-gray-800">Experience</div>

@@ -11,7 +11,7 @@ import {
 
 export const UserProfileAPI = {
 
-  getProfile: async (uid: string) => {
+getProfile: async (uid: string) => {
     const userDocRef = doc(db, "LimboUserMode", uid);
     const userSnap = await getDoc(userDocRef);
 
@@ -121,7 +121,7 @@ export const UserProfileAPI = {
         expertTexts: teacherExpertTexts,
       },
     };
-  },
+},
 
 async getTeacherByUsername(usernameT: string) {
   const teacherQuery = query(
@@ -207,5 +207,83 @@ async getTeacherByUsername(usernameT: string) {
       expertTexts: teacherExpertTexts,
     },
   };
-}
+},
+
+  // Find profile by username (checks TeacherDetails.usernameT and StudentDetails.usernameS)
+  async getProfileByUsername(username: string) {
+    // Try teacher first
+    try {
+      const tQuery = query(
+        collection(db, "TeacherDetails"),
+        where("usernameT", "==", username)
+      );
+      const tSnap = await getDocs(tQuery);
+      if (!tSnap.empty) {
+        const tDoc = tSnap.docs[0];
+        const teacherData = { id: tDoc.id, ...tDoc.data() };
+
+        // reuse getTeacherByUsername logic to build full payload
+        const result = await this.getTeacherByUsername(teacherData.usernameT || username);
+        return { role: "teacher", ...result };
+      }
+    } catch (e) {
+      // continue to student check on error
+      console.warn("Teacher lookup failed", e);
+    }
+
+    // Try student
+    try {
+      const sQuery = query(
+        collection(db, "StudentDetails"),
+        where("usernameS", "==", username)
+      );
+      const sSnap = await getDocs(sQuery);
+      if (!sSnap.empty) {
+        const sDoc = sSnap.docs[0];
+        const studentData = { id: sDoc.id, ...sDoc.data() };
+
+        // resolve limbo profile if present (similar to teacher)
+        let userProfile = null;
+        if (studentData.limbo_ref) {
+          let limboRef;
+          if (typeof studentData.limbo_ref === "string") {
+            limboRef = doc(db, studentData.limbo_ref.replace(/^\//, ""));
+          } else if (
+            typeof studentData.limbo_ref === "object" &&
+            "path" in studentData.limbo_ref
+          ) {
+            limboRef = studentData.limbo_ref;
+          }
+          if (limboRef) {
+            const limboSnap = await getDoc(limboRef);
+            if (limboSnap.exists()) userProfile = { id: limboRef.id, ...limboSnap.data() };
+          }
+        }
+
+        // collect student subcollections if any (optional)
+        const studentDocRef = doc(db, "StudentDetails", studentData.id);
+        const [reviewSnap, gallerySnap] = await Promise.all([
+          getDocs(collection(studentDocRef, "StudentReviews").withConverter?.() || collection(studentDocRef, "StudentReviews")),
+          getDocs(collection(studentDocRef, "StudentGalleryCollection").withConverter?.() || collection(studentDocRef, "StudentGalleryCollection")),
+        ]).catch(() => [null, null]);
+
+        const studentReviews = reviewSnap ? reviewSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
+        const studentGallery = gallerySnap ? gallerySnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
+
+        return {
+          student: studentData,
+          userProfile,
+          subcollections: {
+            reviews: studentReviews,
+            galleryCollection: studentGallery,
+          },
+          role: "student",
+        };
+      }
+    } catch (e) {
+      console.warn("Student lookup failed", e);
+    }
+
+    throw new Error("No profile found for provided username");
+  },
 };
