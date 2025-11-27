@@ -239,6 +239,34 @@ export const useUserProfile = (uid?: string) => {
     }
   };
 
+    // 🔹 Get student by username
+  const getStudentByUsername = async (usernameT: string) => {
+    try {
+      const studentRef = collection(db, "StudentDetails");
+      const q = query(studentRef, where("usernameT", "==", usernameT));
+      const snap = await getDocs(q);
+
+      if (snap.empty) throw new Error("Student not found");
+
+      const studentDoc = snap.docs[0];
+      const studentData = { id: studentDoc.id, ...studentDoc.data() };
+
+      let profileData = null;
+      if (studentData.limbo_ref) {
+        const limboDocRef = doc(db, studentData.limbo_ref);
+        const limboSnap = await getDoc(limboDocRef);
+        if (limboSnap.exists()) {
+          profileData = { id: limboDocRef.id, ...limboSnap.data() };
+        }
+      }
+
+      return { studentDetails: studentData, profile: profileData };
+    } catch (error) {
+      console.error("Error fetching student by username:", error);
+      throw error;
+    }
+  };
+
   // 🔹 Auto-fetch profile on mount
   useEffect(() => {
     fetchProfile();

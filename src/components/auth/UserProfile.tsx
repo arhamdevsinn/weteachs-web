@@ -1,11 +1,10 @@
 // @ts-nocheck
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { UserProfileAPI } from "@/src/lib/api/userProfile";
 import { useAuth } from "@/src/hooks/useAuth";
 import {
@@ -20,6 +19,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { log } from "console";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("images");
@@ -32,98 +32,170 @@ const UserProfile = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const storedId =
-    typeof window !== "undefined"
-      ? localStorage.getItem("user_id") || localStorage.getItem("userId")
-      : null;
+  //  const storedId =
+  //    typeof window !== "undefined"
+  //      ? localStorage.getItem("user_id") || localStorage.getItem("userId")
+  //      : null;
 
-  const {
-    profile,
-    teacherDetails,
-    gallery,
-    categories,
-    subcollections,
-    loading: dataLoading,
-    error: dataError,
-  } = useUserProfile(storedId);
-  console.log('UserProfile data:', { profile, teacherDetails, gallery, categories, subcollections, dataError });
+  //  const {
+  //    profile,
+  //    displayTeacher,
+  //    gallery,
+  //    categories,
+  //    subcollections,
+  //    loading: dataLoading,
+  //    error: dataError,
+  //  } = useUserProfile(storedId);
+  //  console.log('UserProfile data:', { profile, displayTeacher, gallery, categories, subcollections, dataError });
+  //
+  //  const usernameT = searchParams.get("name");
+  //  console.log("usernameT:", usernameT);
+  //  
+  //  useEffect(() => {
+  //    const fetchFallbackTeacher = async () => {
+  //      try {
+  //        setLoadingFallback(true);
+  //
+  //        const { teacher, userProfile, categories, subcollections } =
+  //          await UserProfileAPI.getTeacherByUsername(usernameT);
+  //
+  //        console.log("Fetched public teacher:", teacher, userProfile, categories, subcollections);
+  //        setFallbackTeacher(teacher);
+  //        setFallbackProfile(userProfile);
+  //        setFallbackCategories(categories);
+  //
+  //        // ✅ Temporarily store userId (only if user authenticated)
+  //        if (!user) {
+  //          if (userProfile?.uid) {
+  //            localStorage.setItem("user_id", userProfile.uid);
+  //            console.log("✅ Stored uid:", userProfile.uid);
+  //          } else if (userProfile?.id) {
+  //            localStorage.setItem("user_id", userProfile.id);
+  //            console.log("✅ Stored uid (from id):", userProfile.id);
+  //          }
+  //        }
+  //        else {
+  //          console.log("🧹 No authenticated user — clearing stored user_id");
+  //          localStorage.removeItem("user_id");
+  //          localStorage.removeItem("userId");
+  //        }
+  //      } catch (err) {
+  //        console.error("❌ Error fetching fallback teacher:", err);
+  //        toast.error("No teacher found for this username.");
+  //      } finally {
+  //        setLoadingFallback(false);
+  //      }
+  //    };
+  //
+  //    // ✅ Fetch only if no stored ID but a username is present
+  //    if (usernameT) {
+  //      fetchFallbackTeacher();
+  //    }
+  //
+  //    // 🧹 Cleanup when route changes or component unmounts
+  //    // return () => {
+  //    //   console.log("🧹 Cleaning up: removing userId from localStorage");
+  //    //   localStorage.removeItem("user_id");
+  //    // };
+  //  }, [storedId, usernameT, user]);
 
+  // always use username from query param to fetch profile (no localStorage checks)
   const usernameT = searchParams.get("name");
-  console.log("usernameT:", usernameT);
+  // guard to ensure we fetch only once per username value
+  const fetchedForRef = useRef<string | null>(null);
+
+  // current name param (stable alias) and request id ref used in the effect below
+  const nameParam = usernameT;
+  const currentReqRef = useRef<number | null>(null);
+
+  const [dataLoading, setDataLoading] = useState(false);
+  const [dataError, setDataError] = useState<>(null);
+  const [subcollectionsData, setSubcollectionsData] = useState<>({});
+
   useEffect(() => {
-    const fetchFallbackTeacher = async () => {
+    const username = nameParam;
+    if (!username) return;
+    console.log("Fetching profile for username:", username);
+
+    // clear previous display while fetching new profile so old profile doesn't flash back
+    setFallbackTeacher(null);
+    console.log("Cleared previous teacher data.");
+    setFallbackProfile(null);
+    setFallbackCategories([]);
+    setSubcollectionsData({});
+    setDataError(null);
+     setDataLoading(true);
+    console.log("Cleared previous profile data.");
+
+    const reqId = Date.now();
+    currentReqRef.current = reqId;
+    let mounted = true;
+    setDataLoading(true);
+
+    (async () => {
       try {
-        setLoadingFallback(true);
+        const res = await UserProfileAPI.getProfileByUsername(username);
 
-        const { teacher, userProfile, categories, subcollections } =
-          await UserProfileAPI.getTeacherByUsername(usernameT);
+        // ignore if component unmounted or a newer request started
+        if (!mounted || currentReqRef.current !== reqId) return;
 
-        console.log("Fetched public teacher:", teacher, userProfile, categories, subcollections);
-        setFallbackTeacher(teacher);
-        setFallbackProfile(userProfile);
-        setFallbackCategories(categories);
-
-        // ✅ Temporarily store userId (only if user authenticated)
-        if (!user) {
-          if (userProfile?.uid) {
-            localStorage.setItem("user_id", userProfile.uid);
-            console.log("✅ Stored uid:", userProfile.uid);
-          } else if (userProfile?.id) {
-            localStorage.setItem("user_id", userProfile.id);
-            console.log("✅ Stored uid (from id):", userProfile.id);
-          }
+        if (res.role === "teacher") {
+          setFallbackTeacher(res.teacherDetails || res.teacher || null);
+          setFallbackProfile(res.profile || res.userProfile || null);
+          setFallbackCategories(res.categories || []);
+          setSubcollectionsData(res.subcollections || {});
+        } else if (res.role === "student") {
+          setFallbackTeacher(null);
+          setFallbackProfile(res.profile || res.userProfile || null);
+          setFallbackCategories([]);
+          setSubcollectionsData(res.subcollections || {});
+        } else {
+          throw new Error("Profile not found");
         }
-        // else {
-        //   console.log("🧹 No authenticated user — clearing stored user_id");
-        //   localStorage.removeItem("user_id");
-        //   localStorage.removeItem("userId");
-        // }
       } catch (err) {
-        console.error("❌ Error fetching fallback teacher:", err);
-        toast.error("No teacher found for this username.");
+        if (currentReqRef.current === reqId) {
+          console.error("Error fetching profile by username:", err);
+          setDataError(err);
+          toast.error("No profile found for this username.");
+        }
       } finally {
-        setLoadingFallback(false);
+        if (mounted && currentReqRef.current === reqId) setDataLoading(false);
       }
-    };
+    })();
 
-    // ✅ Fetch only if no stored ID but a username is present
-    if (!storedId && usernameT) {
-      fetchFallbackTeacher();
-    }
-
-    // 🧹 Cleanup when route changes or component unmounts
     return () => {
-      console.log("🧹 Cleaning up: removing userId from localStorage");
-      localStorage.removeItem("user_id");
+      mounted = false;
     };
-  }, [storedId, usernameT, user]);
+  }, [nameParam]);
 
   const handleSettingsClick = () => {
     router.push("/settings", {
-      state: { userImg: profile.photo_url || "/profile.photo_url" },
+      state: { userImg: fallbackProfile?.photo_url || "/profile.photo_url" },
     });
   };
   const handleClick = () => {
-    if (!teacherDetails?.id) {
+    if (!fallbackTeacher?.id) {
       console.error("Teacher ID not available");
       return;
     }
-    router.push(`/categories?userId=${storedId}&teacherId=${teacherDetails.id}`);
+    router.push(`/categories?teacherId=${fallbackTeacher.id}`);
   };
-  const ratings = teacherDetails?.rating ?? [];
-  const averageRating = ratings.length > 0
-    ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
-    : 0;
+  const ratings = (fallbackTeacher?.rating ?? []);
+  const averageRating = ratings.length > 0 ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length : 0;
   const filledStars = Math.round(averageRating);
-  useEffect(() => {
-    if (!dataLoading && (dataError || !profile)) {
-      router.push("/create-profile");
-    }
-  }, [dataLoading, dataError, profile, router]);
 
-  const displayTeacher = storedId ? teacherDetails : fallbackTeacher;
-  const displayProfile = storedId ? profile : fallbackProfile;
-  const displayCategories = storedId ? categories : fallbackCategories;
+  // useEffect(() => {
+  //   if (!dataLoading && (dataError || !fallbackProfile)) {
+  //     // don't auto-redirect for public profile view — show friendly message instead
+  //     // router.push("/create-profile");
+  //   }
+  // }, [dataLoading, dataError, fallbackProfile, router]);
+
+  // always render using fetched username data (no storedId logic)
+  const displayTeacher = fallbackTeacher;
+  const displayProfile = fallbackProfile;
+  const displayCategories = fallbackCategories;
+  const subcollections = subcollectionsData;
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const [open, setOpen] = useState(false);
@@ -186,7 +258,7 @@ const UserProfile = () => {
   }
 
 
-  if (dataError || !profile) {
+  if (dataError || !displayProfile) {
     console.log("dfsf", dataError)
     return (
       <div className="flex items-center justify-center min-h-screen bg-secondary">
@@ -206,7 +278,7 @@ const UserProfile = () => {
           <div className="relative">
             <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
             <Image
-              src={profile.photo_url || user}
+              src={displayProfile.photo_url || user}
               alt="profile"
               width={160}
               height={160}
@@ -216,16 +288,16 @@ const UserProfile = () => {
           <div className="text-center md:text-left  w-full">
             <div className="md:flex-row  md:justify-between flex  flex-col w-full items-center ">
               <div className="text-primary font-bold text-2xl md:text-3xl mb-1">
-                {profile.display_name || "Your Name"}
-                {profile.isTeacher && (
+                {displayProfile.display_name || "Your Name"}
+                {displayProfile.isTeacher && (
                   <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Teacher</span>
                 )}
-                {profile.isStudent && (
+                {displayProfile.isStudent && (
                   <span className="ml-2 text-sm bg-primary text-white px-2 py-1 rounded-full font-semibold">Student</span>
                 )}
 
               </div>
-              {profile.isTeacher && (
+              {displayProfile.isTeacher && (
                 <div className="mt-4">
                   <Button
                     onClick={() => router.push('/download')}
@@ -242,14 +314,14 @@ const UserProfile = () => {
             <div className="text-gray-600 mb-1 flex items-center justify-center md:justify-start">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
               Available now
-              {profile.isTeacher && (
-                <span className="text-gray-600 font-medium">.   ${teacherDetails?.Live_Chat_rate}/15 min</span>
+              {displayProfile.isTeacher && (
+                <span className="text-gray-600 font-medium">.   ${displayTeacher?.Live_Chat_rate}/15 min</span>
               )}
             </div>
             <div className="text-gray-600 mb-1">Languages: English</div>
             <div className="bg-secondary text-primary text-sm px-3 py-1 rounded-full inline-block mt-2">
-              <span className='font-semibold'>  Joining Date:</span> {profile.created_time?.seconds
-                ? new Date(profile.created_time.seconds * 1000).toLocaleDateString("en-US", {
+              <span className='font-semibold'>  Joining Date:</span> {displayProfile.created_time?.seconds
+                ? new Date(displayProfile.created_time.seconds * 1000).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
@@ -262,13 +334,13 @@ const UserProfile = () => {
 
 
         {/* Stats / Settings */}
-        {profile.isTeacher && (
+        {displayProfile.isTeacher && (
           <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
             <div className="flex flex-col items-center">
               <Link
                 href={{
                   pathname: "/settings",
-                  query: { userImg: profile.photo_url || "/profile.photo_url" },
+                  query: { userImg: displayProfile.photo_url || "/profile.photo_url" },
                 }}
               >
                 <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
@@ -287,7 +359,7 @@ const UserProfile = () => {
             <div className="flex flex-col items-center">
               <div className="relative">
                 <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                  <span className="text-2xl">{teacherDetails?.Number_of_completed_jobs || 42}</span>
+                  <span className="text-2xl">{displayTeacher?.Number_of_completed_jobs || 42}</span>
                 </div>
                 {/* <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full h-7 w-7 flex items-center justify-center shadow-md">
             +5
@@ -298,7 +370,7 @@ const UserProfile = () => {
 
             <div className="flex flex-col items-center">
               <div className="bg-primary w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                <span className="text-xl">${teacherDetails?.Total_amount_earned || '248.50'}</span>
+                <span className="text-xl">${displayTeacher?.Total_amount_earned || '248.50'}</span>
               </div>
               <div className="text-md mt-3 text-gray-700 font-medium">Total Earned</div>
             </div>
@@ -307,37 +379,37 @@ const UserProfile = () => {
         )}
 
         {/* Socials */}
-        {profile.isTeacher && (
+        {displayProfile.isTeacher && (
           <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 mt-6 text-sm">
             <div className="text-gray-700 font-medium mb-2 sm:mb-0">Connect with me:</div>
             <div className="flex gap-4 text-2xl">
-              {teacherDetails?.Instagram && (
+              {displayTeacher?.Instagram && (
                 <Link
-                  href={`https://www.instagram.com/${teacherDetails.Instagram}`}
+                  href={`https://www.instagram.com/${displayTeacher.Instagram}`}
                 >
                   <Image src="/instagram.png" alt="instagram" width={24} height={24} />
                 </Link>
               )}
 
-              {teacherDetails?.Facebook && (
+              {displayTeacher?.Facebook && (
                 <Link
-                  href={`https://www.facebook.com/${teacherDetails.Facebook}`}
+                  href={`https://www.facebook.com/${displayTeacher.Facebook}`}
                 >
                   <Image src="/facebook.png" alt="facebook" width={24} height={24} />
                 </Link>
               )}
 
-              {teacherDetails?.Tiktok && (
+              {displayTeacher?.Tiktok && (
                 <Link
-                  href={`https://www.tiktok.com/${teacherDetails.Tiktok}`}
+                  href={`https://www.tiktok.com/${displayTeacher.Tiktok}`}
                 >
                   <Image src="/social-media.png" alt="tiktok" width={24} height={24} />
                 </Link>
               )}
 
-              {teacherDetails?.youtube && (
+              {displayTeacher?.youtube && (
                 <Link
-                  href={`https://www.youtube.com/${teacherDetails.youtube}`}
+                  href={`https://www.youtube.com/${displayTeacher.youtube}`}
                 >
                   <Image src="/youtube.png" alt="youtube" width={24} height={24} />
                 </Link>
@@ -347,10 +419,10 @@ const UserProfile = () => {
         )}
 
         {/* Website and Heart */}
-        {profile.isTeacher && (
+        {displayProfile.isTeacher && (
           <div className="flex justify-between items-center mt-6 p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center">
-              <span className="text-black font-bold mr-2">{teacherDetails?.website || 'https://yourwebsite.com'}</span>
+              <span className="text-black font-bold mr-2">{displayTeacher?.website || 'https://yourwebsite.com'}</span>
               <span className="text-blue-500 text-xs bg-blue-100 px-2 py-1 rounded">Verified</span>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -385,7 +457,7 @@ const UserProfile = () => {
         <div className="mt-6 p-4 bg-secondary rounded-xl">
           <div className="font-bold text-lg text-gray-800 mb-2">About Me</div>
           <div className="text-gray-700">
-            {teacherDetails?.bio_T || "No bio set yet. Add your expertise and experience!"}
+            {displayTeacher?.bio_T || "No bio set yet. Add your expertise and experience!"}
           </div>
           {/* <div className="text-primary font-semibold cursor-pointer mt-2 inline-block hover:underline">
         Read more
@@ -397,32 +469,32 @@ const UserProfile = () => {
         <a 
           href="#" 
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
-          {teacherDetails?.section_1_name}
+          {displayTeacher?.section_1_name}
         </a>
           <a 
           href="#" 
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
-          {teacherDetails?.section_2_name}
+          {displayTeacher?.section_2_name}
         </a>
           <a 
           href="#" 
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
-          {teacherDetails?.section_3_name}
+          {displayTeacher?.section_3_name}
         </a>
           <a 
           href="#" 
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
-          {teacherDetails?.section_4_name}
+          {displayTeacher?.section_4_name}
         </a>
           <a 
           href="#" 
           className="px-4 py-2 bg-white border border-gray-200 text-primary font-medium rounded-full hover:bg-green-50 transition-colors text-sm shadow-sm">
-          {teacherDetails?.section_5_name}
+          {displayTeacher?.section_5_name}
         </a>
     </div> */}
 
 
-        {profile.isTeacher && (
+        {displayProfile.isTeacher && (
           <div className="text-sm py-8 h-fit">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <span className="text-primary text-3xl">✨</span> Recent Work Samples
@@ -434,11 +506,11 @@ const UserProfile = () => {
               <div className="flex flex-wrap gap-3 justify-start mb-6">
                 {[
                   { key: "all", label: "All" },
-                  { key: "section_1", label: teacherDetails?.section_1_name },
-                  { key: "section_2", label: teacherDetails?.section_2_name },
-                  { key: "section_3", label: teacherDetails?.section_3_name },
-                  { key: "section_4", label: teacherDetails?.section_4_name },
-                  { key: "section_5", label: teacherDetails?.section_5_name },
+                  { key: "section_1", label: displayTeacher?.section_1_name },
+                  { key: "section_2", label: displayTeacher?.section_2_name },
+                  { key: "section_3", label: displayTeacher?.section_3_name },
+                  { key: "section_4", label: displayTeacher?.section_4_name },
+                  { key: "section_5", label: displayTeacher?.section_5_name },
                 ]
                   .filter((s) => s.label)
                   .map((section) => (
@@ -645,7 +717,7 @@ const UserProfile = () => {
           </div>
         )}
       </div>
-      {profile.isStudent && !user && (
+      {displayProfile.isStudent && !user && (
         <div className="flex flex-col items-center justify-center w-full py-10 px-6 mt-8 bg-gradient-to-br from-blue-50 via-white to-green-50 rounded-2xl shadow-lg border border-gray-100">
           {/* Title */}
           <h2 className="text-3xl font-extrabold text-primary text-center mb-3 tracking-tight">

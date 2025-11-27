@@ -437,39 +437,40 @@ const CategoriesCard = () => {
 
                 <div className="mt-6 flex items-center gap-3">
                   <button
-                    onClick={() => {
-                      // prefer already-resolved `teacher` object if present
-                      const teacherObj =
-                        selectedCategory.teacher ||
-                        selectedCategory.teacher_ref ||
-                        null;
+                    onClick={() => router.push(`/profile?name=${selectedCategory.teacher.usernameT || ''}`)}
+                    // onClick={() => {
+                    //   // prefer already-resolved `teacher` object if present
+                    //   const teacherObj =
+                    //     selectedCategory.teacher ||
+                    //     selectedCategory.teacher_ref ||
+                    //     null;
 
-                      try {
-                        if (teacherObj) {
-                          // store short-lived teacher object in sessionStorage
-                          sessionStorage.setItem(
-                            "view_expert_teacher",
-                            JSON.stringify(teacherObj)
-                          );
-                        }
-                      } catch (e) {
-                        console.error("Failed to store teacher in sessionStorage", e);
-                      }
+                    //   try {
+                    //     if (teacherObj) {
+                    //       // store short-lived teacher object in sessionStorage
+                    //       sessionStorage.setItem(
+                    //         "view_expert_teacher",
+                    //         JSON.stringify(teacherObj)
+                    //       );
+                    //     }
+                    //   } catch (e) {
+                    //     console.error("Failed to store teacher in sessionStorage", e);
+                    //   }
 
-                      // navigate with teacher id in query so page can fetch if needed
-                      const teacherId =
-                        (teacherObj && (teacherObj.id || teacherObj.uid)) ||
-                        // fallback: try to extract from DocumentReference path
-                        (selectedCategory.teacher_ref && selectedCategory.teacher_ref.id) ||
-                        "";
+                    //   // navigate with teacher id in query so page can fetch if needed
+                    //   const teacherId =
+                    //     (teacherObj && (teacherObj.id || teacherObj.uid)) ||
+                    //     // fallback: try to extract from DocumentReference path
+                    //     (selectedCategory.teacher_ref && selectedCategory.teacher_ref.id) ||
+                    //     "";
 
-                      if (teacherId) {
-                        router.push(`/view-expert?teacherId=${teacherId}`);
-                      } else {
-                        // open view-expert without id — page should handle missing id
-                        router.push(`/view-expert`);
-                      }
-                    }}
+                    //   if (teacherId) {
+                    //     router.push(`/view-expert?teacherId=${teacherId}`);
+                    //   } else {
+                    //     // open view-expert without id — page should handle missing id
+                    //     router.push(`/view-expert`);
+                    //   }
+                    // }}
                      className="bg-primary text-white px-4 py-2 rounded-md"
                    >
                      View Teacher

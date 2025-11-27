@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 import { Eye, EyeOff } from "lucide-react";
 import Image from 'next/image';
 import { toast } from "sonner";
+import { UserProfileAPI } from "@/src/lib/api/userProfile";
 
 const isErrorWithMessage = (error: unknown): error is { message: string } => {
   return (
@@ -65,10 +66,27 @@ function LoginForm() {
       // ✅ Save userId to localStorage
       if (typeof window !== "undefined") {
         localStorage.setItem("userId", userId);
+        // fetch logged-in user's profile and store usernameT (if present)
+        try {
+          const profileRes = await UserProfileAPI.getProfile(userId);
+          const usernameFromProfile =
+            profileRes?.teacherDetails?.usernameT ||
+            profileRes?.teacher?.usernameT ||
+            profileRes?.userProfile?.usernameT ||
+            profileRes?.profile?.usernameT ||
+            profileRes?.studentDetails?.usernameS ||
+            null;
+          if (usernameFromProfile) {
+            localStorage.setItem("usernameT", usernameFromProfile);
+          }
+          console.log("Fetched and stored usernameT:", usernameFromProfile);
+        } catch (err) {
+          console.warn("Failed to fetch/store username after login:", err);
+        }
       }
-
+const usernameProfile = localStorage.getItem("usernameT") || "user";  
       toast.success("Login successful!");
-      router.push("/profile");
+      router.push(`/profile?name=${usernameProfile}`);
     } catch (err) {
       if (err.message?.includes("verify your email")) {
         toast.error("Please verify your email before logging in!");
