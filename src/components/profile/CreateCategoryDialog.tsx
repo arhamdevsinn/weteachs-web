@@ -93,7 +93,7 @@ export const CreateCategoryDialog = ({
           {previewImage && (
             <div className="mt-3 flex justify-center">
               <div className="relative group">
-                <Image
+                <Image  priority={true}
                   src={previewImage}
                   alt="Preview"
                   className="w-40 h-40 object-cover rounded-lg border border-gray-200 shadow-sm"

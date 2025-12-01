@@ -14,7 +14,7 @@ const AboutWeTeachs = () => {
       </div>
 
       <div className="flex justify-center mb-10">
-        <Image
+        <Image  priority={true}
           src="/about.png" 
           alt="WeTeachs Students Illustration"
           width={800}

@@ -49,7 +49,7 @@ export default function TeacherGallery({ teacherId }: { teacherId: string }) {
               key={item.id}
               className="aspect-square rounded-lg overflow-hidden"
             >
-              <Image
+              <Image  priority={true}
                 src={item.url}
                 alt={`gallery-${item.id}`}
                 width={400}

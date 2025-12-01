@@ -80,7 +80,7 @@ const Header = () => {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               
-              <Image
+              <Image  priority={true}
                 src="/logo.png"
                 alt="logo"
                 width={36}

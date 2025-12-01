@@ -106,7 +106,7 @@ const CommunityPage = () => {
             >
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-center gap-3">
-                  <Image
+                  <Image  priority={true}
                     src="/logo.png"
                     alt="Community"
                     width={45}

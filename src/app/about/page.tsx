@@ -22,7 +22,7 @@ const Page = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="relative w-full h-[70vh] flex items-center justify-center overflow-hidden">
-        <Image
+        <Image  priority={true}
           src="/about.jpg"
           alt="About us"
           fill

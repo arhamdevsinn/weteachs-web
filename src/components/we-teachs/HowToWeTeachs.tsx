@@ -15,7 +15,7 @@ const HowToWeTeachs = () => {
 
 
       <div className="flex flex-col md:flex-row items-center justify-center  mb-16">
-        <Image
+        <Image  priority={true}
           src="/how.png"
           alt="WeTeachs Profile Screen"
           width={600}

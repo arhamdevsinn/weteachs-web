@@ -338,7 +338,7 @@ const CommunityPost = () => {
                     <div className="flex items-center gap-3 mt-3 bg-gray-50 border border-gray-200 rounded-lg p-2">
                       <div className="relative">
                         {selectedFiles[q.id].type.startsWith("image/") ? (
-                          <Image
+                          <Image  priority={true}
                             src={URL.createObjectURL(selectedFiles[q.id])}
                             alt="preview"
                             width={80}
@@ -410,7 +410,7 @@ const CommunityPost = () => {
                           className="p-3 mb-3 bg-white border border-gray-200 rounded-xl"
                         >
                           <div className="flex gap-3">
-                            <Image
+                            <Image  priority={true}
                               src={c.LimboUser?.photo_url || "/logo.png"}
                               alt={c.LimboUser?.display_name || "User"}
                             width={36}
@@ -429,7 +429,7 @@ const CommunityPost = () => {
                               <p className="text-sm mt-1">{c.comment_text}</p>
                               {c.image && (
                                 <div className="mt-2">
-                                  <Image
+                                  <Image  priority={true}
                                     src={c.image}
                                     alt={c.comment_text || "Comment image"}
                                     width={400}

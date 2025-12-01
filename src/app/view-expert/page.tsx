@@ -80,7 +80,7 @@ const ViewExpertPage = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
           <div className="relative w-36 h-36 md:w-40 md:h-40 flex-shrink-0">
-            <Image
+            <Image  priority={true}
               src={avatar}
               alt={teacher.usernameT || teacher.display_name || teacher.teacher_name || "Teacher"}
               fill

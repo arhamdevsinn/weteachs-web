@@ -277,7 +277,7 @@ const UserProfile = () => {
         <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
           <div className="relative">
             <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
-            <Image
+            <Image  priority={true}
               src={displayProfile.photo_url || user}
               alt="profile"
               width={160}
@@ -387,7 +387,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.instagram.com/${displayTeacher.Instagram}`}
                 >
-                  <Image src="/instagram.png" alt="instagram" width={24} height={24} />
+                  <Image  priority={true} src="/instagram.png" alt="instagram" width={24} height={24} />
                 </Link>
               )}
 
@@ -395,7 +395,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.facebook.com/${displayTeacher.Facebook}`}
                 >
-                  <Image src="/facebook.png" alt="facebook" width={24} height={24} />
+                  <Image  priority={true} src="/facebook.png" alt="facebook" width={24} height={24} />
                 </Link>
               )}
 
@@ -403,7 +403,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.tiktok.com/${displayTeacher.Tiktok}`}
                 >
-                  <Image src="/social-media.png" alt="tiktok" width={24} height={24} />
+                  <Image  priority={true} src="/social-media.png" alt="tiktok" width={24} height={24} />
                 </Link>
               )}
 
@@ -411,7 +411,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.youtube.com/${displayTeacher.youtube}`}
                 >
-                  <Image src="/youtube.png" alt="youtube" width={24} height={24} />
+                  <Image  priority={true} src="/youtube.png" alt="youtube" width={24} height={24} />
                 </Link>
               )}
             </div>
@@ -428,7 +428,7 @@ const UserProfile = () => {
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <button className="text-xl transition-transform hover:scale-110 active:scale-95">
-                  <Image src="/share.png" alt="share" width={20} height={20} />
+                  <Image  priority={true} src="/share.png" alt="share" width={20} height={20} />
                 </button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
@@ -571,7 +571,7 @@ const UserProfile = () => {
                 >
                   {/* Image */}
                   <div className="relative w-full h-48 overflow-hidden group">
-                    <Image
+                    <Image  priority={true}
                       src={item.image_gallery}
                       alt={item.Title || `Gallery ${i + 1}`}
                       width={300}
@@ -736,7 +736,7 @@ const UserProfile = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image
+                <Image  priority={true}
                   src="/play-store.png"
                   width={140}
                   height={60}
@@ -774,7 +774,7 @@ const UserProfile = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image
+                <Image  priority={true}
                   src="/app-store.png"
                   width={140}
                   height={60}

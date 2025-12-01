@@ -43,7 +43,7 @@ const ForgotPassword = () => {
   return (
     <div className="bg-white shadow-md rounded-xl p-6 w-96 mx-auto">
                <div className="mb-4">
-                  <Image
+                  <Image  priority={true}
                     src="/logo.png" // Update this to your actual logo path
                     alt="WeTeaches Logo"
                     width={80}

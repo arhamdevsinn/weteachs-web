@@ -22,7 +22,7 @@ const Partners = () => {
       {/* Team Founder Section */}
       <div className="flex flex-col md:flex-row items-center justify-center gap-10 mb-16 max-w-5xl mx-auto">
         <div className="flex-shrink-0">
-          <Image
+          <Image  priority={true}
             src="/isaiah.png"
             alt="Isaiah Joseph"
             width={350}
@@ -53,7 +53,7 @@ const Partners = () => {
         </h3>
         <div className="flex justify-center items-center gap-12 flex-wrap">
           {partners.map((p, idx) => (
-            <Image
+            <Image  priority={true}
               key={idx}
               src={p.src}
               alt={p.alt}

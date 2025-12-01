@@ -96,7 +96,7 @@ const TestimonialsSection = () => {
                 whileHover={{ y: -8, scale: 1.03 }}
               >
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <Image  priority={true}
                     src={t.img}
                     alt={t.name}
                     width={90}

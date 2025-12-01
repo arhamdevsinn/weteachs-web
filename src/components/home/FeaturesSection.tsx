@@ -102,7 +102,7 @@ const FeaturesSection = () => {
                 transition={{ duration: 0.3 }}
                 className="relative"
               >
-                <Image
+                <Image  priority={true}
                   src={feature.image}
                   alt={feature.title}
                   width={550}

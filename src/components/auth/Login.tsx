@@ -105,7 +105,7 @@ const usernameProfile = localStorage.getItem("usernameT") || "user";
       <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 text-center">
         {/* Logo */}
         <div className="mb-4">
-          <Image
+          <Image  priority={true}
             src="/logo.png"
             alt="WeTeaches Logo"
             width={80}

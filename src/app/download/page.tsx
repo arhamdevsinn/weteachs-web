@@ -20,7 +20,7 @@ const DownloadPage = () => {
           aria-label="Download on the App Store"
           className="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-lg block"
         >
-          <Image
+          <Image  priority={true}
             src="/apple.jpg" // replace with actual image path
             alt="iOS App"
             fill
@@ -45,7 +45,7 @@ const DownloadPage = () => {
           aria-label="Get it on Google Play"
           className="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-lg block"
         >
-          <Image
+          <Image  priority={true}
             src="/android.png" // replace with actual image path
             alt="Google Play"
             fill

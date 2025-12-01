@@ -19,7 +19,7 @@ const ImageUploader = () => {
         className="h-40 w-full bg-gray-100 border-2 border-dashed border-primary rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-primary/5 transition relative overflow-hidden"
       >
         {preview ? (
-          <Image
+          <Image  priority={true}
             src={preview}
             alt="Preview"
             width={160}

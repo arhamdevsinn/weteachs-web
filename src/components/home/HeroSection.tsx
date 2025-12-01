@@ -71,7 +71,7 @@ const HeroSection = () => {
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
           >
-            <Image
+            <Image  priority={true}
               src="/hero.png"
               alt="Learning app preview"
               width={520}

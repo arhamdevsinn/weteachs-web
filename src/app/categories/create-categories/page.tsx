@@ -65,7 +65,7 @@ const CreateCategory = () => {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Image Upload */}
               <div className="md:col-span-2">
-                <ImageUploader
+                <Image  priority={true}Uploader
                   onUpload={(url) => setFormData((prev) => ({ ...prev, image: url }))}
                 />
               </div>

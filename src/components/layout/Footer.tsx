@@ -55,7 +55,7 @@ const Footer = () => {
           {/* Column 1 */}
           <div>
             <div className="flex items-center mb-5 gap-2">
-              <Image src="/logo.png" width={40} height={40} alt="logo" />
+              <Image  priority={true} src="/logo.png" width={40} height={40} alt="logo" />
               <h3 className="text-xl font-bold text-white">WeTeachs</h3>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
@@ -124,7 +124,7 @@ const Footer = () => {
     target="_blank"
     rel="noopener noreferrer"
   >
-    <Image
+    <Image  priority={true}
       src="/play-store.png"
       width={110}
       height={50}
@@ -138,7 +138,7 @@ const Footer = () => {
     target="_blank"
     rel="noopener noreferrer"
   >
-    <Image
+    <Image  priority={true}
       src="/app-store.png"
       width={110}
       height={50}
