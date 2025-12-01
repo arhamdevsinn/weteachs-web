@@ -9,6 +9,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Image from 'next/image';
 import { toast } from "sonner";
 import { UserProfileAPI } from "@/src/lib/api/userProfile";
+import { useRecaptcha } from "@/src/components/Recaptcha";
 
 const isErrorWithMessage = (error: unknown): error is { message: string } => {
   return (
@@ -20,6 +21,7 @@ const isErrorWithMessage = (error: unknown): error is { message: string } => {
 };
 
 function LoginForm() {
+  const { execute } = useRecaptcha();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -34,6 +36,37 @@ function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // get recaptcha token for action "login"
+    const token = await execute('login');
+    if (!token) {
+      setError('reCAPTCHA failed to load. Please try again.');
+      return;
+    }
+
+    // verify token server-side
+    try {
+      const verifyRes = await fetch('/api/recaptcha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, action: 'login' }),
+      });
+      if (!verifyRes.ok) {
+        const text = await verifyRes.text().catch(() => verifyRes.statusText);
+        console.error('recaptcha verify error', verifyRes.status, text);
+        setError('reCAPTCHA verification failed. Please try again.');
+        return;
+      }
+      const json = await verifyRes.json();
+      if (!json.success) {
+        console.error('recaptcha verify response:', json);
+        setError('reCAPTCHA verification failed. Please try again.');
+        return;
+      }
+    } catch (err) {
+      setError('reCAPTCHA verification error.');
+      return;
+    }
 
     // ✅ Frontend validation
     if (!email) {
