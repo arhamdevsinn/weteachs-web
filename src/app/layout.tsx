@@ -60,7 +60,6 @@ export const metadata: Metadata = {
   keywords: KEYWORDS,
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
