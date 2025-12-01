@@ -27,7 +27,6 @@ const Page = () => {
           alt="About us"
           fill
           className="object-cover brightness-75 scale-105 animate-pulse-slow"
-          priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/60"></div>
 

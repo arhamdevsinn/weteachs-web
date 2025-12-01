@@ -5,6 +5,7 @@ import ImageUploader from "@/src/components/categories/ImageUploader";
 import { useCreateCategory } from "@/src/hooks/useCreateCategory";
 import TeacherGallery from "@/src/components/TeacherGallery";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 const CreateCategory = () => {
   const [loading, setLoading] = useState(true);
