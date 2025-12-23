@@ -23,6 +23,9 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
+  query,
+  where,
   serverTimestamp,
   collection,
   addDoc,
@@ -31,6 +34,7 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/hooks/useAuth";
 // import { checkIfProfileExists } from "@/src/lib/api/userProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 
@@ -39,7 +43,7 @@ const ExpertDialog = () => {
   const [openCategory, setOpenCategory] = useState(false);
   const [preview, setPreview] = useState("/placeholder-avatar.png");
   const [loading, setLoading] = useState(false);
-const router = useRouter();
+  const router = useRouter();
   const db = getFirestore();
   const storage = getStorage();
 
@@ -63,6 +67,7 @@ const router = useRouter();
   });
 
   const { userId } = useUserIdFromUrl();
+  const { user } = useAuth();
 
   // === Image Preview ===
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>, forCategory = false) => {
@@ -80,7 +85,7 @@ const router = useRouter();
     if (!formData.bio_T.trim()) return "Bio is required.";
     if (!formData.birthday.trim()) return "Birthday is required.";
     if (!formData.Howd_you_here_of_us) return "Please select how you heard about us.";
-    if (!formData.imageFile) return "Please upload a profile picture.";
+    // if (!formData.imageFile) return "Please upload a profile picture.";
     return null;
   };
 
@@ -95,7 +100,7 @@ const router = useRouter();
     return null;
   };
 
-   useEffect(() => {
+  useEffect(() => {
     const verifyProfileStatus = async () => {
       if (!userId) return;
 
@@ -126,13 +131,30 @@ const router = useRouter();
 
     try {
       setLoading(true);
+      // ensure usernameT (display_name) is unique among TeacherDetails
+      const usernameToCheck = formData.display_name.trim();
+      if (usernameToCheck) {
+        const usernameQuery = query(
+          collection(db, "TeacherDetails"),
+          where("usernameT", "==", usernameToCheck)
+        );
+        const usernameSnap = await getDocs(usernameQuery);
+        if (!usernameSnap.empty) {
+          const other = usernameSnap.docs.find((d) => d.id !== userId);
+          if (other) {
+            setLoading(false);
+            toast.error("Display name already in use. Choose another name.");
+            return;
+          }
+        }
+      }
       let photoURL = preview;
 
-      if (formData.imageFile) {
-        const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
-        await uploadBytes(storageRef, formData.imageFile);
-        photoURL = await getDownloadURL(storageRef);
-      }
+      // if (formData.imageFile) {
+      //   const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
+      //   await uploadBytes(storageRef, formData.imageFile);
+      //   photoURL = await getDownloadURL(storageRef);
+      // }
 
       const teacherRef = doc(db, "TeacherDetails", userId);
       const teacherData = {
@@ -145,7 +167,7 @@ const router = useRouter();
         created_time_t: serverTimestamp(),
         iSAvailable: false,
         isOnline: true,
-        limbo_ref: `/LimboUserMode/${userId}`,
+        limbo_ref: doc(db, "LimboUserMode", userId),
         teacher: true,
         teacher_profile_picture: photoURL,
         usernameT: formData.display_name,
@@ -157,6 +179,7 @@ const router = useRouter();
       await setDoc(
         limboRef,
         {
+          email: user?.email || "",
           Birthday: new Date(formData.birthday),
           Howd_you_here_of_us: formData.Howd_you_here_of_us,
           Popup: false,
@@ -167,8 +190,8 @@ const router = useRouter();
           isTeacher: true,
           photo_url: photoURL,
           signupcomplete: true,
-          signupcompletepage2: true,
-          teacher_ref: teacherRef.path,
+          signupcompletepage2: false,
+          teacher_ref: teacherRef,
           uid: userId,
         },
         { merge: true }
@@ -178,6 +201,8 @@ const router = useRouter();
       toast.success("Profile created successfully!");
       setOpenProfile(false);
       setOpenCategory(true);
+      router.push('/profile');
+
     } catch (err) {
       console.error("Error creating teacher profile:", err);
       toast.error("Error creating teacher profile");
@@ -213,16 +238,28 @@ const router = useRouter();
         description: categoryData.description,
         image: imageURL,
         teacher_name: formData.display_name,
-        teacher_ref: `/TeacherDetails/${userId}`,
+        teacher_ref: doc(db, "TeacherDetails", userId),
         title: categoryData.title,
         topic: categoryData.topic,
         upload_time: serverTimestamp(),
-        who_created_ref: `/LimboUserMode/${userId}`,
+        who_created_ref: doc(db, `LimboUserMode/${userId}`),
       });
 
       const teacherRef = doc(db, "TeacherDetails", userId);
-      await setDoc(teacherRef, { cat_refs: arrayUnion(categoryRef.path) }, { merge: true });
+      await setDoc(teacherRef, {
+        cat_refs: arrayUnion(categoryRef.path),
+      }, { merge: true });
 
+      const limboRef = doc(db, "LimboUserMode", userId);
+      await setDoc(
+        limboRef,
+        {
+
+          signupcompletepage2: true,
+
+        },
+        { merge: true }
+      );
       toast.success("Category created successfully!");
       setOpenCategory(false);
       router.push('/profile');

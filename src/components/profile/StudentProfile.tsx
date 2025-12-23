@@ -72,7 +72,7 @@ const StudentDialog = () => {
                 created_time_t: serverTimestamp(),
                 iSAvailable: false,
                 isOnline: true,
-                limbo_ref: `/LimboUserMode/${userId}`,
+                limbo_ref: doc(db, "LimboUserMode", userId),
                 student: true,
                 student_profile_picture: photoURL,
                 usernameS: formData.display_name,

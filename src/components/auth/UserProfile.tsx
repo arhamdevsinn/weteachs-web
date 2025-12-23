@@ -20,7 +20,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { log } from "console";
-
+// import { useRequireCompleteProfile } from "@/src/hooks/useRequireCompleteProfile";
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("images");
   const [selectedSection, setSelectedSection] = useState("all");
@@ -32,72 +32,6 @@ const UserProfile = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  //  const storedId =
-  //    typeof window !== "undefined"
-  //      ? localStorage.getItem("user_id") || localStorage.getItem("userId")
-  //      : null;
-
-  //  const {
-  //    profile,
-  //    displayTeacher,
-  //    gallery,
-  //    categories,
-  //    subcollections,
-  //    loading: dataLoading,
-  //    error: dataError,
-  //  } = useUserProfile(storedId);
-  //  console.log('UserProfile data:', { profile, displayTeacher, gallery, categories, subcollections, dataError });
-  //
-  //  const usernameT = searchParams.get("name");
-  //  console.log("usernameT:", usernameT);
-  //  
-  //  useEffect(() => {
-  //    const fetchFallbackTeacher = async () => {
-  //      try {
-  //        setLoadingFallback(true);
-  //
-  //        const { teacher, userProfile, categories, subcollections } =
-  //          await UserProfileAPI.getTeacherByUsername(usernameT);
-  //
-  //        console.log("Fetched public teacher:", teacher, userProfile, categories, subcollections);
-  //        setFallbackTeacher(teacher);
-  //        setFallbackProfile(userProfile);
-  //        setFallbackCategories(categories);
-  //
-  //        // ✅ Temporarily store userId (only if user authenticated)
-  //        if (!user) {
-  //          if (userProfile?.uid) {
-  //            localStorage.setItem("user_id", userProfile.uid);
-  //            console.log("✅ Stored uid:", userProfile.uid);
-  //          } else if (userProfile?.id) {
-  //            localStorage.setItem("user_id", userProfile.id);
-  //            console.log("✅ Stored uid (from id):", userProfile.id);
-  //          }
-  //        }
-  //        else {
-  //          console.log("🧹 No authenticated user — clearing stored user_id");
-  //          localStorage.removeItem("user_id");
-  //          localStorage.removeItem("userId");
-  //        }
-  //      } catch (err) {
-  //        console.error("❌ Error fetching fallback teacher:", err);
-  //        toast.error("No teacher found for this username.");
-  //      } finally {
-  //        setLoadingFallback(false);
-  //      }
-  //    };
-  //
-  //    // ✅ Fetch only if no stored ID but a username is present
-  //    if (usernameT) {
-  //      fetchFallbackTeacher();
-  //    }
-  //
-  //    // 🧹 Cleanup when route changes or component unmounts
-  //    // return () => {
-  //    //   console.log("🧹 Cleaning up: removing userId from localStorage");
-  //    //   localStorage.removeItem("user_id");
-  //    // };
-  //  }, [storedId, usernameT, user]);
 
   // always use username from query param to fetch profile (no localStorage checks)
   const usernameT = searchParams.get("name");
@@ -112,61 +46,180 @@ const UserProfile = () => {
   const [dataError, setDataError] = useState<>(null);
   const [subcollectionsData, setSubcollectionsData] = useState<>({});
 
+  // useEffect(() => {
+
+  //   const username = nameParam;
+  //   if (!username) return;
+  //   console.log("Fetching profile for username:", username);
+  //   setFallbackTeacher(null);
+  //   console.log("Cleared previous teacher data.");
+  //   setFallbackProfile(null);
+  //   setFallbackCategories([]);
+  //   setSubcollectionsData({});
+  //   setDataError(null);
+  //   setDataLoading(true);
+  //   console.log("Cleared previous profile data.");
+
+  //   const reqId = Date.now();
+  //   currentReqRef.current = reqId;
+  //   let mounted = true;
+  //   setDataLoading(true);
+
+  //   (async () => {
+  //     console.log("DAta. -------------------_>:  afasdf",);
+  //     try {
+
+  //       let res
+  //       if (!username && user?.uid) {
+  //         res = await UserProfileAPI.getProfileByUseId(user?.uid);
+  //         console.log("DAta. -------------------_>:", res);
+  //       } else {
+  //         res = await UserProfileAPI.getProfileByUsername(username);
+  //       }
+  //       //  const res2 = await UserProfileAPI.getProfile(user?.uid);
+  //       // ignore if component unmounted or a newer request started
+  //       if (!mounted || currentReqRef.current !== reqId) return;
+
+  //       if (res.role === "teacher") {
+  //         setFallbackTeacher(res.teacherDetails || res.teacher || null);
+  //         setFallbackProfile(res.profile || res.userProfile || null);
+  //         setFallbackCategories(res.categories || []);
+  //         setSubcollectionsData(res.subcollections || {});
+  //       } else if (res.role === "student") {
+  //         setFallbackTeacher(null);
+  //         setFallbackProfile(res.profile || res.userProfile || null);
+  //         setFallbackCategories([]);
+  //         setSubcollectionsData(res.subcollections || {});
+  //       } else {
+  //         throw new Error("Profile not found");
+  //       }
+  //     } catch (err) {
+  //       if (currentReqRef.current === reqId) {
+  //         console.error("Error fetching profile by username:", err);
+  //         setDataError(err);
+  //         toast.error("No profile found for this username.");
+  //       }
+  //     } finally {
+  //       if (mounted && currentReqRef.current === reqId) setDataLoading(false);
+  //     }
+  //   })();
+
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, [nameParam]);
+   
+
   useEffect(() => {
     const username = nameParam;
-    if (!username) return;
-    console.log("Fetching profile for username:", username);
 
-    // clear previous display while fetching new profile so old profile doesn't flash back
+    if (!username && !user?.uid) {
+      // If neither username nor user ID exists, we can't fetch anything
+      console.log("No username or user ID available");
+      return;
+    }else if(!username && user?.uid){
+      //  const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
+    }
+
+    console.log("Fetching profile for:", username || `user ID: ${user?.uid}`);
+
+    // Reset states
     setFallbackTeacher(null);
-    console.log("Cleared previous teacher data.");
     setFallbackProfile(null);
     setFallbackCategories([]);
     setSubcollectionsData({});
     setDataError(null);
-     setDataLoading(true);
-    console.log("Cleared previous profile data.");
-
-    const reqId = Date.now();
-    currentReqRef.current = reqId;
-    let mounted = true;
     setDataLoading(true);
 
-    (async () => {
+    // Generate unique request ID
+    const reqId = Date.now();
+    currentReqRef.current = reqId;
+
+    let isMounted = true;
+
+    const fetchProfile = async () => {
       try {
-        const res = await UserProfileAPI.getProfileByUsername(username);
+        let response;
 
-        // ignore if component unmounted or a newer request started
-        if (!mounted || currentReqRef.current !== reqId) return;
-
-        if (res.role === "teacher") {
-          setFallbackTeacher(res.teacherDetails || res.teacher || null);
-          setFallbackProfile(res.profile || res.userProfile || null);
-          setFallbackCategories(res.categories || []);
-          setSubcollectionsData(res.subcollections || {});
-        } else if (res.role === "student") {
-          setFallbackTeacher(null);
-          setFallbackProfile(res.profile || res.userProfile || null);
-          setFallbackCategories([]);
-          setSubcollectionsData(res.subcollections || {});
-        } else {
-          throw new Error("Profile not found");
+        if (username) {
+          // Fetch by username if available
+          response = await UserProfileAPI.getProfileByUsername(username);
+        } else if (user?.uid) {
+          // Fallback to user ID if no username
+          response = await UserProfileAPI.getProfileByUseId(user.uid);
+          console.log("Fetched profile by user ID: -------------->", response);
         }
-      } catch (err) {
-        if (currentReqRef.current === reqId) {
-          console.error("Error fetching profile by username:", err);
-          setDataError(err);
-          toast.error("No profile found for this username.");
+
+        // Check if component is still mounted and this is the latest request
+        if (!isMounted || currentReqRef.current !== reqId) {
+          console.log("Request cancelled or stale");
+          return;
+        }
+
+        if (!response) {
+          throw new Error("No response received from API");
+        }
+
+        // Handle different roles
+        switch (response.role) {
+          case "teacher":
+            setFallbackTeacher(response.teacherDetails || response.teacher || null);
+            setFallbackProfile(response.profile || response.userProfile || null);
+            setFallbackCategories(response.categories || []);
+            setSubcollectionsData(response.subcollections || {});
+            break;
+
+          case "student":
+            setFallbackTeacher(null);
+            setFallbackProfile(response.profile || response.userProfile || null);
+            setFallbackCategories([]);
+            setSubcollectionsData(response.subcollections || {});
+            break;
+
+          case "limbo":
+            // Handle limbo users (not registered as teacher or student)
+            setFallbackTeacher(null);
+            setFallbackProfile(response.userProfile || response || null);
+            setFallbackCategories([]);
+            setSubcollectionsData({});
+            break;
+
+          default:
+            console.warn("Unknown role in response:", response.role);
+            throw new Error("Profile not found or invalid role");
+        }
+
+      } catch (error) {
+        // Only handle errors for the current request
+        if (isMounted && currentReqRef.current === reqId) {
+          console.error("Error fetching profile:", error);
+          setDataError(error instanceof Error ? error : new Error(String(error)));
+
+          // Show appropriate error message
+          const errorMessage = error instanceof Error
+            ? error.message
+            : "Failed to load profile";
+
+          toast.error(
+            errorMessage.includes("not found")
+              ? "No profile found for this username."
+              : "Failed to load profile. Please try again."
+          );
         }
       } finally {
-        if (mounted && currentReqRef.current === reqId) setDataLoading(false);
+        // Only update loading state for the current request
+        if (isMounted && currentReqRef.current === reqId) {
+          setDataLoading(false);
+        }
       }
-    })();
+    };
+
+    fetchProfile();
 
     return () => {
-      mounted = false;
+      isMounted = false;
     };
-  }, [nameParam]);
+  }, [nameParam, user?.uid]);
 
   const handleSettingsClick = () => {
     router.push("/settings", {
@@ -277,7 +330,7 @@ const UserProfile = () => {
         <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
           <div className="relative">
             <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
-            <Image  priority={true}
+            <Image priority={true}
               src={displayProfile.photo_url || user}
               alt="profile"
               width={160}
@@ -387,7 +440,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.instagram.com/${displayTeacher.Instagram}`}
                 >
-                  <Image  priority={true} src="/instagram.png" alt="instagram" width={24} height={24} />
+                  <Image priority={true} src="/instagram.png" alt="instagram" width={24} height={24} />
                 </Link>
               )}
 
@@ -395,7 +448,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.facebook.com/${displayTeacher.Facebook}`}
                 >
-                  <Image  priority={true} src="/facebook.png" alt="facebook" width={24} height={24} />
+                  <Image priority={true} src="/facebook.png" alt="facebook" width={24} height={24} />
                 </Link>
               )}
 
@@ -403,7 +456,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.tiktok.com/${displayTeacher.Tiktok}`}
                 >
-                  <Image  priority={true} src="/social-media.png" alt="tiktok" width={24} height={24} />
+                  <Image priority={true} src="/social-media.png" alt="tiktok" width={24} height={24} />
                 </Link>
               )}
 
@@ -411,7 +464,7 @@ const UserProfile = () => {
                 <Link
                   href={`https://www.youtube.com/${displayTeacher.youtube}`}
                 >
-                  <Image  priority={true} src="/youtube.png" alt="youtube" width={24} height={24} />
+                  <Image priority={true} src="/youtube.png" alt="youtube" width={24} height={24} />
                 </Link>
               )}
             </div>
@@ -428,7 +481,7 @@ const UserProfile = () => {
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <button className="text-xl transition-transform hover:scale-110 active:scale-95">
-                  <Image  priority={true} src="/share.png" alt="share" width={20} height={20} />
+                  <Image priority={true} src="/share.png" alt="share" width={20} height={20} />
                 </button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
@@ -548,68 +601,68 @@ const UserProfile = () => {
               </div>
 
               {/* === IMAGES TAB === */}
-            {activeTab === "images" && (
-  <div className="animate-fadeIn">
-    {subcollections?.galleryCollection && subcollections.galleryCollection.length > 0 ? (
-      (() => {
-        const filtered = subcollections.galleryCollection.filter((item) => {
-          const hasImage = item?.image_gallery && item.image_gallery.trim() !== "";
-          if (!hasImage) return false;
+              {activeTab === "images" && (
+                <div className="animate-fadeIn">
+                  {subcollections?.galleryCollection && subcollections.galleryCollection.length > 0 ? (
+                    (() => {
+                      const filtered = subcollections.galleryCollection.filter((item) => {
+                        const hasImage = item?.image_gallery && item.image_gallery.trim() !== "";
+                        if (!hasImage) return false;
 
-          return selectedSection === "all" ? true : item[selectedSection];
-        });
+                        return selectedSection === "all" ? true : item[selectedSection];
+                      });
 
-        return filtered.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filtered.map((item, i) => {
-              const likeCount = Array.isArray(item.likes_ref) ? item.likes_ref.length : 0;
+                      return filtered.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                          {filtered.map((item, i) => {
+                            const likeCount = Array.isArray(item.likes_ref) ? item.likes_ref.length : 0;
 
-              return (
-                <div
-                  key={i}
-                  className="rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300 border"
-                >
-                  {/* Image */}
-                  <div className="relative w-full h-48 overflow-hidden group">
-                    <Image  priority={true}
-                      src={item.image_gallery}
-                      alt={item.Title || `Gallery ${i + 1}`}
-                      width={300}
-                      height={300}
-                      className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
+                            return (
+                              <div
+                                key={i}
+                                className="rounded-xl overflow-hidden shadow-md bg-white hover:shadow-lg transition-all duration-300 border"
+                              >
+                                {/* Image */}
+                                <div className="relative w-full h-48 overflow-hidden group">
+                                  <Image priority={true}
+                                    src={item.image_gallery}
+                                    alt={item.Title || `Gallery ${i + 1}`}
+                                    width={300}
+                                    height={300}
+                                    className="object-cover w-full h-full transform transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                </div>
 
-                  {/* Card Content */}
-                  <div className="p-4">
-                    {/* Title */}
-                    <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
-                      {item.Title || "Untitled"}
-                    </h3>
+                                {/* Card Content */}
+                                <div className="p-4">
+                                  {/* Title */}
+                                  <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
+                                    {item.Title || "Untitled"}
+                                  </h3>
 
-                    {/* Description */}
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                      {item.Description || "No description provided."}
-                    </p>
+                                  {/* Description */}
+                                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                                    {item.Description || "No description provided."}
+                                  </p>
 
-                    {/* Likes */}
-                    <div className="flex items-center text-sm text-gray-700 font-medium">
-                      ❤️ {likeCount} Likes
-                    </div>
-                  </div>
+                                  {/* Likes */}
+                                  <div className="flex items-center text-sm text-gray-700 font-medium">
+                                    ❤️ {likeCount} Likes
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-10">No images found.</p>
+                      );
+                    })()
+                  ) : (
+                    <p className="text-gray-500 text-center py-10">No images uploaded yet.</p>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="text-gray-500 text-center py-10">No images found.</p>
-        );
-      })()
-    ) : (
-      <p className="text-gray-500 text-center py-10">No images uploaded yet.</p>
-    )}
-  </div>
-)}
+              )}
               {/* === VIDEOS TAB === */}
               {activeTab === "videos" && (
                 <div className="space-y-6 animate-fadeIn">
@@ -736,7 +789,7 @@ const UserProfile = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image  priority={true}
+                <Image priority={true}
                   src="/play-store.png"
                   width={140}
                   height={60}
@@ -774,7 +827,7 @@ const UserProfile = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image  priority={true}
+                <Image priority={true}
                   src="/app-store.png"
                   width={140}
                   height={60}
