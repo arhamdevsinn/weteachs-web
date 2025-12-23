@@ -20,7 +20,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { log } from "console";
-// import { useRequireCompleteProfile } from "@/src/hooks/useRequireCompleteProfile";
+import { useRequireCompleteProfile } from "@/src/hooks/useRequireCompleteProfile";
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("images");
   const [selectedSection, setSelectedSection] = useState("all");
@@ -29,7 +29,7 @@ const UserProfile = () => {
   const [fallbackCategories, setFallbackCategories] = useState([]);
   const [loadingFallback, setLoadingFallback] = useState(false);
   const { user } = useAuth();
-
+  // const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -40,6 +40,9 @@ const UserProfile = () => {
 
   // current name param (stable alias) and request id ref used in the effect below
   const nameParam = usernameT;
+  if(!nameParam){
+     const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
+  }
   const currentReqRef = useRef<number | null>(null);
 
   const [dataLoading, setDataLoading] = useState(false);
@@ -108,7 +111,8 @@ const UserProfile = () => {
   //     mounted = false;
   //   };
   // }, [nameParam]);
-   
+
+
 
   useEffect(() => {
     const username = nameParam;
@@ -119,6 +123,7 @@ const UserProfile = () => {
       return;
     }else if(!username && user?.uid){
       //  const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
+      
     }
 
     console.log("Fetching profile for:", username || `user ID: ${user?.uid}`);
@@ -250,7 +255,11 @@ const UserProfile = () => {
   const displayCategories = fallbackCategories;
   const subcollections = subcollectionsData;
 
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const [shareUrl, setShareUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") setShareUrl(window.location.href);
+  }, []);
   const [open, setOpen] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);

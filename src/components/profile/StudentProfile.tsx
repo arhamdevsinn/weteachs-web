@@ -27,6 +27,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
 import { Upload, User } from "lucide-react";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
+import { useAuth } from "@/src/hooks/useAuth";
 
 const StudentDialog = () => {
     const [openProfile, setOpenProfile] = useState(false);
@@ -44,6 +45,7 @@ const StudentDialog = () => {
     });
 
     const { userId } = useUserIdFromUrl();
+    const { user } = useAuth();
 
     const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -79,25 +81,31 @@ const StudentDialog = () => {
             };
 
             await setDoc(studentRef, studentData, { merge: true });
-
+            const payload = {
+                Birthday: formData.birthday ? new Date(formData.birthday) : null,
+                Howd_you_here_of_us: formData.Howd_you_here_of_us,
+                Popup: false,
+                Pre_testers: false,
+                bio_set: true,
+                created_time: serverTimestamp(),
+                display_name: formData.display_name,
+                isStudent: true,
+                photo_url: photoURL,
+                signupcomplete: true,
+                signupcompletepage2: true,
+                student_ref: studentRef.path,
+                uid: userId,
+            };
+            if (userId) {
+                payload.uid = userId;
+            }
+            if(useruser?.email){
+                payload.email = user.email;
+            }
             const limboRef = doc(db, "LimboUserMode", userId);
             await setDoc(
                 limboRef,
-                {
-                    Birthday: formData.birthday ? new Date(formData.birthday) : null,
-                    Howd_you_here_of_us: formData.Howd_you_here_of_us,
-                    Popup: false,
-                    Pre_testers: false,
-                    bio_set: true,
-                    created_time: serverTimestamp(),
-                    display_name: formData.display_name,
-                    isStudent: true,
-                    photo_url: photoURL,
-                    signupcomplete: true,
-                    signupcompletepage2: true,
-                    student_ref: studentRef.path,
-                    uid: userId,
-                },
+                payload,
                 { merge: true }
             );
 
@@ -130,43 +138,43 @@ const StudentDialog = () => {
                             Fill your details to become a student.
                         </DialogDescription>
                     </DialogHeader>
-<div className="flex flex-col items-center mt-6 space-y-3">
-  <label
-    htmlFor="profile-upload"
-    className="relative group w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-primary/40 shadow-md flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-lg"
-    tabIndex={0}
-    aria-label="Upload profile picture"
-  >
-    {preview && preview !== "/placeholder-avatar.png" ? (
-      <img
-        src={preview}
-        alt="Profile"
-        className="object-cover w-full h-full rounded-full transition-transform duration-300 group-hover:scale-105"
-      />
-    ) : (
-      <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
-        <User className="w-14 h-14 text-gray-400 mb-2" /> {/* Show User icon */}
-      </div>
-    )}
-    {/* Overlay */}
-    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity duration-300">
-      <Upload className="text-white w-6 h-6 mb-1 animate-bounce" />
-      <span className="bg-primary text-white text-xs px-3 py-1 rounded-full shadow-md mt-1">
-        Change Photo
-      </span>
-    </div>
-    <input
-      id="profile-upload"
-      type="file"
-      accept="image/*"
-      className="hidden"
-      onChange={handleImage}
-    />
-  </label>
-  <p className="text-xs text-gray-500 text-center">
-    Click or drag to upload your profile picture
-  </p>
-</div>
+                    <div className="flex flex-col items-center mt-6 space-y-3">
+                        <label
+                            htmlFor="profile-upload"
+                            className="relative group w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-primary/40 shadow-md flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-lg"
+                            tabIndex={0}
+                            aria-label="Upload profile picture"
+                        >
+                            {preview && preview !== "/placeholder-avatar.png" ? (
+                                <img
+                                    src={preview}
+                                    alt="Profile"
+                                    className="object-cover w-full h-full rounded-full transition-transform duration-300 group-hover:scale-105"
+                                />
+                            ) : (
+                                <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
+                                    <User className="w-14 h-14 text-gray-400 mb-2" /> {/* Show User icon */}
+                                </div>
+                            )}
+                            {/* Overlay */}
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity duration-300">
+                                <Upload className="text-white w-6 h-6 mb-1 animate-bounce" />
+                                <span className="bg-primary text-white text-xs px-3 py-1 rounded-full shadow-md mt-1">
+                                    Change Photo
+                                </span>
+                            </div>
+                            <input
+                                id="profile-upload"
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleImage}
+                            />
+                        </label>
+                        <p className="text-xs text-gray-500 text-center">
+                            Click or drag to upload your profile picture
+                        </p>
+                    </div>
                     <div className="space-y-3 mt-4">
                         <Input
                             placeholder="Display Name"

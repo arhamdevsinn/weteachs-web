@@ -37,6 +37,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/hooks/useAuth";
 // import { checkIfProfileExists } from "@/src/lib/api/userProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
+import { UserProfileAPI } from "@/src/lib/api/userProfile";
 
 const ExpertDialog = () => {
   const [openProfile, setOpenProfile] = useState(false);
@@ -67,7 +68,35 @@ const ExpertDialog = () => {
   });
 
   const { userId } = useUserIdFromUrl();
+
   const { user } = useAuth();
+
+  const [limboUser, setLimboUser] = useState<any | null>(null);
+  const [limboLoading, setLimboLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadLimbo = async () => {
+      const uid = user?.uid || (typeof window !== "undefined" ? localStorage.getItem("userId") : null);
+      if (!uid) return;
+      setLimboLoading(true);
+      try {
+        const l = await UserProfileAPI.getLimboUser(uid);
+        if (!mounted) return;
+        setLimboUser(l || null);
+
+      } catch (err) {
+        console.warn("Failed to load limbo user:", err);
+      } finally {
+        if (mounted) setLimboLoading(false);
+      }
+    };
+
+    loadLimbo();
+    return () => {
+      mounted = false;
+    };
+  }, [userId, user]);
 
   // === Image Preview ===
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>, forCategory = false) => {
@@ -85,7 +114,7 @@ const ExpertDialog = () => {
     if (!formData.bio_T.trim()) return "Bio is required.";
     if (!formData.birthday.trim()) return "Birthday is required.";
     if (!formData.Howd_you_here_of_us) return "Please select how you heard about us.";
-    // if (!formData.imageFile) return "Please upload a profile picture.";
+    if (!formData.imageFile) return "Please upload a profile picture.";
     return null;
   };
 
@@ -150,11 +179,11 @@ const ExpertDialog = () => {
       }
       let photoURL = preview;
 
-      // if (formData.imageFile) {
-      //   const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
-      //   await uploadBytes(storageRef, formData.imageFile);
-      //   photoURL = await getDownloadURL(storageRef);
-      // }
+      if (formData.imageFile) {
+        const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
+        await uploadBytes(storageRef, formData.imageFile);
+        photoURL = await getDownloadURL(storageRef);
+      }
 
       const teacherRef = doc(db, "TeacherDetails", userId);
       const teacherData = {
@@ -174,26 +203,30 @@ const ExpertDialog = () => {
       };
 
       await setDoc(teacherRef, teacherData, { merge: true });
+      const payload = {
 
+        Birthday: new Date(formData.birthday),
+        Howd_you_here_of_us: formData.Howd_you_here_of_us,
+        Popup: false,
+        Pre_testers: false,
+        bio_set: true,
+        created_time: serverTimestamp(),
+        display_name: formData.display_name,
+        isTeacher: true,
+        photo_url: photoURL,
+        signupcomplete: true,
+        signupcompletepage2: false,
+        teacher_ref: teacherRef,
+
+      };
+      if (!limboUser && user?.email) {
+        payload.email = user.email;
+        payload.uid = userId;
+      }
       const limboRef = doc(db, "LimboUserMode", userId);
       await setDoc(
         limboRef,
-        {
-          email: user?.email || "",
-          Birthday: new Date(formData.birthday),
-          Howd_you_here_of_us: formData.Howd_you_here_of_us,
-          Popup: false,
-          Pre_testers: false,
-          bio_set: true,
-          created_time: serverTimestamp(),
-          display_name: formData.display_name,
-          isTeacher: true,
-          photo_url: photoURL,
-          signupcomplete: true,
-          signupcompletepage2: false,
-          teacher_ref: teacherRef,
-          uid: userId,
-        },
+        payload,
         { merge: true }
       );
 
@@ -201,7 +234,6 @@ const ExpertDialog = () => {
       toast.success("Profile created successfully!");
       setOpenProfile(false);
       setOpenCategory(true);
-      router.push('/profile');
 
     } catch (err) {
       console.error("Error creating teacher profile:", err);
@@ -274,7 +306,14 @@ const ExpertDialog = () => {
   return (
     <>
       <Button
-        onClick={() => setOpenProfile(true)}
+        onClick={() => {
+          if (limboUser && limboUser?.signupcomplete == true) {
+            setOpenCategory(true);
+          } else {
+            setOpenProfile(true);
+          }
+
+        }}
         className="bg-primary text-white font-semibold px-6 py-2 rounded-full transition"
       >
         Become an Expert

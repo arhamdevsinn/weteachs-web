@@ -119,7 +119,8 @@ function LoginForm() {
       }
 const usernameProfile = localStorage.getItem("usernameT") || "user";  
       toast.success("Login successful!");
-      router.push(`/profile?name=${usernameProfile}`);
+      // router.push(`/profile?name=${usernameProfile}`);
+      router.push(`/profile`);
     } catch (err) {
       if (err.message?.includes("verify your email")) {
         toast.error("Please verify your email before logging in!");
