@@ -40,9 +40,8 @@ const UserProfile = () => {
 
   // current name param (stable alias) and request id ref used in the effect below
   const nameParam = usernameT;
-  if (!nameParam) {
-    const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
-  }
+  // Always call the hook to preserve Hooks order
+  const { limboUser, loadingLimbo, error: limboError } = useRequireCompleteProfile({ username: nameParam });
   const currentReqRef = useRef<number | null>(null);
 
   const [dataLoading, setDataLoading] = useState(false);
@@ -258,8 +257,15 @@ const UserProfile = () => {
   const [shareUrl, setShareUrl] = useState("");
 
   useEffect(() => {
-    if (typeof window !== "undefined") setShareUrl(window.location.href);
-  }, []);
+    if (typeof window !== "undefined") {
+      let cleanUrl = window.location.href;
+      if (!nameParam) {
+        cleanUrl = window.location.origin + window.location.pathname;
+        cleanUrl += "/?name=" + displayTeacher?.usernameT
+      }
+      setShareUrl(cleanUrl)
+    };
+  }, [nameParam,displayTeacher]);
   const [open, setOpen] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
@@ -361,7 +367,7 @@ const UserProfile = () => {
                 )}
 
               </div>
-              
+
               {displayProfile.isTeacher && displayProfile.uid !== user?.uid && (
                 <div className="mt-4">
                   <Button
