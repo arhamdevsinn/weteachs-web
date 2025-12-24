@@ -40,8 +40,8 @@ const UserProfile = () => {
 
   // current name param (stable alias) and request id ref used in the effect below
   const nameParam = usernameT;
-  if(!nameParam){
-     const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
+  if (!nameParam) {
+    const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
   }
   const currentReqRef = useRef<number | null>(null);
 
@@ -121,9 +121,9 @@ const UserProfile = () => {
       // If neither username nor user ID exists, we can't fetch anything
       console.log("No username or user ID available");
       return;
-    }else if(!username && user?.uid){
+    } else if (!username && user?.uid) {
       //  const { limboUser, loadingLimbo, error } = useRequireCompleteProfile();
-      
+
     }
 
     console.log("Fetching profile for:", username || `user ID: ${user?.uid}`);
@@ -339,13 +339,15 @@ const UserProfile = () => {
         <div className="flex flex-col md:flex-row items-center gap-6 px-4 py-6">
           <div className="relative">
             <div className="absolute -inset-2 bg-gradient-to-r from-secondary to-secondary rounded-full opacity-20"></div>
-            <Image priority={true}
-              src={displayProfile.photo_url || user}
-              alt="profile"
-              width={160}
-              height={160}
-              className="rounded-full border-4 border-secondary shadow-lg relative"
-            />
+            <div className="h-40 w-40 rounded-full overflow-hidden relative border-4 border-secondary shadow-lg bg-white">
+              <Image
+                priority={true}
+                src={displayProfile.photo_url || "/splash_screen.png"}
+                alt="profile"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
           <div className="text-center md:text-left  w-full">
             <div className="md:flex-row  md:justify-between flex  flex-col w-full items-center ">
@@ -359,7 +361,8 @@ const UserProfile = () => {
                 )}
 
               </div>
-              {displayProfile.isTeacher && (
+              
+              {displayProfile.isTeacher && displayProfile.uid !== user?.uid && (
                 <div className="mt-4">
                   <Button
                     onClick={() => router.push('/download')}
@@ -399,16 +402,19 @@ const UserProfile = () => {
         {displayProfile.isTeacher && (
           <div className="border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center pt-6 mt-4">
             <div className="flex flex-col items-center">
-              <Link
-                href={{
-                  pathname: "/settings",
-                  query: { userImg: displayProfile.photo_url || "/profile.photo_url" },
-                }}
-              >
-                <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
-                  Profile Settings
-                </button>
-              </Link>
+              {displayProfile.uid === user?.uid && (
+                <Link
+                  href={{
+                    pathname: "/settings",
+                    query: { userImg: displayProfile.photo_url || "/profile.photo_url" },
+                  }}
+                >
+                  <button className="bg-primary hover:from-green-800 hover:to-primary text-white px-8 py-3 rounded-xl font-semibold text-sm shadow-md transition-all transform hover:-translate-y-1">
+                    Profile Settings
+                  </button>
+                </Link>
+              )
+              }
               <div className="flex gap-1 mt-4 text-amber-400 text-xl">
                 {'★'.repeat(filledStars)}
                 <span className="text-gray-300">{'★'.repeat(5 - filledStars)}</span>
