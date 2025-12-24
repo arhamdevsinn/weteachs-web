@@ -17,7 +17,7 @@ import { getAllCategories } from "@/src/lib/api/categories";
 import { Input } from "@/src/components/ui/input";
 import { Search } from "lucide-react";
 // import algoliasearch from "algoliasearch/lite";
-import { default as algoliasearch } from "algoliasearch/lite"; // ✅ Correct
+ import * as algoliasearch from "algoliasearch/lite"; 
 
 
 // Skeleton Loader
