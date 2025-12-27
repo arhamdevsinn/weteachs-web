@@ -1,21 +1,33 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/src/lib/firebase/config";
 import { useAuth } from "@/src/hooks/useAuth";
 import { UserProfileAPI } from "@/src/lib/api/userProfile";
 import { onAuthStateChanged, User } from "firebase/auth";
+import { REACT_LOADABLE_MANIFEST } from "next/dist/shared/lib/constants";
+interface UseRequireCompleteProfileProps {
+  username?: string|null;
+}
 
-export const useRequireCompleteProfile = () => {
+export const useRequireCompleteProfile = ({ username }: UseRequireCompleteProfileProps = {}) => {
+
   const redirectTo = "/create-profile"
   // const { user, loading } = useAuth();
   // const [user, setUser] = useState<User | null>(null);
 
-  const [limboUser, setLimboUser] = useState<any | null>(null);
   const [loadingLimbo, setLoadingLimbo] = useState(true);
   const [error, setError] = useState<any | null>(null);
   const router = useRouter();
-  const uid = auth.currentUser?.uid;
+  const [limboUser, setLimboUser] = useState<any | null>(null);
+
+  
+  const uid = auth.currentUser?.uid;  
+  const isClient = typeof window !== 'undefined';
+  if (!isClient) {
+    return { limboUser: null, loadingLimbo: true, error: null };
+  }
+
 
   useEffect(() => {
     let mounted = true;
@@ -42,16 +54,16 @@ export const useRequireCompleteProfile = () => {
         if (mounted) setLoadingLimbo(false);
       }
     };
-
+  
     fetchLimbo();
     return () => {
       mounted = false;
     };
-  }, [uid]);
+  }, [!username]);
 
   useEffect(() => {
-    console.log("useRequireCompleteProfile uid --------->:" ,limboUser?.signupcomplete, limboUser?.signupcompletepage2);
-    if (!loadingLimbo) {
+    
+    if (!loadingLimbo && !username) {
       if (!limboUser?.signupcomplete || !limboUser?.signupcompletepage2) {
         router.replace(redirectTo);
       }
@@ -60,5 +72,6 @@ export const useRequireCompleteProfile = () => {
 
   return { limboUser, loadingLimbo, error };
 }
+
 
 
