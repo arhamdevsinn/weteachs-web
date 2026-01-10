@@ -6,6 +6,8 @@ import { Toaster } from "sonner";
 import Footer from "../components/layout/Footer";
 // 1. Import Metadata type from next
 import type { Metadata } from 'next';
+import React from "react";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -67,13 +69,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* ⚠️ NOTE: You should remove the <head> element here! 
-         Next.js automatically handles it using the exported metadata. */}
-      {/* <head>
-        <title>WeTeachs</title> 
+
+      <head>
+        {/* <title>WeTeachs</title> 
         <meta name="theme-color" content="#2b683a" />
-        <link rel="icon" href="/logo.png" type="image/png+xml" />
-      </head> */}
+        <link rel="icon" href="/logo.png" type="image/png+xml" /> */}
+      <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11114959066"></script> 
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-11114959066');
+          `,
+        }}
+      />
+      </head>
       <body className={`${poppins.className} w-screen min-h-screen`}>
         <Header />
         <Suspense fallback={<div>Loading...</div>}>

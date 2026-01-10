@@ -29,12 +29,16 @@
 import HeroSection from "@/src/components/home/HeroSection";
 import TestimonialsSection from "@/src/components/home/TestimonialsSection";
 import FeaturesSection from "../components/home/FeaturesSection";
+import { RecentUsersSection } from "@/src/components/home/RecentUsersSection";
+import { RecentCategoriesSection } from "@/src/components/home/RecentCategoriesSection";
 
 export default function Page() {
   return (
     <main>
       <HeroSection />
+      <RecentUsersSection />
       <FeaturesSection/>
+      <RecentCategoriesSection />
       <TestimonialsSection />
     </main>
   );
