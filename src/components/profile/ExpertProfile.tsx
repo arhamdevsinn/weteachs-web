@@ -23,6 +23,9 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
+  query,
+  where,
   serverTimestamp,
   collection,
   addDoc,
@@ -31,15 +34,17 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/hooks/useAuth";
 // import { checkIfProfileExists } from "@/src/lib/api/userProfile";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
+import { UserProfileAPI } from "@/src/lib/api/userProfile";
 
 const ExpertDialog = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const [openCategory, setOpenCategory] = useState(false);
   const [preview, setPreview] = useState("/placeholder-avatar.png");
   const [loading, setLoading] = useState(false);
-const router = useRouter();
+  const router = useRouter();
   const db = getFirestore();
   const storage = getStorage();
 
@@ -63,6 +68,35 @@ const router = useRouter();
   });
 
   const { userId } = useUserIdFromUrl();
+
+  const { user } = useAuth();
+
+  const [limboUser, setLimboUser] = useState<any | null>(null);
+  const [limboLoading, setLimboLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadLimbo = async () => {
+      const uid = user?.uid || (typeof window !== "undefined" ? localStorage.getItem("userId") : null);
+      if (!uid) return;
+      setLimboLoading(true);
+      try {
+        const l = await UserProfileAPI.getLimboUser(uid);
+        if (!mounted) return;
+        setLimboUser(l || null);
+
+      } catch (err) {
+        console.warn("Failed to load limbo user:", err);
+      } finally {
+        if (mounted) setLimboLoading(false);
+      }
+    };
+
+    loadLimbo();
+    return () => {
+      mounted = false;
+    };
+  }, [userId, user]);
 
   // === Image Preview ===
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>, forCategory = false) => {
@@ -95,7 +129,7 @@ const router = useRouter();
     return null;
   };
 
-   useEffect(() => {
+  useEffect(() => {
     const verifyProfileStatus = async () => {
       if (!userId) return;
 
@@ -126,6 +160,23 @@ const router = useRouter();
 
     try {
       setLoading(true);
+      // ensure usernameT (display_name) is unique among TeacherDetails
+      const usernameToCheck = formData.display_name.trim();
+      if (usernameToCheck) {
+        const usernameQuery = query(
+          collection(db, "TeacherDetails"),
+          where("usernameT", "==", usernameToCheck)
+        );
+        const usernameSnap = await getDocs(usernameQuery);
+        if (!usernameSnap.empty) {
+          const other = usernameSnap.docs.find((d) => d.id !== userId);
+          if (other) {
+            setLoading(false);
+            toast.error("Display name already in use. Choose another name.");
+            return;
+          }
+        }
+      }
       let photoURL = preview;
 
       if (formData.imageFile) {
@@ -145,32 +196,37 @@ const router = useRouter();
         created_time_t: serverTimestamp(),
         iSAvailable: false,
         isOnline: true,
-        limbo_ref: `/LimboUserMode/${userId}`,
+        limbo_ref: doc(db, "LimboUserMode", userId),
         teacher: true,
         teacher_profile_picture: photoURL,
         usernameT: formData.display_name,
       };
 
       await setDoc(teacherRef, teacherData, { merge: true });
+      const payload = {
 
+        Birthday: new Date(formData.birthday),
+        Howd_you_here_of_us: formData.Howd_you_here_of_us,
+        Popup: false,
+        Pre_testers: false,
+        bio_set: true,
+        created_time: serverTimestamp(),
+        display_name: formData.display_name,
+        isTeacher: true,
+        photo_url: photoURL,
+        signupcomplete: true,
+        signupcompletepage2: false,
+        teacher_ref: teacherRef,
+
+      };
+      if (!limboUser && user?.email) {
+        payload.email = user.email;
+        payload.uid = userId;
+      }
       const limboRef = doc(db, "LimboUserMode", userId);
       await setDoc(
         limboRef,
-        {
-          Birthday: new Date(formData.birthday),
-          Howd_you_here_of_us: formData.Howd_you_here_of_us,
-          Popup: false,
-          Pre_testers: false,
-          bio_set: true,
-          created_time: serverTimestamp(),
-          display_name: formData.display_name,
-          isTeacher: true,
-          photo_url: photoURL,
-          signupcomplete: true,
-          signupcompletepage2: true,
-          teacher_ref: teacherRef.path,
-          uid: userId,
-        },
+        payload,
         { merge: true }
       );
 
@@ -178,6 +234,7 @@ const router = useRouter();
       toast.success("Profile created successfully!");
       setOpenProfile(false);
       setOpenCategory(true);
+
     } catch (err) {
       console.error("Error creating teacher profile:", err);
       toast.error("Error creating teacher profile");
@@ -213,16 +270,28 @@ const router = useRouter();
         description: categoryData.description,
         image: imageURL,
         teacher_name: formData.display_name,
-        teacher_ref: `/TeacherDetails/${userId}`,
+        teacher_ref: doc(db, "TeacherDetails", userId),
         title: categoryData.title,
         topic: categoryData.topic,
         upload_time: serverTimestamp(),
-        who_created_ref: `/LimboUserMode/${userId}`,
+        who_created_ref: doc(db, `LimboUserMode/${userId}`),
       });
 
       const teacherRef = doc(db, "TeacherDetails", userId);
-      await setDoc(teacherRef, { cat_refs: arrayUnion(categoryRef.path) }, { merge: true });
+      await setDoc(teacherRef, {
+        cat_refs: arrayUnion(categoryRef.path),
+      }, { merge: true });
 
+      const limboRef = doc(db, "LimboUserMode", userId);
+      await setDoc(
+        limboRef,
+        {
+
+          signupcompletepage2: true,
+
+        },
+        { merge: true }
+      );
       toast.success("Category created successfully!");
       setOpenCategory(false);
       router.push('/profile');
@@ -237,7 +306,14 @@ const router = useRouter();
   return (
     <>
       <Button
-        onClick={() => setOpenProfile(true)}
+        onClick={() => {
+          if (limboUser && limboUser?.signupcomplete == true) {
+            setOpenCategory(true);
+          } else {
+            setOpenProfile(true);
+          }
+
+        }}
         className="bg-primary text-white font-semibold px-6 py-2 rounded-full transition"
       >
         Become an Expert

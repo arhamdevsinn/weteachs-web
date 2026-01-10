@@ -1,11 +1,11 @@
 // @ts-nocheck
 import { useState } from "react";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { app } from "@/src/lib/firebase/config"; 
+import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/src/lib/firebase/config"; 
 export const useUploadImage = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const storage = getStorage(app);
+  // const storage = getStorage(app);
 
   const uploadImage = async (file: File, folder: string = "uploads") => {
     if (!file) throw new Error("No file provided.");

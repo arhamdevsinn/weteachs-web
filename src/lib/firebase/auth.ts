@@ -8,7 +8,7 @@ import {
   UserCredential,
    signOut as firebaseSignOut
 } from 'firebase/auth';
-import { auth, db } from "@/src/lib/firebase/config";
+import { auth, db,serverTimestamp } from "@/src/lib/firebase/config";
 import { doc, setDoc } from "firebase/firestore";
 import { Router } from 'lucide-react';
 
@@ -59,12 +59,19 @@ export class AuthService {
       const uid = user.uid;
 
       // Store teacher details
-      await setDoc(doc(db, "TeacherDetails", uid), {
+      // await setDoc(doc(db, "TeacherDetails", uid), {
+      //   email,
+      //   ...teacherData,
+      //   uid,
+      //   createdAt: new Date().toISOString(),
+      //   emailVerified: false,
+      // });
+       await setDoc(doc(db, "LimboUserMode", uid), {
         email,
         ...teacherData,
         uid,
-        createdAt: new Date().toISOString(),
-        emailVerified: false,
+        createdAt: serverTimestamp(),
+        // emailVerified: false,
       });
 
       // Store credentials for verify-email

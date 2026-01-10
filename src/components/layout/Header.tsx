@@ -14,7 +14,6 @@ import {
   User,
   GraduationCap,
 } from "lucide-react";
-import ChatIcon from "@/src/components/ui/ChatIcon";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -114,51 +113,56 @@ const Header = () => {
             })}
           </nav>
 
-          {/* Right: Chat Icon + Auth / User */}
+          {/* Right: Auth / User */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Chat Icon */}
-            <Link href="/chat" aria-label="Open chat" className="flex items-center justify-center rounded-full p-2 hover:bg-blue-100 transition focus:outline-none focus:ring-2 focus:ring-primary">
-              <ChatIcon className="w-6 h-6 text-primary" />
-            </Link>
-            {user ? (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-primary text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
-                    <User size={16} />
-                    <span>{user?.email?.split("@")[0] || "User"}</span>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44">
-                    <DropdownMenuItem
-                      onClick={() => handleNavigate("/profile")}
-                      className="cursor-pointer"
-                    >
-                      My Profile
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button variant="ghost" size="sm" className="text-sm flex items-center bg-primary text-white gap-2 hover:bg-red-50 hover:text-red-600" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => (window.location.href = "/auth/login")}
-                  className="flex items-center gap-2 hover:text-primary"
-                >
-                  <LogIn size={15} />
-                  Login
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => (window.location.href = "/auth/signup")}
-                  className="flex items-center gap-2 bg-primary text-white hover:opacity-90"
-                >
-                  <UserPlus size={15} />
-                  Sign up
-                </Button>
-              </>
-            )}
+       {user ? (
+  <>
+    <DropdownMenu>
+   <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-primary text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
+  <User size={16} />
+  <span>{user?.email?.split("@")[0] || "User"}</span>
+</DropdownMenuTrigger>
+
+
+      <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuItem
+          onClick={() => handleNavigate("/profile")}
+          className="cursor-pointer"
+        >
+          My Profile
+        </DropdownMenuItem>
+        {/* <DropdownMenuItem
+          onClick={() => handleNavigate("/edit-profile")}
+          className="cursor-pointer"
+        >
+          Edit Profile
+        </DropdownMenuItem> */}
+        
+      </DropdownMenuContent>
+    </DropdownMenu>
+    <Button variant="ghost" size="sm" className="text-sm flex items-center bg-primary text-white gap-2 hover:bg-red-50 hover:text-red-600" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
+  </>
+) : (
+  <>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => (window.location.href = "/auth/login")}
+      className="flex items-center gap-2 hover:text-primary"
+    >
+      <LogIn size={15} />
+      Login
+    </Button>
+    <Button
+      size="sm"
+      onClick={() => (window.location.href = "/auth/signup")}
+      className="flex items-center gap-2 bg-primary text-white hover:opacity-90"
+    >
+      <UserPlus size={15} />
+      Sign up
+    </Button>
+  </>
+)}
           </div>
 
           {/* Mobile Menu Button */}
