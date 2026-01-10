@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import { useEffect, useState,useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -18,20 +17,19 @@ export const useRequireCompleteProfile = ({ username }: UseRequireCompleteProfil
   // const [user, setUser] = useState<User | null>(null);
 
   const [loadingLimbo, setLoadingLimbo] = useState(true);
-  const [error, setError] = useState< | null>(null);
+  const [error, setError] = useState<any | null>(null);
   const router = useRouter();
-  const [limboUser, setLimboUser] = useState< | null>(null);
+  const [limboUser, setLimboUser] = useState<any | null>(null);
 
   
   const uid = auth.currentUser?.uid;  
   const isClient = typeof window !== 'undefined';
+  if (!isClient) {
+    return { limboUser: null, loadingLimbo: true, error: null };
+  }
+
 
   useEffect(() => {
-    // Skip effect if not on client side
-    if (!isClient) {
-      return;
-    }
-
     let mounted = true;
 
     const fetchLimbo = async () => {
@@ -61,7 +59,7 @@ export const useRequireCompleteProfile = ({ username }: UseRequireCompleteProfil
     return () => {
       mounted = false;
     };
-  }, [!username, isClient]);
+  }, [!username]);
 
   useEffect(() => {
     

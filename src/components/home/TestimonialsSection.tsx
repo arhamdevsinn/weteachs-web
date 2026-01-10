@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const testimonials = [
   {
@@ -78,7 +77,7 @@ const TestimonialsSection = () => {
           disabled={index === 0}
           className="rounded-full w-12 h-12 flex items-center justify-center bg-primary text-white hover:bg-primary/80 disabled:opacity-30"
         >
-          <ChevronLeft />
+          ‹
         </Button>
 
         <div className="overflow-hidden w-full max-w-4xl">
@@ -119,9 +118,9 @@ const TestimonialsSection = () => {
         <Button
           onClick={handleNext}
           disabled={index + visible >= testimonials.length}
-          className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-primary text-white hover:bg-primary/80 disabled:opacity-30"
+          className="rounded-full w-12 h-12 flex items-center justify-center bg-primary text-white hover:bg-primary/80 disabled:opacity-30"
         >
-          <ChevronRight size={172} />
+          ›
         </Button>
       </div>
 
