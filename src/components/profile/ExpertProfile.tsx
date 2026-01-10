@@ -71,7 +71,7 @@ const ExpertDialog = () => {
 
   const { user } = useAuth();
 
-  const [limboUser, setLimboUser] = useState<any | null>(null);
+  const [limboUser, setLimboUser] = useState< | null>(null);
   const [limboLoading, setLimboLoading] = useState(false);
 
   useEffect(() => {
@@ -92,6 +92,7 @@ const ExpertDialog = () => {
       }
     };
 
+    
     loadLimbo();
     return () => {
       mounted = false;
