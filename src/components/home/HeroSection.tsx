@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden bg-gradient-to-br from-green-50  to-white">
+    <section className="relative h-[85vh] flex flex-col justify-center items-center overflow-hidden bg-gradient-to-br from-green-50  to-white">
       {/* Subtle floating shapes / glow effect */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-green-200/40 blur-3xl rounded-full mix-blend-multiply animate-pulse"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-300/30 blur-3xl rounded-full mix-blend-multiply animate-pulse delay-1000"></div>

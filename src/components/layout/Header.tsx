@@ -61,8 +61,9 @@ const Header = () => {
     { href: "/teach", label: "Teach" },
     { href: "/learn", label: "Learn" },
     { href: "/about", label: "About" },
+    { href: "/categories", label: "Explore" },
     ...(user ? [{ href: "/community", label: "Community" }] : []),
-    ...(user ? [{ href: "/categories", label: "Explore" }] : []),
+    // ...(user ? [{ href: "/categories", label: "Explore" }] : []),
     // ...(user ? [{ href: "/profile", label: "Profile" }] : []),
   ];
 

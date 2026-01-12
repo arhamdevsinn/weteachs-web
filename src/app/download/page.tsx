@@ -1,8 +1,54 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
+
+declare global {
+  interface Window {
+    gtag: any;
+  }
+}
 
 const DownloadPage = () => {
+  useEffect(() => {
+    // Add conversion tracking script
+    const script = document.createElement('script');
+    script.innerHTML = `
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+            'send_to': 'AW-11114959066/EXsuCK2Rt-EbENqhg7Qp',
+            'value': 0.27,
+            'currency': 'USD',
+            'event_callback': callback
+        });
+        return false;
+      }
+    `;
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
+  const handleDownloadClick = (url: string) => {
+    // Track conversion
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-11114959066/EXsuCK2Rt-EbENqhg7Qp',
+        'value': 0.27,
+        'currency': 'USD'
+      });
+    }
+    
+    // Open the app store link
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="container mx-auto  min-h-screen bg-white px-6 py-16">
      <h1 className="text-4xl font-bold text-center text-primary mb-12">
@@ -13,15 +59,20 @@ const DownloadPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl w-full">
 
         {/* LEFT — iOS */}
-        <a
-          href="https://apps.apple.com/us/app/weteachs/id6502515880"
-          target="_blank"
-          rel="noopener noreferrer"
+        <div
+          onClick={() => handleDownloadClick("https://apps.apple.com/us/app/weteachs/id6502515880")}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleDownloadClick("https://apps.apple.com/us/app/weteachs/id6502515880");
+            }
+          }}
           aria-label="Download on the App Store"
-          className="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-lg block"
+          className="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-lg cursor-pointer hover:shadow-2xl transition-shadow"
         >
           <Image  priority={true}
-            src="/apple.jpg" // replace with actual image path
+            src="/apple.jpg"
             alt="iOS App"
             fill
             className="object-cover"
@@ -35,18 +86,23 @@ const DownloadPage = () => {
               TO CONNECT & <br /> GROW
             </h2>
           </div>
-        </a>
+        </div>
 
         {/* RIGHT — Google Play */}
-        <a
-          href="https://play.google.com/store/apps/details?id=com.weteachappneww.app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <div
+          onClick={() => handleDownloadClick("https://play.google.com/store/apps/details?id=com.weteachappneww.app")}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleDownloadClick("https://play.google.com/store/apps/details?id=com.weteachappneww.app");
+            }
+          }}
           aria-label="Get it on Google Play"
-          className="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-lg block"
+          className="relative w-full h-[420px] rounded-2xl overflow-hidden shadow-lg cursor-pointer hover:shadow-2xl transition-shadow"
         >
           <Image  priority={true}
-            src="/android.png" // replace with actual image path
+            src="/android.png"
             alt="Google Play"
             fill
             className="object-cover"
@@ -59,7 +115,7 @@ const DownloadPage = () => {
               GOOGLE PLAY
             </h2>
           </div>
-        </a>
+        </div>
 
       </div>
     </div>

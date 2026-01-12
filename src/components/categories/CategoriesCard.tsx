@@ -17,6 +17,8 @@ import { getAllCategories } from "@/src/lib/api/categories";
 import { Input } from "@/src/components/ui/input";
 import { Search } from "lucide-react";
 import { algoliasearch } from "algoliasearch";
+import { auth } from "@/src/lib/firebase/config";
+import SignupPromptDialog from "./SignupPromptDialog";
 
 
 // Skeleton Loader
@@ -33,35 +35,44 @@ const SkeletonCard = () => (
 const CategoriesCard = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
-  // get uid safely from localStorage (works in browser only)
-  const uid =
-    typeof window !== "undefined"
-      ? localStorage.getItem("userId") || localStorage.getItem("user_id") || undefined
-      : undefined;
-  console.log("uid", uid);
   const router = useRouter();
-  const { userId } = useUserIdFromUrl();
+  
+  // Get uid for teacher profile features (optional - not needed for viewing categories)
+  const uid = typeof window !== "undefined"
+    ? localStorage.getItem("userId") || localStorage.getItem("user_id") || undefined
+    : undefined;
 
-  // Fetch teacher + categories from Firestore
+  // Fetch teacher + categories from Firestore (only if uid exists)
   const {
     profile,
     categories,
     teacherDetails,
-    loading,
-    error,
+    loading: profileLoading,
+    error: profileError,
   } = useUserProfile(uid);
-  // local fetched list of all categories (fallback / global)
+  
+  // local fetched list of all categories (independent fetch)
   const [allCategories, setAllCategories] = useState<[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
     (async () => {
       try {
         const cats = await getAllCategories();
         console.log("Fetched all categories:", cats);
-        if (mounted) setAllCategories(cats);
+        if (mounted) {
+          setAllCategories(cats);
+          setLoading(false);
+        }
       } catch (err) {
         console.error("Failed to load all categories:", err);
+        if (mounted) {
+          setError("Failed to load categories");
+          setLoading(false);
+        }
       }
     })();
     return () => {
@@ -140,14 +151,42 @@ const CategoriesCard = () => {
   // moved here so hooks run before any early returns (fixes Hooks order error)
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [open, setOpen] = useState(false);
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+
+  // Check if user is authenticated
+  const isAuthenticated = () => {
+    // Check Firebase auth
+    if (auth.currentUser) return true;
+    
+    // Check localStorage as fallback
+    if (typeof window !== "undefined") {
+      const userId = localStorage.getItem("userId") || localStorage.getItem("user_id");
+      if (userId) return true;
+    }
+    
+    return false;
+  };
 
   const openCategoryModal = (cat) => {
-    setSelectedCategory(cat);
-    setOpen(true);
+    // Check authentication before opening modal
+    if (isAuthenticated()) {
+      // User is logged in - show category details
+      setSelectedCategory(cat);
+      setOpen(true);
+    } else {
+      // User is not logged in - show signup prompt
+      setSelectedCategory(cat);
+      setShowSignupPrompt(true);
+    }
   };
 
   const closeCategoryModal = () => {
     setOpen(false);
+    setSelectedCategory(null);
+  };
+
+  const closeSignupPrompt = () => {
+    setShowSignupPrompt(false);
     setSelectedCategory(null);
   };
 
@@ -177,10 +216,19 @@ const CategoriesCard = () => {
   }
 
   const handleCreate = () => {
-    if (!teacherDetails?.id) {
-      console.log("Teacher ID not found");
+    // Check if user is authenticated
+    if (!isAuthenticated()) {
+      setShowSignupPrompt(true);
       return;
     }
+    
+    // Check if user has teacher details
+    if (!teacherDetails?.id) {
+      console.log("Teacher ID not found - redirecting to create profile");
+      router.push("/create-profile");
+      return;
+    }
+    
     router.push(`/upload?teacherId=${teacherDetails.id}`);
   };
 
@@ -491,6 +539,13 @@ const CategoriesCard = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Signup Prompt Dialog */}
+      <SignupPromptDialog
+        open={showSignupPrompt}
+        onOpenChange={closeSignupPrompt}
+        categoryName={selectedCategory?.title}
+      />
     </div>
   );
 };

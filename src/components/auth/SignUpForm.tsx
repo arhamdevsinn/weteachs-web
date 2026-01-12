@@ -1,11 +1,17 @@
 // @ts-nocheck
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CircleArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { AuthService } from '@/src/lib/firebase/auth';
+
+declare global {
+  interface Window {
+    gtag: any;
+  }
+}
 
 const isErrorWithMessage = (error: unknown): error is { message: string } =>
   typeof error === "object" && error !== null && "message" in error && typeof (error as { message: unknown }).message === "string";
@@ -18,6 +24,32 @@ function SignUpForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    // Add conversion tracking script
+    const script = document.createElement('script');
+    script.innerHTML = `
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+            'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
+            'value': 0.27,
+            'currency': 'USD',
+            'event_callback': callback
+        });
+        return false;
+      }
+    `;
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +76,16 @@ function SignUpForm() {
     setLoading(true);
     try {
       const res = await AuthService.signup(email, password);
+      
+      // Track conversion
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'conversion', {
+          'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
+          'value': 0.27,
+          'currency': 'USD'
+        });
+      }
+      
       toast.success(res.message); // ✅ "Go to your email and verify first"
       router.push('/auth/verify-email');
     } catch (err) {
