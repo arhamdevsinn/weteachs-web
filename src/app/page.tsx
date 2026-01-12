@@ -38,7 +38,6 @@ export default function Page() {
       <HeroSection />
       <RecentUsersSection />
       <FeaturesSection/>
-      
       <RecentCategoriesSection />
       <TestimonialsSection />
     </main>
