@@ -18,6 +18,7 @@ export const useAuth = () => {
 
   // ✅ Extract username from URL like `/profile=Isaiah`
   useEffect(() => {
+    
     if (typeof window !== "undefined") {
       const urlPath = window.location.pathname;
       // match /profile=username
