@@ -4,8 +4,6 @@ import Header from "../components/layout/Header";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
 import Footer from "../components/layout/Footer";
-// 1. Import Metadata type from next
-import type { Metadata } from 'next';
 import React from "react";
 
 
@@ -54,8 +52,8 @@ const KEYWORDS = [
   "Your skills deserve a platform"
 ];
 
-// 3. Export the metadata object
-export const metadata: Metadata = {
+// 2. Export the metadata object
+export const metadata = {
   title: 'WeTeachs - Real Experts, Real Answers | Teach, Learn, or Earn',
   description: 'Find and hire online experts for one-on-one help, mentorship, and instant human-powered answers. Learn from real people or earn by teaching your expertise online.',
   // Add the keywords property here
@@ -75,6 +73,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#2b683a" />
         <link rel="icon" href="/logo.png" type="image/png+xml" /> */}
       <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11114959066"></script> 
+      <script src="https://t.contentsquare.net/uxa/27feb494c51fc.js"></script>
       <script
         dangerouslySetInnerHTML={{
           __html: `

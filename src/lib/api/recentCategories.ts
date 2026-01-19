@@ -89,7 +89,7 @@ export const getRecentCategories = async (limitCount: number = 8): Promise<Recen
       categories.push({
         id: docSnap.id,
         category_name: categoryData.category_name || "Unknown Category",
-        category_image_url: categoryData.category_image_url || "/sample.png",
+        category_image_url: categoryData.image || "/sample.png",
         description: categoryData.description || "",
         teacher_name: teacherName,
         teacher_photo_url: teacherPhotoUrl || "/pro.png",
