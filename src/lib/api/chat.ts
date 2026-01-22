@@ -17,7 +17,9 @@ import {
   orderBy,
   onSnapshot
 } from "firebase/firestore";
+import { limit } from "firebase/firestore";
 import { db } from "@/src/lib/firebase/config";
+import type { Conversation } from "@/src/lib/types/chat";
 
 /**
  * Get or create a conversation between two users
@@ -261,7 +263,7 @@ export const sendMessage = async (
  * Get all conversations for a user from the 'chats' collection
  * Fetches conversations where user is either limboref or limboref2
  */
-export const getUserConversations = async (userId: string) => {
+export const getUserConversations = async (userId: string): Promise<Conversation[]> => {
   try {
     const userRef = doc(db, "LimboUserMode", userId);
 
@@ -284,78 +286,116 @@ export const getUserConversations = async (userId: string) => {
     ]);
 
     // Combine results
-    const conversations = [];
+    const conversations: Conversation[] = [];
+
+    // Helper to fetch limboref and student_ref data if present
+    const fetchRefsData = async (data: any) => {
+      let limborefData = {};
+      let studentRefData = {};
+      try {
+        if (data.limboref) {
+          const limborefDoc = await getDoc(data.limboref);
+          if (limborefDoc.exists()) limborefData = limborefDoc.data();
+        }
+        if (data.student_ref) {
+          const studentRefDoc = await getDoc(data.student_ref);
+          if (studentRefDoc.exists()) studentRefData = studentRefDoc.data();
+        }
+      } catch (e) {
+        // ignore individual ref fetch errors
+      }
+      return { limborefData, studentRefData };
+    };
 
     // Process conversations where user is limboref
     for (const docSnap of snapshot1.docs) {
       const data = docSnap.data();
+
+      // Skip conversations that have no messages in chat_messages subcollection
+      try {
+        const messagesSnap = await getDocs(query(collection(db, "chats", docSnap.id, "chat_messages"), limit(1)));
+        if (messagesSnap.empty) {
+          // no messages, skip showing this conversation
+          continue;
+        }
+      } catch (e) {
+        // if check fails, continue and include the conversation to avoid hiding due to transient errors
+        console.warn("Could not check messages for conversation", docSnap.id, e);
+      }
       
       // Get the other user's details (limboref2)
       const otherUserRef = data.limboref2;
-      const otherUserDoc = await getDoc(otherUserRef);
-      const otherUserData = otherUserDoc.exists() ? otherUserDoc.data() : {};
+      const otherUserDoc = otherUserRef ? await getDoc(otherUserRef) : null;
+      const otherUserData = otherUserDoc && otherUserDoc.exists() ? otherUserDoc.data() : {};
 
-      // Current user is limboref, other user is limboref2
-      // If limboref2 is teacher, use is_expert_online
-      // If limboref2 is student, use is_student_online
       const isOtherUserTeacher = otherUserData.isTeacher || false;
       const isOtherUserStudent = otherUserData.isStudent || false;
+
+      const { limborefData, studentRefData } = await fetchRefsData(data);
 
       conversations.push({
         id: docSnap.id,
         ...data,
         otherParticipant: {
-          uid: otherUserRef.id,
+          uid: otherUserRef?.id || "",
           display_name: otherUserData.display_name || "User",
           photo_url: otherUserData.photo_url || "",
           isTeacher: isOtherUserTeacher,
           isStudent: isOtherUserStudent,
-          // Determine which online status to use based on limboref2's role
           isOnline: isOtherUserTeacher 
             ? (data.is_expert_online || false) 
             : (data.is_student_online || false),
         },
         type: data.chat_paid_for ? "paid" : "free",
-        // Include both online status fields for reference
         is_expert_online: data.is_expert_online || false,
         is_student_online: data.is_student_online || false,
+        limborefData,
+        studentRefData,
       });
     }
 
     // Process conversations where user is limboref2
     for (const docSnap of snapshot2.docs) {
-
       const data = docSnap.data();
+
+      // Skip conversations that have no messages in chat_messages subcollection
+      try {
+        const messagesSnap = await getDocs(query(collection(db, "chats", docSnap.id, "chat_messages"), limit(1)));
+        if (messagesSnap.empty) {
+          continue;
+        }
+      } catch (e) {
+        console.warn("Could not check messages for conversation", docSnap.id, e);
+      }
       
       // Get the other user's details (limboref)
       const otherUserRef = data.limboref;
-      const otherUserDoc = await getDoc(otherUserRef);
-      const otherUserData = otherUserDoc.exists() ? otherUserDoc.data() : {};
+      const otherUserDoc = otherUserRef ? await getDoc(otherUserRef) : null;
+      const otherUserData = otherUserDoc && otherUserDoc.exists() ? otherUserDoc.data() : {};
 
-      // Current user is limboref2, other user is limboref
-      // If limboref is teacher, use is_expert_online
-      // If limboref is student, use is_student_online
       const isOtherUserTeacher = otherUserData.isTeacher || false;
       const isOtherUserStudent = otherUserData.isStudent || false;
+
+      const { limborefData, studentRefData } = await fetchRefsData(data);
 
       conversations.push({
         id: docSnap.id,
         ...data,
         otherParticipant: {
-          uid: otherUserRef.id,
+          uid: otherUserRef?.id || "",
           display_name: otherUserData.display_name || "User",
           photo_url: otherUserData.photo_url || "",
           isTeacher: isOtherUserTeacher,
           isStudent: isOtherUserStudent,
-          // Determine which online status to use based on limboref's role
           isOnline: isOtherUserTeacher 
             ? (data.is_expert_online || false) 
             : (data.is_student_online || false),
         },
         type: data.chat_paid_for ? "paid" : "free",
-        // Include both online status fields for reference
         is_expert_online: data.is_expert_online || false,
         is_student_online: data.is_student_online || false,
+        limborefData,
+        studentRefData,
       });
     }
 

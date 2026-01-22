@@ -7,7 +7,10 @@ import {
   sendMessage,
   subscribeToMessages
 } from "@/src/lib/api/chat";
-import {MessageSquareDot} from "lucide-react";
+import type { Conversation } from "@/src/lib/types/chat";
+import { MessageSquareDot, Video, Phone } from "lucide-react";
+import { getUserCalls, subscribeToUserCalls } from "@/src/lib/api/calls";
+import type { CallRecord } from "@/src/lib/types/call";
 import { auth, db } from "@/src/lib/firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "sonner";
@@ -53,9 +56,10 @@ const ChatScreen = () => {
   const conversationIdFromUrl = searchParams.get("conversationId") || "";
   
   const [activeTab, setActiveTab] = React.useState("free");
-  const [conversations, setConversations] = React.useState([]);
-  const [selectedChat, setSelectedChat] = React.useState(null);
+  const [conversations, setConversations] = React.useState<Conversation[]>([]);
+  const [selectedChat, setSelectedChat] = React.useState<Conversation | null>(null);
   const [messages, setMessages] = React.useState([]);
+  const [calls, setCalls] = React.useState<CallRecord[]>([]);
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [sendingMessage, setSendingMessage] = React.useState(false);
@@ -68,6 +72,103 @@ const ChatScreen = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const formatCallWhen = (when: any) => {
+    // Normalize various timestamp shapes into a Date
+    if (!when) return "Now";
+    let date: Date | null = null;
+    try {
+      if (when?.seconds && typeof when.seconds === 'number') {
+        date = new Date(when.seconds * 1000);
+      } else if (typeof when === 'number') {
+        date = new Date(when);
+      } else if (typeof when === 'string') {
+        const parsed = new Date(when);
+        if (!isNaN(parsed.getTime())) date = parsed;
+      } else if (when?.toDate && typeof when.toDate === 'function') {
+        date = when.toDate();
+      }
+    } catch (e) {
+      // fallthrough to string fallback
+      console.warn('formatCallWhen: failed to parse when', when, e);
+    }
+
+    if (!date) return String(when);
+
+    const now = new Date();
+    const diffSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diffSeconds < 60) return 'Just now';
+    if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)}m`;
+    if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)}h`;
+
+    const diffDays = Math.floor(diffSeconds / 86400);
+    if (diffDays < 7) return `${diffDays}d`;
+
+    const diffWeeks = Math.floor(diffDays / 7);
+    if (diffWeeks < 5) return `${diffWeeks}w`;
+
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths < 12) return `${diffMonths}mo`;
+
+    return `${Math.floor(diffDays / 365)}y`;
+  };
+
+  const getParticipantIds = (call: any) => {
+    if (!call?.users || !Array.isArray(call.users)) return [];
+    return call.users.map((r: any) => {
+      try {
+        if (typeof r === "string") return r.split("/").pop();
+        if (r.path) return r.path.split("/").pop();
+        if (r.id) return r.id;
+      } catch (e) {
+        return String(r);
+      }
+    });
+  };
+
+  const getRefId = (ref: any) => {
+    if (!ref) return null;
+    try {
+      if (typeof ref === 'string') return ref.split('/').pop();
+      if (ref.path) return ref.path.split('/').pop();
+      if (ref.id) return ref.id;
+    } catch (e) {
+      return null;
+    }
+    return null;
+  };
+
+  const serializeCallForLog = (c: any) => {
+    const users = Array.isArray(c?.users) ? c.users.map((u: any) => (u?.path ? u.path.split('/').pop() : (u?.id || String(u)))) : [];
+    const limboref = c?.limbo_ref?.path ? c.limbo_ref.path.split('/').pop() : (c?.limbo_ref?.id || null);
+    const limboref2 = c?.limbo_ref2?.path ? c.limbo_ref2.path.split('/').pop() : (c?.limbo_ref2?.id || null);
+    let when = null;
+    try {
+      if (c?.call_when?.seconds) when = new Date(c.call_when.seconds * 1000).toISOString();
+      else if (c?.call_when?.toDate) when = c.call_when.toDate().toISOString();
+      else if (typeof c?.call_when === 'string') when = c.call_when;
+    } catch (e) {
+      when = String(c?.call_when);
+    }
+
+    return {
+      id: c?.id,
+      app_id: c?.app_id || null,
+      channelname: c?.channelname || null,
+      call_declined: !!c?.call_declined,
+      call_ended: !!c?.call_ended,
+      call_when: when,
+      isVideo: !!c?.isVideo,
+      limbo_ref: limboref,
+      limbo_ref2: limboref2,
+      ringing: !!c?.ringing,
+      student_joined: !!c?.student_joined,
+      teacher_joined: !!c?.teacher_joined,
+      token_id: c?.token_id || null,
+      users,
+      videoRequst: !!c?.videoRequst,
+    };
   };
 
   React.useEffect(() => {
@@ -115,8 +216,49 @@ const ChatScreen = () => {
       setMessages(loadedMessages);
     });
 
-    return () => unsubscribe();
+    // Some subscribe helpers may return undefined; guard the cleanup call
+    return () => {
+      try {
+        if (typeof unsubscribe === "function") unsubscribe();
+      } catch (e) {
+        console.warn("Error during messages unsubscribe cleanup:", e);
+      }
+    };
   }, [selectedChat?.id]);
+
+  // Load and subscribe to calls for current user
+  React.useEffect(() => {
+    if (!currentUserId) return;
+
+    let unsub: (() => void) | undefined;
+    const load = async () => {
+      try {
+        const fetched = await getUserCalls(currentUserId);
+        setCalls(fetched);
+        // Log each call in a serializable, readable format
+        console.log("User calls loaded (raw):", fetched);
+        try {
+          fetched.forEach((c: any, idx: number) => {
+            console.log(`call[${idx}]`, serializeCallForLog(c));
+          });
+        } catch (e) {
+          console.warn('Could not serialize calls for logging', e);
+        }
+      } catch (err) {
+        console.error("Error loading calls:", err);
+      }
+      // Subscribe for realtime updates
+      unsub = subscribeToUserCalls(currentUserId, (latest) => {
+        setCalls(latest);
+      });
+    };
+
+    load();
+
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [currentUserId]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -205,10 +347,10 @@ const ChatScreen = () => {
 
   return (
     <div className="bg-gradient-to-br from-[#E8ECE4] via-white to-[#E8ECE4]/50 md:py-2 md:px-6 md:min-h-[calc(100vh-4rem)]">
-      <div className="max-w-7xl mx-auto h-full">
-        <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)] md:h-[calc(100vh-6rem)] bg-white md:rounded-2xl md:shadow-2xl overflow-hidden md:border md:border-gray-100">
+      <div className=" h-full">
+        <div className="flex w-[100%] flex-col md:flex-row h-[calc(100vh-4rem)] md:h-[calc(100vh-6rem)] bg-white md:rounded-2xl md:shadow-2xl overflow-hidden md:border md:border-gray-100">
           {/* Sidebar - Hidden on mobile when chat is selected */}
-          <aside className={`w-full md:w-80 bg-gradient-to-b from-[#22542F] to-[#1a4023] text-white flex flex-col ${
+          <aside className={`sm:w-[40%] w-full bg-gradient-to-b from-[#22542F] to-[#1a4023] text-white flex flex-col ${
             showChatSection ? 'hidden md:flex' : 'flex'
           }`}>
             {/* Header */}
@@ -263,31 +405,173 @@ const ChatScreen = () => {
             {/* Conversations List */}
             <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
               {activeTab === "calls" ? (
-                <div className="p-4 space-y-3">
-                  {mockCallLogs.map((log) => (
-                    <div
-                      key={log.id}
-                      className="bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-all duration-200 cursor-pointer border border-white/5"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-sm">{log.name}</span>
-                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                          log.status === "completed" 
-                            ? "bg-emerald-500/20 text-emerald-200 border border-emerald-500/30" 
-                            : "bg-red-500/20 text-red-200 border border-red-500/30"
-                        }`}>
-                          {log.status}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-white/70">
-                        <span className="flex items-center gap-2">
-                          {log.type === "video" ? "📹" : "📞"} {log.duration}
-                        </span>
-                        <span>{log.time}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                // <div className="p-4 space-y-3">
+                //     {(calls.length ? calls : mockCallLogs).map((log: any) => {
+                //     const isMock = !log.id || typeof log.id === 'number';
+                //     const status = isMock ? log.status : (
+                //       log.call_ended ? 'ended' : (log.call_declined ? 'declined' : (log.ringing ? 'ringing' : 'scheduled'))
+                //     );
+                //     const type = isMock ? log.type : (log.isVideo ? 'video' : 'audio');
+                //     const when = isMock ? log.time : formatCallWhen(log.call_when);
+                //     const participants = isMock ? [log.name] : getParticipantIds(log);
+                //     const senderName = isMock ? log.name : (log.limbo_ref_name || participants[0] || 'Unknown');
+                //     const receiverName = isMock ? '' : (log.limbo_ref2_name || participants[1] || '');
+                //     // compute limbo ids and arrow direction relative to current user
+                //     const limboId = !isMock ? getRefId(log.limbo_ref) : null;
+                //     const limbo2Id = !isMock ? getRefId(log.limbo_ref2) : null;
+                //     const showUpArrow = !!(limboId && currentUserId && limboId === currentUserId);
+
+                //     // Show the "other" participant relative to the current user
+                //     let primaryDisplay = senderName;
+                //     if (!isMock) {
+                //       if (limbo2Id && limbo2Id === currentUserId) {
+                //         // current user is receiver -> show sender
+                //         primaryDisplay = log.limbo_ref_name || limboId || senderName;
+                //       } else if (limboId && limboId === currentUserId) {
+                //         // current user is sender -> show receiver
+                //         primaryDisplay = log.limbo_ref2_name || limbo2Id || receiverName || 'Unknown';
+                //       }
+                //     }
+
+                //     return (
+                //       <div
+                //         key={log.id}
+                //         className="bg-white rounded-lg p-3 transition-all duration-200 cursor-pointer border-2 border-[#22542F]"
+                //       >
+                //         <div className="flex items-center gap-4">
+                //           {/* Avatar */}
+                //           <div className="flex-shrink-0">
+                //             <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-[#22542F]">
+                //               {/* if you have a logo or avatar, replace src below */}
+                //               <img src="/logo.png" alt="avatar" className="w-full h-full object-cover" />
+                //             </div>
+                //           </div>
+
+                //           {/* Main content: name + time */}
+                //           <div className="flex-1 min-w-0">
+                //             <div className="flex items-center justify-between">
+                //               <div className="truncate">
+                //                 {/* <div className="font-semibold text-sm text-[#0f2f18]">{isMock ? log.name : (log.channelname || log.app_id || log.id)}</div> */}
+                //                   {/* <div className="font-semibold">{
+                //                     (() => {
+                //                       const limboId = getRefId(call.limbo_ref);
+                //                       const limbo2Id = getRefId(call.limbo_ref2);
+                //                       const showUp = !!(limboId && currentUserId && limboId === currentUserId);
+                //                       const name = (limbo2Id && limbo2Id === currentUserId) ? (call.limbo_ref_name || limboId || 'Unknown') : ((limboId && limboId === currentUserId) ? (call.limbo_ref2_name || limbo2Id || 'Unknown') : (call.limbo_ref_name || call.limbo_ref || 'Unknown'));
+                //                       return (
+                //                         <span className="inline-flex items-center gap-2">
+                //                           <span>{name}</span>
+                //                           <span className={`text-sm ${showUp ? 'text-red-400' : 'text-green-400'}`}>{showUp ? '⬆' : '⬇'}</span>
+                //                         </span>
+                //                       );
+                //                     })()
+                //                   }</div> */}
+                //                 <div className="text-[12px] text-[#22542F] mt-1">{when}</div>
+                //               </div>
+                //               {/* Arrow indicator on the right */}
+                //               <div className="ml-4 flex-shrink-0">
+                //                 <span className={`text-xl ${showUpArrow ? 'text-red-500' : 'text-green-500'}`} title={showUpArrow ? 'Error (up)' : 'Normal (down)'}>
+                //                   {showUpArrow ? '↗' : '↘'}
+                //                 </span>
+                //               </div>
+                //             </div>
+
+                //             {/* Secondary line: badge + participants (hidden on very small screens truncated) */}
+                //             <div className="mt-2 flex items-center justify-between text-sm">
+                //               <div className="flex items-center gap-2 truncate">
+                //                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${type === 'video' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-800'}`}>
+                //                   {type === 'video' ? 'Video call' : 'Audio call'}
+                //                 </span>
+                //                 <span className="text-gray-600 truncate">{primaryDisplay}{receiverName && primaryDisplay !== `${senderName}` ? ` • ${receiverName}` : (receiverName && primaryDisplay === senderName ? ` → ${receiverName}` : '')}</span>
+                //               </div>
+                //             </div>
+
+                //             {/* Joined indicators - subtle, shown only on md+ */}
+                //             {!isMock && (
+                //               <div className="mt-3 text-xs text-gray-600 hidden md:flex gap-3">
+                //                 {log.student_joined ? (
+                //                   <span className="px-2 py-0.5 bg-emerald-600/10 text-emerald-700 rounded-full">Student joined</span>
+                //                 ) : (
+                //                   <span className="px-2 py-0.5 bg-white/10 rounded-full">Student not joined</span>
+                //                 )}
+                //                 {log.teacher_joined ? (
+                //                   <span className="px-2 py-0.5 bg-emerald-600/10 text-emerald-700 rounded-full">Teacher joined</span>
+                //                 ) : (
+                //                   <span className="px-2 py-0.5 bg-white/10 rounded-full">Teacher not joined</span>
+                //                 )}
+                //               </div>
+                //             )}
+                //           </div>
+                //         </div>
+                //       </div>
+                //     );
+                //   })}
+                // </div>
+                    <div className="p-4 space-y-4">
+                    {calls.map((call) => {
+                      const status = call.call_ended ? 'Ended' : (call.call_declined ? 'Declined' : (call.ringing ? 'Ringing' : 'Scheduled'));
+                      const type = call.isVideo ? 'Video' : 'Audio';
+                      const when = formatCallWhen(call.call_when);
+                      const participants = getParticipantIds(call).join(', ');
+                      return (
+                        <div key={call.id} className="bg-white rounded-xl p-4 shadow-sm border">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#22542F] to-[#1a4023] flex items-center justify-center text-white font-bold">
+                                  {/* decorative call icon (video or audio) */}
+                                  {type === 'Video' ? (
+                                    <Video className="w-6 h-6 text-white" />
+                                  ) : (
+                                    <Phone className="w-6 h-6 text-white" />
+                                  )}
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-primary">{
+                                    (() => {
+                                      const limboId = getRefId(call.limbo_ref);
+                                      const limbo2Id = getRefId(call.limbo_ref2);
+                                      const showUp = !!(limboId && currentUserId && limboId === currentUserId);
+                                      const name = (limbo2Id && limbo2Id === currentUserId) ? (call.limbo_ref_name || limboId || 'Unknown') : ((limboId && limboId === currentUserId) ? (call.limbo_ref2_name || limbo2Id || 'Unknown') : (call.limbo_ref_name || call.limbo_ref || 'Unknown'));
+                                      return (
+                                        <span className="inline-flex items-center gap-2">
+                                          <span>{name}</span>
+                                                       <div className="ml-4 flex-shrink-0">
+                                <span className={`text-xl ${showUp ? 'text-red-500' : 'text-green-500'}`} title={showUp ? 'Error (up)' : 'Normal (down)'}>
+                                  {showUp ? '↗' : '↘'}
+                                </span>
+                              </div>
+                                        </span>
+                            
+                                      );
+                                    })()
+                                  }</div>
+                                  <div className="text-sm text-gray-500">{
+                                    (() => {
+                                      const limboId = getRefId(call.limbo_ref);
+                                      const limbo2Id = getRefId(call.limbo_ref2);
+                                      const left = call.limbo_ref_name || limboId;
+                                      const right = call.limbo_ref2_name || limbo2Id;
+                                    })()
+                                  }</div>
+                                  <div className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+                                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${call.isVideo ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-800'}`}>
+                                      {call.isVideo ? 'Video call' : 'Audio call'}
+                                    </span>
+                                  </div>
+                                   <div className="text-xs text-gray-500 mt-1">{when}</div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm text-primary font-medium">{status}</div>
+                             
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
               ) : (
                 <>
                   {currentChats.length === 0 ? (
@@ -334,6 +618,12 @@ const ChatScreen = () => {
                           <div className="flex items-center justify-between">
                             <span className="font-semibold text-base truncate group-hover:text-white transition-colors">
                               {chat.otherParticipant?.display_name || "Unknown"}
+                              {chat.otherParticipant?.isTeacher && (
+                                <span className="ml-2 text-[11px] px-2 py-0.5 bg-white/10 text-white rounded-full font-semibold">Teacher</span>
+                              )}
+                              {chat.otherParticipant?.isStudent && (
+                                <span className="ml-2 text-[11px] px-2 py-0.5 bg-white/10 text-white rounded-full font-semibold">Student</span>
+                              )}
                             </span>
                             {chat.type === "paid" && (
                               <span className="text-[10px] bg-amber-400/90 text-amber-900 px-2 py-1 rounded-full flex-shrink-0 ml-2 font-bold">
@@ -344,6 +634,13 @@ const ChatScreen = () => {
                           <span className="text-sm text-white/70 truncate group-hover:text-white/80 transition-colors">
                             {chat.last_message || "Start a conversation..."}
                           </span>
+                          {/* If reference data exists, show a subtle line */}
+                          {/* {(chat.limborefData?.display_name || chat.studentRefData?.display_name) && (
+                            <span className="text-[11px] text-white/50 mt-0.5">
+                              {chat.limborefData?.display_name ? `Ref: ${chat.limborefData.display_name}` : ''}
+                              {chat.studentRefData?.display_name ? (chat.limborefData?.display_name ? ` • ${chat.studentRefData.display_name}` : `Ref: ${chat.studentRefData.display_name}`) : ''}
+                            </span>
+                          )} */}
                           <span className="text-[10px] text-white/50">
                             {chat.last_message_time?.seconds
                               ? new Date(chat.last_message_time.seconds * 1000).toLocaleTimeString([], {
@@ -362,32 +659,96 @@ const ChatScreen = () => {
           </aside>
 
           {/* Main Chat Section - Hidden on mobile when no chat is selected */}
-          <section className={`flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-white ${
+          <section className={`flex-1 w-full sm:w-[60%] flex flex-col bg-gradient-to-br from-gray-50 to-white ${
             !showChatSection ? 'hidden md:flex' : 'flex'
           }`}>
             {activeTab === "calls" ? (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#22542F] to-[#1a4023] flex items-center justify-center shadow-xl">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
+              <div className="flex-1 overflow-y-auto p-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Call History</h3>
+                {calls.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500">No calls found yet.</p>
+                    <p className="text-gray-400 text-sm mt-2">Calls will appear here when you have call activity.</p>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Call History</h3>
-                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                    View your call logs in the sidebar or start a new video call
-                  </p>
-                  <button
-                    onClick={() => router.push("/download")}
-                    className="bg-gradient-to-r from-[#22542F] to-[#1a4023] text-white px-8 py-3 rounded-full hover:shadow-xl transition-all duration-300 font-semibold text-sm flex items-center gap-2 mx-auto"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Start Video Call
-                  </button>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-3">Coming Soon</h1>
+                ) : (
+                //   <div className="space-y-4">
+                //     {calls.map((call) => {
+                //       const status = call.call_ended ? 'Ended' : (call.call_declined ? 'Declined' : (call.ringing ? 'Ringing' : 'Scheduled'));
+                //       const type = call.isVideo ? 'Video' : 'Audio';
+                //       const when = formatCallWhen(call.call_when);
+                //       const participants = getParticipantIds(call).join(', ');
+                //       return (
+                //         <div key={call.id} className="bg-white rounded-xl p-4 shadow-sm border">
+                //           <div className="flex items-start justify-between gap-4">
+                //             <div className="flex-1">
+                //               <div className="flex items-center gap-3">
+                //                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#22542F] to-[#1a4023] flex items-center justify-center text-white font-bold">
+                //                   {/* kept as decorative avatar for the call */}
+                //                   {type === 'Video' ? 'VC' : 'AC'}
+                //                 </div>
+                //                 <div>
+                //                   {/* Show the participant opposite the current user */}
+                //                   <div className="font-semibold">{
+                //                     (() => {
+                //                       const limboId = getRefId(call.limbo_ref);
+                //                       const limbo2Id = getRefId(call.limbo_ref2);
+                //                       const showUp = !!(limboId && currentUserId && limboId === currentUserId);
+                //                       const name = (limbo2Id && limbo2Id === currentUserId) ? (call.limbo_ref_name || limboId || 'Unknown') : ((limboId && limboId === currentUserId) ? (call.limbo_ref2_name || limbo2Id || 'Unknown') : (call.limbo_ref_name || call.limbo_ref || 'Unknown'));
+                //                       return (
+                //                         <span className="inline-flex items-center gap-2">
+                //                           <span>{name}</span>
+                //                           <span className={`text-sm ${showUp ? 'text-red-400' : 'text-green-400'}`}>{showUp ? '⬆' : '⬇'}</span>
+                //                         </span>
+                //                       );
+                //                     })()
+                //                   }</div>
+                //                   <div className="text-sm text-gray-500">{
+                //                     (() => {
+                //                       const limboId = getRefId(call.limbo_ref);
+                //                       const limbo2Id = getRefId(call.limbo_ref2);
+                //                       const left = call.limbo_ref_name || limboId;
+                //                       const right = call.limbo_ref2_name || limbo2Id;
+                //                       if (left && right) return `${left} → ${right}`;
+                //                       return participants || 'Participants not available';
+                //                     })()
+                //                   }</div>
+                //                   <div className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+                //                     <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${call.isVideo ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-800'}`}>
+                //                       {call.isVideo ? 'Video call' : 'Audio call'}
+                //                     </span>
+                //                     <span className="text-xs text-gray-400">Token: {call.token_id ? `${String(call.token_id).slice(0,24)}...` : 'N/A'}</span>
+                //                   </div>
+                //                   {/* <div className="text-xs text-gray-400 mt-1 flex gap-2">
+                //                     <span className={`${call.student_joined ? 'text-emerald-600' : 'text-gray-400'}`}>{call.student_joined ? 'Student joined' : 'Student not joined'}</span>
+                //                     <span className={`${call.teacher_joined ? 'text-emerald-600' : 'text-gray-400'}`}>{call.teacher_joined ? 'Teacher joined' : 'Teacher not joined'}</span>
+                //                   </div> */}
+                //                 </div>
+                //               </div>
+                //             </div>
+                //             <div className="text-right">
+                //               <div className="text-sm font-medium">{status}</div>
+                //               <div className="text-xs text-gray-500 mt-1">{when}</div>
+                //             </div>
+                //           </div>
+                //         </div>
+                //       );
+                //     })}
+                //   </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#22542F] to-[#1a4023] flex items-center justify-center text-white font-bold">
+                      {/* Phone icon */}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M22 16.92V21a1 1 0 0 1-1.11 1 19 19 0 0 1-8.63-3.07 19 19 0 0 1-6-6A19 19 0 0 1 2 3.11 1 1 0 0 1 3 2h4.09a1 1 0 0 1 1 .75c.12.7.34 1.38.66 2.02a1 1 0 0 1-.24 1L7.91 7.91a15 15 0 0 0 6 6l1.14-1.14a1 1 0 0 1 1-.24c.64.32 1.32.54 2.02.66a1 1 0 0 1 .75 1V21z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-gray-800">Call History</div>
+                      <div className="text-sm text-gray-500">Recent call activity will appear here</div>
+                    </div>
+                  </div>
                 </div>
+                )}
               </div>
             ) : (
               <>
@@ -445,6 +806,18 @@ const ChatScreen = () => {
                           <span className="text-xs text-gray-500 font-medium">Offline</span>
                         )
                       ) : null}
+
+                      {/* Show reference info if available */}
+                      {/* {(selectedChat?.limborefData?.display_name || selectedChat?.studentRefData?.display_name) && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {selectedChat?.limborefData?.display_name && (
+                            <span className="mr-2">Ref: {selectedChat.limborefData.display_name}</span>
+                          )}
+                          {selectedChat?.studentRefData?.display_name && (
+                            <span>Student Ref: {selectedChat.studentRefData.display_name}</span>
+                          )}
+                        </div>
+                      )} */}
                     </div>
                   </div>
                   {selectedChat && (
@@ -619,7 +992,6 @@ const ChatScreen = () => {
                                 SSL Encrypted
                               </div>
                             </div>
-                          </div>
                           */}
                         </DialogContent>
                       </Dialog>
@@ -716,7 +1088,7 @@ const ChatScreen = () => {
                           </div>
                         );
                       })}
-                      <div ref={messagesEndRef} />
+                      {/* <div ref={messagesEndRef} /> */}
                     </>
                   )}
                 </div>
