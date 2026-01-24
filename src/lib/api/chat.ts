@@ -198,7 +198,8 @@ export const sendMessage = async (
   conversationId: string,
   senderId: string,
   messageText: string,
-  senderName: string = "User"
+  senderName: string = "User",
+  sharedUrl: string = ""
 ) => {
   try {
     console.log("sendMessage called with:", { conversationId, senderId, messageText, senderName });
@@ -240,7 +241,7 @@ export const sendMessage = async (
         message_text: messageText,
         nameofsender: finalSenderName,
         created_at: serverTimestamp(),
-        shared_image: "", // Empty string for text messages
+        shared_image: sharedUrl || "", // set shared image/video url when provided
       }
     );
 

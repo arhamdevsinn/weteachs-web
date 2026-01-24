@@ -1,5 +1,8 @@
 // @ts-nocheck
 "use client";
+// --- Reply UI state ---
+// (state must be inside the component, not at the top level)
+// @ts-nocheck
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { 
@@ -7,8 +10,11 @@ import {
   sendMessage,
   subscribeToMessages
 } from "@/src/lib/api/chat";
+import { deleteMessage, editMessage } from "@/src/lib/api/chat-message-actions";
 import type { Conversation } from "@/src/lib/types/chat";
-import { MessageSquareDot, Video, Phone } from "lucide-react";
+import { MessageSquareDot, Video, Phone, Image as ImageIcon } from "lucide-react";
+import MessageDialog from "@/src/components/chat/MessageDialog";
+import { useUploadImage } from "@/src/hooks/useUploadImage";
 import { getUserCalls, subscribeToUserCalls } from "@/src/lib/api/calls";
 import type { CallRecord } from "@/src/lib/types/call";
 import { auth, db } from "@/src/lib/firebase/config";
@@ -51,6 +57,54 @@ const mockCallLogs = [
 ];
 
 const ChatScreen = () => {
+  // Handler for editing a message (opens the edit dialog)
+  const handleEdit = () => {
+    setMessageDialogOpen(false);
+    setEditingMessage(dialogPayload);
+    setEditInput(dialogPayload?.text || "");
+    setEditDialogOpen(true);
+  };
+
+  // Handler for copying a message
+  const handleCopy = async () => {
+    setMessageDialogOpen(false);
+    try {
+      await navigator.clipboard.writeText(dialogPayload?.text || dialogPayload?.message_text || "");
+      toast.success("Copied to clipboard");
+    } catch (e) {
+      toast.error("Copy failed");
+    }
+  };
+
+  // Handler for deleting a message
+  const handleDelete = async () => {
+    setMessageDialogOpen(false);
+    if (!dialogPayload || !selectedChat) return;
+    try {
+      await deleteMessage(selectedChat.id, dialogPayload.id);
+      toast.success("Message deleted");
+    } catch (e) {
+      toast.error("Failed to delete message");
+    }
+  };
+
+  // Handler for saving an edited message
+  const handleSaveEditDialog = async () => {
+    if (!editingMessage || !selectedChat) return;
+    try {
+      await editMessage(selectedChat.id, editingMessage.id, editInput);
+      toast.success("Message updated");
+      setEditDialogOpen(false);
+      setEditingMessage(null);
+    } catch (e) {
+      toast.error("Failed to update message");
+    }
+  };
+  // --- Reply UI state ---
+  const [replyTo, setReplyTo] = React.useState<any>(null);
+  const [editInput, setEditInput] = React.useState("");
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  const [editingMessage, setEditingMessage] = React.useState<any>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
   const conversationIdFromUrl = searchParams.get("conversationId") || "";
@@ -58,11 +112,13 @@ const ChatScreen = () => {
   const [activeTab, setActiveTab] = React.useState("free");
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [selectedChat, setSelectedChat] = React.useState<Conversation | null>(null);
-  const [messages, setMessages] = React.useState([]);
+  const [messages, setMessages] = React.useState<any[]>([]);
   const [calls, setCalls] = React.useState<CallRecord[]>([]);
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [sendingMessage, setSendingMessage] = React.useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = React.useState(false);
+  const [dialogPayload, setDialogPayload] = React.useState<any>(null);
   const [showChatSection, setShowChatSection] = React.useState(false); // For mobile view
   const [openPaidChatDialog, setOpenPaidChatDialog] = React.useState(false);
   const messagesEndRef = React.useRef(null);
@@ -139,6 +195,12 @@ const ChatScreen = () => {
     return null;
   };
 
+  const isVideoUrl = (url: string | undefined) => {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return (lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg') || lower.includes('video'));
+  };
+
   const serializeCallForLog = (c: any) => {
     const users = Array.isArray(c?.users) ? c.users.map((u: any) => (u?.path ? u.path.split('/').pop() : (u?.id || String(u)))) : [];
     const limboref = c?.limbo_ref?.path ? c.limbo_ref.path.split('/').pop() : (c?.limbo_ref?.id || null);
@@ -185,6 +247,7 @@ const ChatScreen = () => {
       try {
         setLoading(true);
         const userConversations = await getUserConversations(currentUserId);
+        console.log("Fetched conversations for user:", currentUserId, userConversations);
         setConversations(userConversations);
         console.log("User conversations loaded:", userConversations);
         if (conversationIdFromUrl) {
@@ -260,35 +323,85 @@ const ChatScreen = () => {
     };
   }, [currentUserId]);
 
+  // (Removed duplicate handleSendMessage; only the reply-enabled version remains below)
+
+  // Image / Video upload
+  const { uploadImage, uploading: uploadingMedia } = useUploadImage();
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleMediaPick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedChat?.id || !currentUserId) return;
+    try {
+      const folder = `users/${currentUserId}/uploads`;
+      const url = await uploadImage(file, folder);
+      // send message with media URL and empty text
+      await sendMessage(selectedChat.id, currentUserId, "", currentUserName || "User", url);
+    } catch (err) {
+      console.error("Error uploading media:", err);
+      toast.error("Failed to upload media");
+    } finally {
+      // clear the input so same file can be re-picked
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const openMessageDialogFor = (msg: any) => {
+    setDialogPayload(msg);
+    setMessageDialogOpen(true);
+  };
+
+  const handleReply = () => {
+    setMessageDialogOpen(false);
+    if (dialogPayload) {
+      setReplyTo({
+        id: dialogPayload.id,
+        text: dialogPayload.text,
+        senderName: dialogPayload.senderName,
+      });
+    }
+  };
+
+  const handleSaveEdit = () => {
+    setMessageDialogOpen(false);
+    console.log("Save edit for", dialogPayload);
+  };
+
+  const handleReport = () => {
+    setMessageDialogOpen(false);
+    console.log("Report", dialogPayload);
+    toast("Reported");
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
     if (!input.trim() || !selectedChat?.id || !currentUserId) {
       return;
     }
-
     try {
       setSendingMessage(true);
-      
-      // Always fetch the current user's display name from Firebase
-      let senderName = "User"; // Default fallback
+      let senderName = "User";
       try {
         const userDoc = await getDoc(doc(db, "LimboUserMode", currentUserId));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          console.log("User data from Firebase:", userData);
           senderName = userData.display_name || userData.displayName || userData.name || "User";
-          console.log("Sender name to be used:", senderName);
-        } else {
-          console.warn("User document does not exist for:", currentUserId);
         }
       } catch (fetchError) {
         console.error("Error fetching user data:", fetchError);
       }
-      
-      console.log("Sending message with sender name:", senderName);
-      await sendMessage(selectedChat.id, currentUserId, input.trim(), senderName);
+      // If replying, prepend reply info to message (for now, as a simple string, or you can extend schema)
+      let messageText = input.trim();
+      if (replyTo) {
+        messageText = `↩️ ${replyTo.senderName ? replyTo.senderName + ': ' : ''}${replyTo.text}\n${messageText}`;
+      }
+      await sendMessage(selectedChat.id, currentUserId, messageText, senderName);
       setInput("");
+      setReplyTo(null);
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message");
@@ -296,6 +409,7 @@ const ChatScreen = () => {
       setSendingMessage(false);
     }
   };
+  // --- End of logic section ---
 
   const getCurrentChats = () => {
     if (activeTab === "calls") return [];
@@ -1053,11 +1167,31 @@ const ChatScreen = () => {
                             
                             <div className={`flex flex-col ${isMe ? "items-end" : "items-start"} max-w-md`}>
                               {msg.sharedImage && (
-                                <img 
-                                  src={msg.sharedImage} 
-                                  alt="Shared" 
-                                  className="w-full rounded-2xl mb-2 shadow-lg border border-gray-200"
-                                />
+                                isVideoUrl(msg.sharedImage) ? (
+                                  <video
+                                    controls
+                                    className="w-full rounded-2xl mb-2 shadow-lg border border-gray-200 cursor-pointer"
+                                    onClick={() => openMessageDialogFor(msg)}
+                                    onContextMenu={(e) => {
+                                      e.preventDefault();
+                                      openMessageDialogFor(msg);
+                                    }}
+                                  >
+                                    <source src={msg.sharedImage} />
+                                    Your browser does not support the video tag.
+                                  </video>
+                                ) : (
+                                  <img
+                                    src={msg.sharedImage}
+                                    alt="Shared"
+                                    className="w-full rounded-2xl mb-2 shadow-lg border border-gray-200 cursor-pointer"
+                                    onClick={() => openMessageDialogFor(msg)}
+                                    onContextMenu={(e) => {
+                                      e.preventDefault();
+                                      openMessageDialogFor(msg);
+                                    }}
+                                  />
+                                )
                               )}
                               {msg.text && (
                                 <div
@@ -1065,7 +1199,12 @@ const ChatScreen = () => {
                                     isMe
                                       ? "bg-gradient-to-br from-[#22542F] to-[#1a4023] text-white"
                                       : "bg-white text-gray-900 border border-gray-200"
-                                  }`}
+                                  } cursor-pointer`}
+                                  onClick={() => openMessageDialogFor(msg)}
+                                  onContextMenu={e => {
+                                    e.preventDefault();
+                                    openMessageDialogFor(msg);
+                                  }}
                                 >
                                   <p className="text-sm leading-relaxed">{msg.text}</p>
                                 </div>
@@ -1094,18 +1233,33 @@ const ChatScreen = () => {
                 </div>
 
                 {/* Input Area */}
+                {replyTo && (
+                  <div className="flex items-center gap-2 px-6 py-2 bg-[#e6efe6] border-l-4 border-[#22542F] rounded-t-lg mb-[-8px]">
+                    <span className="text-xs text-gray-500">Replying to</span>
+                    <span className="font-semibold text-xs text-gray-700 truncate max-w-[120px]">{replyTo.senderName}</span>
+                    <span className="text-xs text-gray-600 italic truncate max-w-[120px]">{replyTo.text}</span>
+                    <button className="ml-auto text-gray-400 hover:text-gray-700" onClick={() => setReplyTo(null)}>&times;</button>
+                  </div>
+                )}
                 <form
                   className="flex items-center gap-3 px-6 py-4 bg-white border-t border-gray-200 shadow-lg"
                   onSubmit={handleSendMessage}
                 >
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
                   <button
                     type="button"
+                    onClick={handleMediaPick}
                     className="p-2.5 hover:bg-gray-100 rounded-full transition-colors"
-                    disabled={!selectedChat}
+                    disabled={!selectedChat || uploadingMedia}
+                    title="Attach image or video"
                   >
-                    <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                    </svg>
+                    <ImageIcon className="w-6 h-6 text-gray-500" />
                   </button>
                   
                   <input
@@ -1138,6 +1292,44 @@ const ChatScreen = () => {
           </section>
         </div>
       </div>
+      <MessageDialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+        message={dialogPayload?.text || dialogPayload?.message_text}
+        imageUrl={dialogPayload?.sharedImage}
+        isMine={dialogPayload?.from?.uid === currentUserId}
+        onReply={handleReply}
+  onSaveEdit={handleEdit}
+        onReport={handleReport}
+        onCopy={handleCopy}
+        onDelete={handleDelete}
+      />
+
+      {/* Edit Message Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Message</DialogTitle>
+          </DialogHeader>
+          <textarea
+            className="w-full border rounded-md p-2 min-h-[80px]"
+            value={editInput}
+            onChange={e => setEditInput(e.target.value)}
+            autoFocus
+          />
+          <div className="flex gap-2 justify-end mt-4">
+            <button
+              className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              onClick={() => setEditDialogOpen(false)}
+            >Cancel</button>
+            <button
+              className="px-4 py-2 rounded bg-[#22542F] text-white hover:bg-[#1a4023]"
+              onClick={handleSaveEditDialog}
+              disabled={!editInput.trim()}
+            >Save</button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
