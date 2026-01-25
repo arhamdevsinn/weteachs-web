@@ -31,12 +31,7 @@ const MessageDialog: React.FC<Props> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <div className="max-w-md w-[90vw] bg-white rounded-lg border-2 border-[#e6efe6] shadow-lg p-4">
-          <div className="flex justify-end">
-            <button onClick={() => onOpenChange(false)} className="p-1 rounded-full">
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
-
+          {/* Only one close icon (Dialog's default) should be present */}
           {imageUrl ? (
             <div className="mb-4">
               {/* Image preview; responsive */}
@@ -44,7 +39,12 @@ const MessageDialog: React.FC<Props> = ({
             </div>
           ) : (
             <div className="mb-4">
-              <div className="p-3 border border-[#e6efe6] rounded-md text-gray-800 min-h-[48px]">{message || ""}</div>
+              <textarea
+                className="w-full border border-[#e6efe6] rounded-md text-gray-800 min-h-[48px] resize-none bg-white p-3"
+                value={message || ""}
+                readOnly
+                style={{overflowWrap: 'break-word', whiteSpace: 'pre-line'}}
+              />
             </div>
           )}
 
@@ -54,23 +54,30 @@ const MessageDialog: React.FC<Props> = ({
               <span>Reply</span>
             </button>
 
-            <button onClick={onSaveEdit} className="flex items-center gap-3 px-3 py-2 border rounded-md">
-              <Save className="w-5 h-5" />
-              <span>Save edit</span>
-            </button>
+            {isMine && (
+              <button onClick={onSaveEdit} className="flex items-center gap-3 px-3 py-2 border rounded-md">
+                <Save className="w-5 h-5" />
+                <span>Edit</span>
+              </button>
+            )}
 
-            <button onClick={onReport} className="flex items-center gap-3 px-3 py-2 border rounded-md">
-              <AlertTriangle className="w-5 h-5" />
-              <span>Report</span>
-            </button>
+
+            {!isMine && (
+              <button onClick={onReport} className="flex items-center gap-3 px-3 py-2 border rounded-md">
+                <AlertTriangle className="w-5 h-5" />
+                <span>Report</span>
+              </button>
+            )}
 
             <div className="flex items-center justify-between mt-2">
               <button onClick={onCopy} className="p-3 border rounded-md">
                 <Copy className="w-5 h-5" />
               </button>
-              <button onClick={onDelete} className="p-3 border rounded-md text-red-500">
-                <Trash className="w-5 h-5" />
-              </button>
+              {isMine && (
+                <button onClick={onDelete} className="p-3 border rounded-md text-red-500">
+                  <Trash className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </div>
         </div>

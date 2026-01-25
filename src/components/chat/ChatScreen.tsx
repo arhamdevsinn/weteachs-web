@@ -1,8 +1,7 @@
+
+ 
 // @ts-nocheck
 "use client";
-// --- Reply UI state ---
-// (state must be inside the component, not at the top level)
-// @ts-nocheck
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { 
@@ -10,6 +9,7 @@ import {
   sendMessage,
   subscribeToMessages
 } from "@/src/lib/api/chat";
+import ReportDialog from "@/src/components/chat/ReportDialog";
 import { deleteMessage, editMessage } from "@/src/lib/api/chat-message-actions";
 import type { Conversation } from "@/src/lib/types/chat";
 import { MessageSquareDot, Video, Phone, Image as ImageIcon } from "lucide-react";
@@ -57,6 +57,44 @@ const mockCallLogs = [
 ];
 
 const ChatScreen = () => {
+     const [reportDialogOpen, setReportDialogOpen] = React.useState(false);
+  const [reportLoading, setReportLoading] = React.useState(false);
+  // Handler for reporting a message
+  const handleReport = () => {
+    setMessageDialogOpen(false);
+    setReportDialogOpen(true);
+  };
+
+  // Handler for submitting a report
+  const handleSubmitReport = async (data: any) => {
+    setReportLoading(true);
+    try {
+      // Firestore add logic here
+      const { report_message, reporte_image, reporter_uploaded_ss, message_ref } = data;
+      const reportsRef = (await import("firebase/firestore")).collection(db, "reports");
+      const docData = {
+        message_ref,
+        open: true,
+        report_message,
+        reporte_image,
+        reporter_uploaded_ss,
+        time_when_reported: new Date(),
+        who_received_report: selectedChat?.otherParticipant?.uid
+          ? (await import("firebase/firestore")).doc(db, "LimboUserMode", selectedChat.otherParticipant.uid)
+          : null,
+        who_sent_report: currentUserId
+          ? (await import("firebase/firestore")).doc(db, "LimboUserMode", currentUserId)
+          : null,
+      };
+      await (await import("firebase/firestore")).addDoc(reportsRef, docData);
+      toast.success("Report submitted");
+      setReportDialogOpen(false);
+    } catch (e) {
+      toast.error("Failed to submit report");
+    } finally {
+      setReportLoading(false);
+    }
+  };
   // Handler for editing a message (opens the edit dialog)
   const handleEdit = () => {
     setMessageDialogOpen(false);
@@ -371,11 +409,11 @@ const ChatScreen = () => {
     console.log("Save edit for", dialogPayload);
   };
 
-  const handleReport = () => {
-    setMessageDialogOpen(false);
-    console.log("Report", dialogPayload);
-    toast("Reported");
-  };
+//   const handleReport = () => {
+//     setMessageDialogOpen(false);
+//     console.log("Report", dialogPayload);
+//     toast("Reported");
+//   };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -1195,21 +1233,30 @@ const ChatScreen = () => {
                               )}
                               {msg.text && (
                                 <div
-                                  className={`rounded-2xl px-5 py-3 mb-1.5 shadow-sm ${
+                                  className={`rounded-2xl px-0 py-0 mb-1.5 shadow-sm ${
                                     isMe
-                                      ? "bg-gradient-to-br from-[#22542F] to-[#1a4023] text-white"
+                                      ? "bg-primary text-white"
                                       : "bg-white text-gray-900 border border-gray-200"
-                                  } cursor-pointer`}
+                                  } cursor-pointer relative min-w-[120px] max-w-[70vw] break-words whitespace-pre-line`}
                                   onClick={() => openMessageDialogFor(msg)}
                                   onContextMenu={e => {
                                     e.preventDefault();
                                     openMessageDialogFor(msg);
                                   }}
                                 >
-                                  <p className="text-sm leading-relaxed">{msg.text}</p>
+                                  {msg.text.startsWith('↩️') && (
+                                    <div className="rounded-t-lg rounded-br-lg bg-[#2e6a3e] px-3 pt-2 pb-1 flex flex-col" style={{borderTopLeftRadius: 12, borderTopRightRadius: 12, borderBottomRightRadius: 0, borderBottomLeftRadius: 0}}>
+                                      <span className="text-xs font-bold text-white">You</span>
+                                      <span className="text-xs text-white/80">{msg.text.split('\n')[0].replace(/^↩️\s*You: /, '').replace(/^↩️\s*/, '')}</span>
+                                    </div>
+                                  )}
+                                  <div className="px-4 py-2">
+                                    <span className="block text-base leading-relaxed">{msg.text.startsWith('↩️') ? msg.text.split('\n').slice(1).join('\n') : msg.text}</span>
+                                    <span className="block text-xs text-gray-200 text-right mt-1">{msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Now"}</span>
+                                  </div>
                                 </div>
                               )}
-                              <span className={`text-xs text-gray-400 ${isMe ? "mr-2" : "ml-2"} flex items-center gap-1`}>
+                              {/* <span className={`text-xs text-gray-400 ${isMe ? "mr-2" : "ml-2"} flex items-center gap-1`}>
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -1219,7 +1266,7 @@ const ChatScreen = () => {
                                       minute: "2-digit",
                                     })
                                   : "Now"}
-                              </span>
+                              </span> */}
                             </div>
                             
                             {/* Spacer for sent messages to maintain alignment */}
@@ -1299,10 +1346,19 @@ const ChatScreen = () => {
         imageUrl={dialogPayload?.sharedImage}
         isMine={dialogPayload?.from?.uid === currentUserId}
         onReply={handleReply}
-  onSaveEdit={handleEdit}
+        onSaveEdit={handleEdit}
         onReport={handleReport}
         onCopy={handleCopy}
         onDelete={handleDelete}
+      />
+
+      <ReportDialog
+        open={reportDialogOpen}
+        onOpenChange={setReportDialogOpen}
+        name={currentUserName}
+        message={dialogPayload?.text || dialogPayload?.message_text || ""}
+        onSubmit={handleSubmitReport}
+        loading={reportLoading}
       />
 
       {/* Edit Message Dialog */}
