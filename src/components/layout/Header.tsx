@@ -32,6 +32,7 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { Button } from "@/src/components/ui/button";
 import { motion } from "framer-motion";
+import ChatIcon from "../ChatIcon";
 
 const Header = () => {
    const router = useRouter();
@@ -116,6 +117,9 @@ const Header = () => {
 
           {/* Right: Auth / User */}
           <div className="hidden md:flex items-center gap-3">
+                   <Link href="/chat" aria-label="Open chat" className="flex items-center justify-center rounded-full p-2 hover:bg-blue-100 transition focus:outline-none focus:ring-2 focus:ring-primary">
+              <ChatIcon className="w-6 h-6 text-primary" />
+            </Link>
        {user ? (
   <>
     <DropdownMenu>

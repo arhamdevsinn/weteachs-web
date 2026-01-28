@@ -2,20 +2,20 @@
 import { db } from "@/src/lib/firebase/config";
 import {
   doc,
-  getDoc,
   collection,
   getDocs,
   query,
   where,
   DocumentReference,
 } from "firebase/firestore";
+import { getDocWithRetry, getDocsWithRetry } from "@/src/lib/firebase/firestoreRetry";
 
 export const UserProfileAPI = {
 
   getProfile: async (uid: string) => {
 
     const userDocRef = doc(db, "LimboUserMode", uid);
-    const userSnap = await getDoc(userDocRef);
+  const userSnap = await getDocWithRetry(userDocRef);
     if (!userSnap.exists()) throw new Error("Profile not found");
 
     const profileData = userSnap.data();
@@ -39,7 +39,7 @@ export const UserProfileAPI = {
           )
           : profileData.teacher_ref;
 
-      const teacherSnap = await getDoc(teacherRef);
+  const teacherSnap = await getDocWithRetry(teacherRef);
 
       if (teacherSnap.exists()) {
         teacherDetails = { id: teacherRef.id, ...teacherSnap.data() };
@@ -58,7 +58,7 @@ export const UserProfileAPI = {
                   )
                   : catRefPath;
 
-              const catSnap = await getDoc(catRef);
+              const catSnap = await getDocWithRetry(catRef);
               return catSnap.exists()
                 ? { id: catRef.id, ...catSnap.data() }
                 : null;
@@ -79,7 +79,7 @@ export const UserProfileAPI = {
               )
               : teacherDetails.teacher_gallery;
 
-          const galleryDocSnap = await getDoc(galleryRef);
+          const galleryDocSnap = await getDocWithRetry(galleryRef);
           if (galleryDocSnap.exists()) {
             const data = galleryDocSnap.data();
             if (Array.isArray(data.teacher_gallery_list)) {
@@ -129,7 +129,7 @@ export const UserProfileAPI = {
   async getLimboUser(uid: string) {
     if (!uid) throw new Error("uid required");
     const limboRef = doc(db, "LimboUserMode", uid);
-    const snap = await getDoc(limboRef);
+  const snap = await getDocWithRetry(limboRef);
     if (!snap.exists()) return null;
     return { id: limboRef.id, ...snap.data() };
   },
@@ -140,7 +140,7 @@ export const UserProfileAPI = {
       where("usernameT", "==", usernameT)
     );
 
-    const querySnapshot = await getDocs(teacherQuery);
+  const querySnapshot = await getDocsWithRetry(teacherQuery);
     if (querySnapshot.empty) throw new Error("No teacher found");
 
     const teacherDoc = querySnapshot.docs[0];
@@ -160,7 +160,7 @@ export const UserProfileAPI = {
       }
 
       if (limboRef) {
-        const limboSnap = await getDoc(limboRef);
+  const limboSnap = await getDocWithRetry(limboRef);
         if (limboSnap.exists()) {
           userProfile = { id: limboRef.id, ...limboSnap.data() };
         }
@@ -179,7 +179,7 @@ export const UserProfileAPI = {
             ref = refPath;
           } else return null;
 
-          const snap = await getDoc(ref);
+          const snap = await getDocWithRetry(ref);
           return snap.exists() ? { id: ref.id, ...snap.data() } : null;
         })
       );
@@ -190,10 +190,10 @@ export const UserProfileAPI = {
     const teacherDocRef = doc(db, "TeacherDetails", teacherData.id);
 
     const [videoSnap, reviewSnap, gallerySnap, expertSnap] = await Promise.all([
-      getDocs(collection(teacherDocRef, "TeacherVideoCollection")),
-      getDocs(collection(teacherDocRef, "TeacherReviews")),
-      getDocs(collection(teacherDocRef, "TeacherGalleryCollection")),
-      getDocs(collection(teacherDocRef, "Expert_Text_collection")),
+      getDocsWithRetry(collection(teacherDocRef, "TeacherVideoCollection")),
+      getDocsWithRetry(collection(teacherDocRef, "TeacherReviews")),
+      getDocsWithRetry(collection(teacherDocRef, "TeacherGalleryCollection")),
+      getDocsWithRetry(collection(teacherDocRef, "Expert_Text_collection")),
     ]);
 
     const teacherVideos = videoSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -228,7 +228,7 @@ export const UserProfileAPI = {
         collection(db, "TeacherDetails"),
         where("usernameT", "==", username)
       );
-      const tSnap = await getDocs(tQuery);
+  const tSnap = await getDocsWithRetry(tQuery);
       if (!tSnap.empty) {
         const tDoc = tSnap.docs[0];
         const teacherData = { id: tDoc.id, ...tDoc.data() };
@@ -248,7 +248,7 @@ export const UserProfileAPI = {
         collection(db, "StudentDetails"),
         where("usernameS", "==", username)
       );
-      const sSnap = await getDocs(sQuery);
+  const sSnap = await getDocsWithRetry(sQuery);
       if (!sSnap.empty) {
         const sDoc = sSnap.docs[0];
         const studentData = { id: sDoc.id, ...sDoc.data() };
@@ -266,7 +266,7 @@ export const UserProfileAPI = {
             limboRef = studentData.limbo_ref;
           }
           if (limboRef) {
-            const limboSnap = await getDoc(limboRef);
+      const limboSnap = await getDocWithRetry(limboRef);
             if (limboSnap.exists()) userProfile = { id: limboRef.id, ...limboSnap.data() };
           }
         }
@@ -274,8 +274,8 @@ export const UserProfileAPI = {
         // collect student subcollections if any (optional)
         const studentDocRef = doc(db, "StudentDetails", studentData.id);
         const [reviewSnap, gallerySnap] = await Promise.all([
-          getDocs(collection(studentDocRef, "StudentReviews").withConverter?.() || collection(studentDocRef, "StudentReviews")),
-          getDocs(collection(studentDocRef, "StudentGalleryCollection").withConverter?.() || collection(studentDocRef, "StudentGalleryCollection")),
+          getDocsWithRetry(collection(studentDocRef, "StudentReviews").withConverter?.() || collection(studentDocRef, "StudentReviews")),
+          getDocsWithRetry(collection(studentDocRef, "StudentGalleryCollection").withConverter?.() || collection(studentDocRef, "StudentGalleryCollection")),
         ]).catch(() => [null, null]);
 
         const studentReviews = reviewSnap ? reviewSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
@@ -310,8 +310,8 @@ export const UserProfileAPI = {
       }
 
       if (user.isTeacher && user.teacher_ref instanceof DocumentReference) {
-        // const teacherDoc = await user.teacher_ref.get();
-        const teacherDoc =  await getDoc(user.teacher_ref)  ;
+  // const teacherDoc = await user.teacher_ref.get();
+  const teacherDoc =  await getDocWithRetry(user.teacher_ref)  ;
         
 
         if (teacherDoc.exists()) {
@@ -324,7 +324,7 @@ export const UserProfileAPI = {
         }
       } else if (user.isStudent && user.student_ref instanceof DocumentReference) {
 
-        const sSnap = await getDoc(user.student_ref) ;
+  const sSnap = await getDocWithRetry(user.student_ref) ;
         if (sSnap.exists()) {
           const studentData = { id: sSnap.id, ...sSnap.data() };
 
@@ -341,7 +341,7 @@ export const UserProfileAPI = {
               limboRef = studentData.limbo_ref;
             }
             if (limboRef) {
-              const limboSnap = await getDoc(limboRef);
+              const limboSnap = await getDocWithRetry(limboRef);
               if (limboSnap.exists()) userProfile = { id: limboRef.id, ...limboSnap.data() };
             }
           }
