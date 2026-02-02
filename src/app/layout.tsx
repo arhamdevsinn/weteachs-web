@@ -74,7 +74,7 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" type="image/png+xml" /> */}
        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11114959066"></script>
         <script src="https://t.contentsquare.net/uxa/27feb494c51fc.js"></script>
-     
+     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script> 
         <script
           dangerouslySetInnerHTML={{
             __html: `
