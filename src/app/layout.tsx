@@ -72,18 +72,45 @@ export default function RootLayout({
         {/* <title>WeTeachs</title> 
         <meta name="theme-color" content="#2b683a" />
         <link rel="icon" href="/logo.png" type="image/png+xml" /> */}
-      <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11114959066"></script> 
-      <script src="https://t.contentsquare.net/uxa/27feb494c51fc.js"></script>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
+       <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11114959066"></script>
+        <script src="https://t.contentsquare.net/uxa/27feb494c51fc.js"></script>
+     
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'AW-11114959066');
           `,
-        }}
-      />
+          }}
+        />
+        {/* Meta Pixel Code */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window,document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '1412229196421285');
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: 'none' }}
+            src="https://www.facebook.com/tr?id=1412229196421285&ev=PageView&noscript=1"
+            alt=""
+          />
+        </noscript>
       </head>
       <body className={`${poppins.className} w-screen min-h-screen`}>
         <Header />

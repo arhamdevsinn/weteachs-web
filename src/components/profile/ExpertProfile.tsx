@@ -295,7 +295,7 @@ const ExpertDialog = () => {
       );
       toast.success("Category created successfully!");
       setOpenCategory(false);
-      router.push('/profile');
+      router.push('/congratulations?expert=true&category=true');
     } catch (err) {
       console.error("Failed to create category:", err);
       toast.error("Failed to create category");
