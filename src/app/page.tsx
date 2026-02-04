@@ -36,7 +36,7 @@ export default function Page() {
   return (
     <main>
       <HeroSection />
-      <RecentUsersSection />
+      {/* <RecentUsersSection /> */}
       <FeaturesSection/>
       <RecentCategoriesSection />
       <TestimonialsSection />
