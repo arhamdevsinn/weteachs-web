@@ -3,7 +3,7 @@ import "./globals.css";
 import Header from "../components/layout/Header";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
-import Footer from "../components/layout/Footer";
+import ConditionalFooter from "../components/layout/ConditionalFooter";
 import React from "react";
 
 
@@ -118,7 +118,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </Suspense>
-        <Footer />
+        <ConditionalFooter />
       </body>
     </html>
   );

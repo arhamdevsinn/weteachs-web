@@ -7,6 +7,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { UserProfileAPI } from "@/src/lib/api/userProfile";
 import { useAuth } from "@/src/hooks/useAuth";
+import { getOrCreateConversation } from "@/src/lib/api/chat";
 import {
   Dialog,
   DialogContent,
@@ -369,10 +370,50 @@ const UserProfile = () => {
               </div>
 
               {displayProfile.isTeacher && displayProfile.uid !== user?.uid && (
-                <div className="mt-4">
+                <div className="mt-4 flex gap-3">
+                  <Button
+                    onClick={async () => {
+                      try {
+                        // Get current user ID
+                        const currentUserId = user?.uid || localStorage.getItem("userId");
+                        
+                        if (!currentUserId) {
+                          toast.error("Please log in to send messages");
+                          router.push("/auth/login");
+                          return;
+                        }
+
+                        if (!displayProfile.uid) {
+                          toast.error("Expert ID not found");
+                          return;
+                        }
+
+                        // Show loading toast
+                        toast.loading("Opening chat...");
+
+                        // Get or create conversation
+                        const conversationId = await getOrCreateConversation(
+                          currentUserId,
+                          displayProfile.uid
+                        );
+
+                        toast.dismiss();
+                        
+                        // Navigate to chat with conversation ID
+                        router.push(`/chat?conversationId=${conversationId}&expert=${encodeURIComponent(displayProfile.display_name || '')}&expertId=${displayProfile.uid || ''}`);
+                      } catch (error) {
+                        toast.dismiss();
+                        console.error("Error opening chat:", error);
+                        toast.error("Failed to open chat. Please try again.");
+                      }
+                    }}
+                    className="px-8 py-3 bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white transition"
+                  >
+                    💬 Message
+                  </Button>
                   <Button
                     onClick={() => router.push('/download')}
-                    className="px-12 py-3 "
+                    className="px-12 py-3"
                   >
                     Hire
                   </Button>
