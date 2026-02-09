@@ -372,9 +372,24 @@ const ChatScreen = () => {
                 otherParticipant,
               };
             }));
+            // Sort by last_message_time.seconds (descending)
+            mapped.sort((a, b) => {
+              const aTime = a.last_message_time?.seconds || 0;
+              const bTime = b.last_message_time?.seconds || 0;
+              return bTime - aTime;
+            });
             setConversations(mapped);
           };
-          mapConversationsWithUserData();
+          await mapConversationsWithUserData();
+          // After conversations are set, select the first chat if available
+          setTimeout(() => {
+            setConversations(prev => {
+              if (prev.length > 0) {
+                setSelectedChat(prev[0]);
+              }
+              return prev;
+            });
+          }, 0);
         if (conversationIdFromUrl) {
           const foundConversation = userConversations.find(c => c.id === conversationIdFromUrl);
           if (foundConversation) {
@@ -403,6 +418,34 @@ const ChatScreen = () => {
 
     const unsubscribe = subscribeToMessages(selectedChat.id, (loadedMessages) => {
       setMessages(loadedMessages);
+      // Update conversations in real time when a new message arrives
+      if (loadedMessages && loadedMessages.length > 0) {
+        const lastMsg = loadedMessages[loadedMessages.length - 1];
+        setConversations(prev => {
+          let updated = prev.map(c => {
+            if (c.id === selectedChat.id) {
+              return {
+                ...c,
+                last_message: lastMsg.text || lastMsg.message_text || '',
+                last_message_time: lastMsg.createdAt || lastMsg.timestamp || c.last_message_time,
+              };
+            }
+            return c;
+          });
+          // Sort by last_message_time.seconds (descending)
+          updated.sort((a, b) => {
+            const aTime = a.last_message_time?.seconds || 0;
+            const bTime = b.last_message_time?.seconds || 0;
+            return bTime - aTime;
+          });
+          return updated;
+        });
+        // Optionally, auto-select the chat if the message is from another user
+        if (lastMsg.from?.uid && lastMsg.from.uid !== currentUserId) {
+          setSelectedChat(selectedChat);
+        }
+        console.log(`[ChatScreen] New message, updating chat tile and sorting:`, lastMsg);
+      }
     });
 
     // Some subscribe helpers may return undefined; guard the cleanup call
