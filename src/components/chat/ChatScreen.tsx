@@ -151,6 +151,12 @@ const ChatScreen = () => {
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [selectedChat, setSelectedChat] = React.useState<Conversation | null>(null);
   const [messages, setMessages] = React.useState<any[]>([]);
+  // Always scroll to bottom when messages change
+  React.useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
   const [calls, setCalls] = React.useState<CallRecord[]>([]);
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(true);
@@ -382,14 +388,12 @@ const ChatScreen = () => {
           };
           await mapConversationsWithUserData();
           // After conversations are set, select the first chat if available
-          setTimeout(() => {
-            setConversations(prev => {
-              if (prev.length > 0) {
-                setSelectedChat(prev[0]);
-              }
-              return prev;
-            });
-          }, 0);
+          setConversations(prev => {
+            if (prev.length > 0) {
+              setSelectedChat(prev[0]);
+            }
+            return prev;
+          });
         if (conversationIdFromUrl) {
           const foundConversation = userConversations.find(c => c.id === conversationIdFromUrl);
           if (foundConversation) {
