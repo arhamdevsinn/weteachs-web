@@ -36,6 +36,9 @@ export default function Page() {
   return (
     <main>
       <HeroSection />
+      <div className="flex justify-center my-8">
+        <img src="/hi.jpeg" alt="Hi" className="rounded-xl shadow-lg max-w-full h-auto" />
+      </div>
       {/* <RecentUsersSection /> */}
       <FeaturesSection/>
       <RecentCategoriesSection />

@@ -71,7 +71,7 @@ export const RecentCategoriesSection = () => {
         >
           <div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">
-              Recent <span className="text-primary">Categories</span>
+            What are People <span className="text-primary">Helping</span> with?
             </h2>
             <p className="text-gray-600 text-base">
               Explore our latest learning topics and subjects

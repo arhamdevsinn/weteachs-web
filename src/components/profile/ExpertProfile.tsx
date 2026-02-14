@@ -123,7 +123,15 @@ const ExpertDialog = () => {
     if (!categoryData.title.trim()) return "Title is required.";
     if (!categoryData.topic.trim()) return "Topic is required.";
     if (!categoryData.description.trim()) return "Description is required.";
-    if (!categoryData.category_rate.trim()) return "Rate is required.";
+    // Handle category_rate as string or number
+    if (
+      categoryData.category_rate === undefined ||
+      categoryData.category_rate === null ||
+      (typeof categoryData.category_rate === "string" && !categoryData.category_rate.trim()) ||
+      (typeof categoryData.category_rate === "number" && isNaN(categoryData.category_rate))
+    ) {
+      return "Rate is required.";
+    }
     if (!categoryData.ExperienceLevel) return "Please select an experience level.";
     if (!categoryData.Language.trim()) return "Language is required.";
     if (!categoryData.imageFile) return "Please upload a category image.";
@@ -321,7 +329,7 @@ const ExpertDialog = () => {
       </Button>
 
       {/* === Profile Dialog === */}
-      <Dialog open={openProfile} onOpenChange={setOpenProfile}>
+      <Dialog open={openProfile} onOpenChange={setOpenProfile} >
         <DialogContent className="max-w-md bg-white rounded-xl p-6">
           <DialogHeader>
             <DialogTitle className="text-xl text-center font-semibold">
@@ -415,79 +423,120 @@ const ExpertDialog = () => {
       </Dialog>
 
       {/* === Category Dialog === */}
-      <Dialog open={openCategory} onOpenChange={setOpenCategory}>
-        <DialogContent className="max-w-md bg-white rounded-xl p-6">
-          <DialogHeader>
-            <DialogTitle className="text-xl text-center font-semibold">
-              Create Category
-            </DialogTitle>
-            <DialogDescription className="text-center text-gray-500">
-              Fill in details to create a new category for your expert profile.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-3 mt-4">
-            <label className="text-sm font-medium text-gray-700">Category Title</label>
-            <Input
-              placeholder="Title"
-              onChange={(e) => setCategoryData({ ...categoryData, title: e.target.value })}
-            />
-
-            <label className="text-sm font-medium text-gray-700">Topic</label>
-            <Input
-              placeholder="Topic"
-              onChange={(e) => setCategoryData({ ...categoryData, topic: e.target.value })}
-            />
-
-            <label className="text-sm font-medium text-gray-700">Description</label>
-            <Input
-              placeholder="Description"
-              onChange={(e) => setCategoryData({ ...categoryData, description: e.target.value })}
-            />
-
-            <label className="text-sm font-medium text-gray-700">Rate (USD)</label>
-            <Input
-              type="number"
-              placeholder="Rate"
-              onChange={(e) => setCategoryData({ ...categoryData, category_rate: e.target.value })}
-            />
-
-            <label className="text-sm font-medium text-gray-700">Experience Level</label>
-            <Select
-              onValueChange={(val) => setCategoryData({ ...categoryData, ExperienceLevel: val })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Beginner">Beginner</SelectItem>
-                <SelectItem value="Intermediate">Intermediate</SelectItem>
-                <SelectItem value="Advanced">Advanced</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <label className="text-sm font-medium text-gray-700">Language</label>
-            <Input
-              placeholder="Language (e.g. English)"
-              onChange={(e) => setCategoryData({ ...categoryData, Language: e.target.value })}
-            />
-
-            <label className="text-sm font-medium text-gray-700">Upload Category Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleImage(e, true)}
-              className="text-sm"
-            />
+      <Dialog open={openCategory} onOpenChange={setOpenCategory} className="z-50 w-full">
+  <DialogContent className="max-w-auto bg-white rounded-xl p-10 shadow-lg">
+          <div className="flex flex-row gap-8">
+            {/* Live Preview Card */}
+            <div className="flex-1 min-w-[280px] max-w-[340px] bg-white rounded-xl shadow-md p-6 border border-gray-200">
+              <div className="bg-gradient-to-r from-green-200 to-green-400 h-40 rounded-lg mb-6 flex items-center justify-center">
+                {categoryData.imageFile ? (
+                  <img src={URL.createObjectURL(categoryData.imageFile)} alt="Preview" className="w-40 h-40 object-cover rounded-lg border border-gray-200 shadow-sm" />
+                ) : (
+                  <span className="text-gray-400">No image</span>
+                )}
+              </div>
+              <h4 className="text-xl font-bold text-green-700">{categoryData.topic || "Topic (Math)"}</h4>
+              <p className="text-gray-600">{categoryData.title || "Category (Education)"}</p>
+              <p className="text-gray-600 mb-4">{categoryData.description || "Description (I can help you with algebra)"}</p>
+              <div className="flex justify-between text-sm text-gray-700">
+                <span>${categoryData.category_rate || 3} / 15min</span>
+                <span>{categoryData.ExperienceLevel || "Level (Advanced)"}</span>
+                <span>{categoryData.Language || "Language (English)"}</span>
+              </div>
+            </div>
+            {/* Form Section */}
+            <div className="flex-[2]">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold text-primary">
+                  Create Category
+                </DialogTitle>
+                <DialogDescription className="text-gray-500">
+                  Fill in details to create a new category for your expert profile.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3 mt-4">
+                <label className="text-sm font-medium text-gray-700">Category Title</label>
+                <Input
+                  placeholder="Title"
+                  value={categoryData.title}
+                  onChange={(e) => setCategoryData({ ...categoryData, title: e.target.value })}
+                />
+                <label className="text-sm font-medium text-gray-700">Topic</label>
+                <Input
+                  placeholder="Topic"
+                  value={categoryData.topic}
+                  onChange={(e) => setCategoryData({ ...categoryData, topic: e.target.value })}
+                />
+                <label className="text-sm font-medium text-gray-700">Description</label>
+                <Input
+                  placeholder="Description"
+                  value={categoryData.description}
+                  onChange={(e) => setCategoryData({ ...categoryData, description: e.target.value })}
+                />
+                <label className="text-sm font-medium text-gray-700">Rate (USD)</label>
+                <Input
+                  type="number"
+                  min={3}
+                  placeholder="Rate"
+                  value={categoryData.category_rate}
+                  onChange={(e) => {
+                    const val = Math.max(3, Number(e.target.value));
+                    setCategoryData({ ...categoryData, category_rate: val });
+                  }}
+                />
+                <label className="text-sm font-medium text-gray-700">Experience Level</label>
+                <Select
+                  value={categoryData.ExperienceLevel}
+                  onValueChange={(val) => setCategoryData({ ...categoryData, ExperienceLevel: val })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+                <label className="text-sm font-medium text-gray-700">Language</label>
+                <Input
+                  placeholder="Language (e.g. English)"
+                  value={categoryData.Language}
+                  onChange={(e) => setCategoryData({ ...categoryData, Language: e.target.value })}
+                />
+                <label className="text-sm font-medium text-gray-700">Upload Category Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImage(e, true)}
+                  className="text-sm"
+                />
+                {/* {categoryData.imageFile && (
+                  <div className="mt-3 flex justify-center">
+                    <div className="relative group">
+                      <img src={URL.createObjectURL(categoryData.imageFile)} alt="Preview" className="w-40 h-40 object-cover rounded-lg border border-gray-200 shadow-sm" />
+                      <button
+                        onClick={() => {
+                          setCategoryData({ ...categoryData, imageFile: null });
+                        }}
+                        className="absolute top-1 right-1 bg-white text-red-500 rounded-full shadow p-1 hover:bg-red-100"
+                        title="Remove image"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )} */}
+              </div>
+              <Button
+                className="w-full mt-5 bg-primary text-white hover:bg-primary/90"
+                onClick={handleCategorySubmit}
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create Category"}
+              </Button>
+            </div>
           </div>
-
-          <Button
-            className="w-full mt-5 bg-primary text-white"
-            onClick={handleCategorySubmit}
-            disabled={loading}
-          >
-            {loading ? "Creating..." : "Create Category"}
-          </Button>
         </DialogContent>
       </Dialog>
     </>
