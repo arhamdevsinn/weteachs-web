@@ -160,7 +160,6 @@ const Page: React.FC = () => {
       </div>
     ))}
   </div>
-
   {/* PROFILE PREVIEW CARD */}
   <div className="bg-white rounded-xl mx-auto w-96 shadow-md p-6 mb-14">
     <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
