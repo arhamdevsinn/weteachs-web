@@ -5,6 +5,7 @@ const page = () => {
   return (
     <div>
       <TeamWeTeachs/>
+      
     </div>
   )
 }
