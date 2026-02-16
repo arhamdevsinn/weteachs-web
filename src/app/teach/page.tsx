@@ -162,8 +162,14 @@ const Page: React.FC = () => {
   </div>
 
   {/* PROFILE PREVIEW CARD */}
-  <div className="bg-white rounded-xl shadow-md p-6 mb-14">
-    <div className="bg-gradient-to-r from-green-200 to-green-400 h-40 rounded-lg mb-6"></div>
+  <div className="bg-white rounded-xl mx-auto w-96 shadow-md p-6 mb-14">
+    <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
+      <img
+        src="/helper-categpry.jpg"
+        alt="Helper Category"
+        className="object-cover w-full h-full"
+      />
+    </div>
 
     <h4 className="text-xl font-bold text-green-700">
       Topic (Math)
@@ -191,21 +197,19 @@ const Page: React.FC = () => {
 
   {/* IMAGES SECTION */}
   <div className="grid md:grid-cols-2 gap-8 mb-14">
-    <div className="h-64 rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
       <img
-        src="/image.png"
+        src="/help.jpeg"
         alt="Picture of a person"
         className="object-cover w-full h-full"
-        style={{ maxHeight: '16rem' }}
       />
     </div>
 
-    <div className="h-64 rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
       <img
         src="/image.png"
         alt="Screenshot from web/app"
         className="object-cover w-full h-full"
-        style={{ maxHeight: '16rem' }}
       />
     </div>
   </div>
