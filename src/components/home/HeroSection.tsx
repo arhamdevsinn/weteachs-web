@@ -6,12 +6,12 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative h-[85vh] flex flex-col justify-center items-center overflow-hidden bg-gradient-to-br from-green-50  to-white">
+    <section className="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-gradient-to-br from-green-50  to-white">
       {/* Subtle floating shapes / glow effect */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-green-200/40 blur-3xl rounded-full mix-blend-multiply animate-pulse"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-300/30 blur-3xl rounded-full mix-blend-multiply animate-pulse delay-1000"></div>
 
-      <div className="container mx-auto px-6 py-20 grid md:grid-cols-2 gap-16 items-center relative z-10">
+      <div className="container mx-auto px-6 py-32 grid md:grid-cols-2 gap-16 items-center relative z-10">
         {/* ==== TEXT SECTION ==== */}
         <motion.div
           initial={{ opacity: 0, x: -70 }}
@@ -19,42 +19,41 @@ const HeroSection = () => {
           transition={{ duration: 0.9, ease: "easeOut" }}
           className="space-y-8"
         >
-          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight text-gray-900">
+          <h1 className="text-3xl md:text-4xl font-extrabold leading-tight text-gray-900">
             Master Your <span className="text-primary">Skills</span>.<br />
-            Build Your <span className="bg-primary bg-clip-text text-transparent">Future</span>.<br />
-            All in One Place.
+            Stuck? Get Real <span className="bg-primary bg-clip-text text-transparent">Answers</span>.<br />
+            From Real People.
           </h1>
 
           <p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-lg">
-            Learn, grow, and share knowledge effortlessly. Whether you teach or learn, 
-            we bring everything together for your growth journey.
+          Ask any question and get personal help - not another YouTube video that doesn't solve it.
           </p>
 
           <div className="flex flex-wrap gap-4 pt-4">
   <Button
     onClick={() =>
       window.open(
-        "https://play.google.com/store/apps/details?id=com.weteachappneww.app",
+        "/auth/signup",
         "_blank",
         "noopener,noreferrer"
       )
     }
     className="bg-primary text-white hover:bg-green-800 rounded-full px-8 py-6 text-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
   >
-    Download for Android
+    Ask a Question
   </Button>
   <Button
     variant="outline"
     onClick={() =>
       window.open(
-        "https://apps.apple.com/us/app/weteachs/id6502515880",
+        "/categories",     
         "_blank",
         "noopener,noreferrer"
       )
     }
     className="border-green-700 text-green-800 hover:bg-green-100 rounded-full px-8 py-6 text-lg shadow-sm hover:shadow-md transition-transform transform hover:scale-105"
   >
-    Get on iOS
+   Browser Helpers
   </Button>
 </div>
 
