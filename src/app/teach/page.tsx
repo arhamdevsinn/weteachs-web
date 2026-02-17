@@ -168,7 +168,6 @@ const Page: React.FC = () => {
         alt="Helper Category"
         className="object-cover w-full h-full"
       />
-      
     </div>
 
     <h4 className="text-xl font-bold text-green-700">
