@@ -435,9 +435,9 @@ const ExpertDialog = () => {
                   <span className="text-gray-400">No image</span>
                 )}
               </div>
-              <h4 className="text-xl font-bold text-green-700">{categoryData.topic || "Topic (Math)"}</h4>
-              <p className="text-gray-600">{categoryData.title || "Category (Education)"}</p>
-              <p className="text-gray-600 mb-4">{categoryData.description || "Description (I can help you with algebra)"}</p>
+              <h4 className="text-xl font-bold text-green-700">{categoryData.topic || "Topic "}</h4>
+              <p className="text-gray-600">{categoryData.title || "Category"}</p>
+              <p className="text-gray-600 mb-4">{categoryData.description || "Description "}</p>
               <div className="flex justify-between text-sm text-gray-700">
                 <span>${categoryData.category_rate || 3} / 15min</span>
                 <span>{categoryData.ExperienceLevel || "Level (Advanced)"}</span>
@@ -455,12 +455,39 @@ const ExpertDialog = () => {
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-3 mt-4">
-                <label className="text-sm font-medium text-gray-700">Category Title</label>
-                <Input
-                  placeholder="Title"
+                <label className="text-sm font-medium text-gray-700">Categories</label>
+                <Select
                   value={categoryData.title}
-                  onChange={(e) => setCategoryData({ ...categoryData, title: e.target.value })}
-                />
+                  onValueChange={(val) => setCategoryData({ ...categoryData, title: val })}
+                  
+                >
+                  <SelectTrigger>
+                    <SelectValue className="w-full" placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Arts">Arts</SelectItem>
+                    <SelectItem value="Business & Entrepreneur">Business & Entrepreneur</SelectItem>
+                    <SelectItem value="Education">Education</SelectItem>
+                    <SelectItem value="Family">Family</SelectItem>
+                    <SelectItem value="Fashion & Beauty">Fashion & Beauty</SelectItem>
+                    <SelectItem value="Finance & Investing">Finance & Investing</SelectItem>
+                    <SelectItem value="Fitness">Fitness</SelectItem>
+                    <SelectItem value="Foods & Cooking">Foods & Cooking</SelectItem>
+                    <SelectItem value="Gaming">Gaming</SelectItem>
+                    <SelectItem value="Health & Wellness">Health & Wellness</SelectItem>
+                    <SelectItem value="Home improvements & DIY">Home improvements & DIY</SelectItem>
+                    <SelectItem value="Language & Communication">Language & Communication</SelectItem>
+                    <SelectItem value="Marketing & Social Media">Marketing & Social Media</SelectItem>
+                    <SelectItem value="Mental Health & Mindfulness">Mental Health & Mindfulness</SelectItem>
+                    <SelectItem value="Music">Music</SelectItem>
+                    <SelectItem value="Pet Care & Training">Pet Care & Training</SelectItem>
+                    <SelectItem value="Relationships & Dating Advice">Relationships & Dating Advice</SelectItem>
+                    <SelectItem value="Spirituality & Religion">Spirituality & Religion</SelectItem>
+                    <SelectItem value="Technology">Technology</SelectItem>
+                    <SelectItem value="Travel & Culture">Travel & Culture</SelectItem>
+                    <SelectItem value="Random">Random</SelectItem>
+                  </SelectContent>
+                </Select>
                 <label className="text-sm font-medium text-gray-700">Topic</label>
                 <Input
                   placeholder="Topic"
@@ -484,7 +511,7 @@ const ExpertDialog = () => {
                     setCategoryData({ ...categoryData, category_rate: val });
                   }}
                 />
-                <label className="text-sm font-medium text-gray-700">Experience Level</label>
+                <label className="text-sm font-medium text-gray-700">Expertise Level</label>
                 <Select
                   value={categoryData.ExperienceLevel}
                   onValueChange={(val) => setCategoryData({ ...categoryData, ExperienceLevel: val })}
@@ -505,12 +532,16 @@ const ExpertDialog = () => {
                   onChange={(e) => setCategoryData({ ...categoryData, Language: e.target.value })}
                 />
                 <label className="text-sm font-medium text-gray-700">Upload Category Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImage(e, true)}
-                  className="text-sm"
-                />
+                <label className="flex items-center gap-2 cursor-pointer w-fit px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg border border-primary/30 text-primary font-medium transition">
+                  <Upload className="w-5 h-5" />
+                  <span>Upload Image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImage(e, true)}
+                    className="hidden"
+                  />
+                </label>
                 {/* {categoryData.imageFile && (
                   <div className="mt-3 flex justify-center">
                     <div className="relative group">
