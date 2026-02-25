@@ -2,21 +2,12 @@
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
+  sendEmailVerification, 
   updateProfile, User,
   signOut, 
   UserCredential,
-  signOut as firebaseSignOut
+   signOut as firebaseSignOut
 } from 'firebase/auth';
-import { sendEmailVerification as firebaseSendEmailVerification } from 'firebase/auth';
-// Utility: Send verification email with custom URL
-export const sendVerificationEmail = async (user: User) => {
-  if (!user) return;
-  await firebaseSendEmailVerification(user, {
-    url: "https://www.weteachs.com/auth/verify-email",
-    handleCodeInApp: true,
-  });
-  console.log("Verification email sent!");
-};
 import { auth, db,serverTimestamp } from "@/src/lib/firebase/config";
 import { doc, setDoc } from "firebase/firestore";
 import { Router } from 'lucide-react';
@@ -38,7 +29,7 @@ export class AuthService {
         }
 
         try {
-          await sendVerificationEmail(user);
+          await sendEmailVerification(user);
         } catch (err) {
           if (err.code === "auth/too-many-requests") {
             throw new Error("Too many verification attempts. Please wait a few minutes.");
@@ -91,7 +82,7 @@ export class AuthService {
       }
 
       // Send verification email
-  await sendVerificationEmail(user);
+      await sendEmailVerification(user);
       console.log("📧 Verification email sent to:", email);
 
       await signOut(auth);
@@ -155,7 +146,7 @@ static async resendVerificationEmail(): Promise<void> {
         throw new Error("Your email is already verified. Please log in again.");
       }
 
-  await sendVerificationEmail(user);
+      await sendEmailVerification(user);
       console.log("📧 Verification email re-sent to:", email);
       await signOut(auth);
     } catch (error) {
