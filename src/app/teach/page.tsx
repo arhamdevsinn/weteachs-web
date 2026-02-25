@@ -166,7 +166,7 @@ const Page: React.FC = () => {
       <img
         src="/helper-categpry.jpg"
         alt="Helper Category"
-        className="object-cover w-full h-full"
+        className="object-cover w-full h-full "
       />
     </div>
 
