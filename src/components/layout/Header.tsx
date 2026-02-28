@@ -59,7 +59,7 @@ const Header = () => {
   const navigationItems = [
     { href: "/", label: "Home" },
     { href: "/teach", label: "Helper" },
-    { href: "/learn", label: "Seekers" },
+    { href: "/learn", label: "Clients" },
     { href: "/about", label: "Learn" },
     { href: "/categories", label: "Explore" },
     // ...(user ? [{ href: "/community", label: "Community" }] : []),

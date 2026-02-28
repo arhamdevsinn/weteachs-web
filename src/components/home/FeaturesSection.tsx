@@ -19,7 +19,7 @@ const features = [
   },
   {
     id: 2,
-    title: "Learn as a Seeker",
+    title: "Learn as a Client",
     description:
       "Imagine talking to Al-but it's a real person.Get help tailored exactly to what you need, quickly and stress-free.",
     image: "/student.png",
