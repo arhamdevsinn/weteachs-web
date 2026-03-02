@@ -31,14 +31,23 @@ import TestimonialsSection from "@/src/components/home/TestimonialsSection";
 import FeaturesSection from "../components/home/FeaturesSection";
 import { RecentUsersSection } from "@/src/components/home/RecentUsersSection";
 import { RecentCategoriesSection } from "@/src/components/home/RecentCategoriesSection";
+import Helpers from "../components/home/Helpers";
+import Clients from "../components/home/Clients";
 
 export default function Page() {
   return (
     <main>
       <HeroSection />
-      <RecentUsersSection />
-      <FeaturesSection/>
-      <RecentCategoriesSection />
+      <div className="flex justify-center my-8">
+        <img src="/hi.jpeg" alt="Hi" className="rounded-xl shadow-lg max-w-full h-auto" />
+      </div>
+      {/* <RecentUsersSection /> */}
+      <Clients />
+      <Helpers />
+        <RecentCategoriesSection />
+      <FeaturesSection />
+
+    
       <TestimonialsSection />
     </main>
   );

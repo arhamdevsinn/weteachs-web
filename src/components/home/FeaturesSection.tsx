@@ -7,11 +7,11 @@ import { motion } from "framer-motion";
 const features = [
   {
     id: 1,
-    title: "Earn as an Expert",
+    title: "Earn as an Helper",
     description:
-      "Monetize your expertise with freedom. Offer personalized 1-on-1 sessions via video, voice, or chat — and earn instantly for every minute you teach.",
+      "Earn by chatting with people who need your skills. Set your own rates, times, and topics-it's that simple.",
     image: "/expert.png",
-    buttonText: "Start Freelancing",
+    buttonText: "Learn More",
     accent: "from-primary to-primary",
     reverse: false,
     onClick: () =>
@@ -19,11 +19,11 @@ const features = [
   },
   {
     id: 2,
-    title: "Learn as a Student",
+    title: "Learn as a Client",
     description:
-      "Find verified experts, book flexible sessions, and gain real-world insights that accelerate your learning journey — anytime, anywhere.",
+      "Imagine talking to Al-but it's a real person.Get help tailored exactly to what you need, quickly and stress-free.",
     image: "/student.png",
-    buttonText: "Start Learning",
+    buttonText: "Learn More",
     accent: "from-primary to-primary",
     reverse: true,
     onClick: () =>

@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { Upload, User } from "lucide-react";
 import { useUserIdFromUrl } from "@/src/hooks/useUserIdFromUrl";
 import { useAuth } from "@/src/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const StudentDialog = () => {
     const [openProfile, setOpenProfile] = useState(false);
@@ -35,6 +36,7 @@ const StudentDialog = () => {
     const [loading, setLoading] = useState(false);
     const db = getFirestore();
     const storage = getStorage();
+    const router = useRouter();
 
     const [formData, setFormData] = useState({
         display_name: "",
@@ -111,6 +113,7 @@ const StudentDialog = () => {
 
             toast.success("Profile created successfully!");
             setOpenProfile(false);
+            router.push('/congratulations?expert=false');
         } catch (err) {
             console.error("Error creating student profile:", err);
             toast.error("Error creating student profile");
@@ -128,16 +131,16 @@ const StudentDialog = () => {
                 Become a Student
             </Button>
 
-            <Dialog open={openProfile} onOpenChange={setOpenProfile}>
-                <DialogContent className="max-w-md bg-white rounded-xl p-6">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl text-center font-semibold">
-                            Create Student Profile
-                        </DialogTitle>
-                        <DialogDescription className="text-center text-gray-500">
-                            Fill your details to become a student.
-                        </DialogDescription>
-                    </DialogHeader>
+                    <Dialog open={openProfile} onOpenChange={setOpenProfile}>
+                        <DialogContent className="max-w-md bg-white rounded-xl p-6">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl text-center font-semibold">
+                                    Create Student Profile
+                                </DialogTitle>
+                                <DialogDescription className="text-center text-gray-500">
+                                    Fill your details to become a student.
+                                </DialogDescription>
+                            </DialogHeader>
                     <div className="flex flex-col items-center mt-6 space-y-3">
                         <label
                             htmlFor="profile-upload"

@@ -59,11 +59,11 @@ const Header = () => {
 
   const navigationItems = [
     { href: "/", label: "Home" },
-    { href: "/teach", label: "Teach" },
-    { href: "/learn", label: "Learn" },
-    { href: "/about", label: "About" },
+    { href: "/teach", label: "Helper" },
+    { href: "/learn", label: "Clients" },
+    { href: "/about", label: "Learn" },
     { href: "/categories", label: "Explore" },
-    ...(user ? [{ href: "/community", label: "Community" }] : []),
+    // ...(user ? [{ href: "/community", label: "Community" }] : []),
     // ...(user ? [{ href: "/categories", label: "Explore" }] : []),
     // ...(user ? [{ href: "/profile", label: "Profile" }] : []),
   ];

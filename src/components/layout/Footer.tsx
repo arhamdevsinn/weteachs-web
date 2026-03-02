@@ -1,8 +1,12 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import { useAuth } from "@/src/hooks/useAuth";
+
 
 const Footer = () => {
+    const { user } = useAuth();
+  
   const socialLinks = [
     {
       name: "facebook",
@@ -74,6 +78,8 @@ const Footer = () => {
                 { href: "/about", label: "About Us" },
                 { href: "/contact", label: "Contact" },
                 { href: "/privacy-policy", label: "Privacy Policy" },
+    ...(user ? [{ href: "/community", label: "Community" }] : []),
+
               ].map((link, i) => (
                 <li key={i}>
                   <a
