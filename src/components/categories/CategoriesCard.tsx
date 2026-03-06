@@ -32,6 +32,62 @@ const SkeletonCard = () => (
   </div>
 );
 
+// Category Card Component
+const CategoryCard = ({ cat, index, openCategoryModal }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+    animate={{ opacity: 1, scale: 1, y: 0 }}
+    transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
+    whileHover={{ scale: 1.03, y: -5 }}
+    className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition h-full"
+    onClick={() => openCategoryModal(cat)}
+  >
+    {cat.image ? (
+      <motion.img
+        src={cat.image}
+        alt={cat.title || "Category"}
+        className="h-40 w-full object-cover"
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.3 }}
+      />
+    ) : (
+      <div className="bg-gray-200 h-40 w-full flex items-center justify-center text-gray-400">
+        No Image
+      </div>
+    )}
+
+    <div className="p-4 flex flex-col flex-1">
+      <div className="text-xs uppercase tracking-wide text-primary font-medium">
+        {cat.topic || "No topic"}
+      </div>
+
+      <div className="text-xl font-semibold mt-1 text-gray-800">
+        {cat.title || "Untitled"}
+      </div>
+
+      <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+        {cat.description || "No description available."}
+      </p>
+
+      <div className="flex justify-between items-center mt-2">
+        <p className="text-sm text-gray-600 font-bold">
+          ${cat.category_rate || 0} / 15 mins
+        </p>
+        <p className="text-sm text-gray-600">
+          {cat.Language}
+        </p>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
+        <span>❤️ {cat.category_rate || 0} likes</span>
+        <span className="text-primary font-medium">
+          {cat.teacher_name || "Unknown"}
+        </span>
+      </div>
+    </div>
+  </motion.div>
+);
+
 const CategoriesCard = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
@@ -234,6 +290,15 @@ const CategoriesCard = () => {
 
   return (
     <div className="min-h-screen bg-secondary">
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
       {/* Header */}
       <div className="px-4 md:px-8 py-4 md:py-5 bg-gradient-to-r from-white to-gray-50 shadow-md border-b sticky top-0 z-20">
         {/* Mobile Layout */}
@@ -359,9 +424,35 @@ const CategoriesCard = () => {
         </div>
       </div>
 
-      {/* Grid of Cards */}
-      <div className="p-6">
+      {/* Categories by Section */}
+      <div className="p-6 space-y-8">
         {(() => {
+          // Category titles to display
+          const categoryTitles = [
+            "New",
+            "Arts",
+            "Business & Entrepreneur",
+            "Education",
+            "Family",
+            "Fashion & Beauty",
+            "Finance & Investing",
+            "Fitness",
+            "Foods & Cooking",
+            "Gaming",
+            "Health & Wellness",
+            "Home improvements & DIY",
+            "Language & Communication",
+            "Marketing & Social Media",
+            "Mental Health & Mindfulness",
+            "Music",
+            "Pet Care & Training",
+            "Relationships & Dating Advice",
+            "Spirituality & Religion",
+            "Technology",
+            "Travel & Culture",
+            "Random"
+          ];
+
           // if Algolia supplied results (search active), use them
           const usingAlgolia = Array.isArray(algoliaHits);
           const rawSource = (allCategories && allCategories.length > 0) ? allCategories : (categories || []);
@@ -378,127 +469,92 @@ const CategoriesCard = () => {
               })
             : rawSource;
 
-          const total = usingAlgolia ? (algoliaTotal ?? source.length) : (source.length || 0);
-          const totalPages = usingAlgolia ? Math.max(1, algoliaPages ?? 1) : Math.max(1, Math.ceil(total / perPage));
-          const page = Math.min(Math.max(1, currentPage), totalPages);
-          const start = (page - 1) * perPage;
-          const end = start + perPage;
-          const pageItems = usingAlgolia ? source : source.slice(start, end);
-
-          if (total === 0) {
+          // If search is active, show filtered results in grid
+          if (searchQuery && source.length > 0) {
             return (
-              <div className="col-span-full text-center text-gray-500">
-                No categories found.
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {source.map((cat, index) => (
+                  <CategoryCard key={cat.id} cat={cat} index={index} openCategoryModal={openCategoryModal} />
+                ))}
               </div>
             );
           }
 
-          return (
-            <>
-               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                 {pageItems.map((cat, index) => (
-                   <motion.div
-                     key={cat.id}
-                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                     transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
-                     whileHover={{ scale: 1.03, y: -5 }}
-                     className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition"
-                     onClick={() => openCategoryModal(cat)}
-                     >
-                     {cat.image ? (
-                       <motion.img
-                         src={cat.image}
-                         alt={cat.title || "Category"}
-                         className="h-40 w-full object-cover"
-                         whileHover={{ scale: 1.05 }}
-                         transition={{ duration: 0.3 }}
-                       />
-                     ) : (
-                       <div className="bg-gray-200 h-40 w-full flex items-center justify-center text-gray-400">
-                         No Image
-                       </div>
-                     )}
+          if (searchQuery && source.length === 0) {
+            return (
+              <div className="col-span-full text-center text-gray-500 py-12">
+                No categories found for "{searchQuery}".
+              </div>
+            );
+          }
 
-                     <div className="p-4 flex flex-col flex-1">
-                       <div className="text-xs uppercase tracking-wide text-primary font-medium">
-                         {cat.topic || "No topic"}
-                       </div>
+          // Group categories by title
+          return categoryTitles.map((categoryTitle) => {
+            const filtered = source.filter((cat) => {
+              if (categoryTitle === "New") {
+                // Show most recent 10 categories for "New"
+                return true;
+              }
+              return cat.title === categoryTitle;
+            });
 
-                       <div className="text-xl font-semibold mt-1 text-gray-800">
-                         {cat.title || "Untitled"}
-                       </div>
+            // For "New", get latest 10 by upload_time
+            const categoriesForSection = categoryTitle === "New" 
+              ? [...source]
+                  .sort((a, b) => {
+                    const aTime = a.upload_time?.seconds || 0;
+                    const bTime = b.upload_time?.seconds || 0;
+                    return bTime - aTime;
+                  })
+                  .slice(0, 10)
+              : filtered;
 
-                       <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-                         {cat.description || "No description available."}
-                       </p>
-  <div className="flex justify-between items-center mt-2">
-    <p className="text-sm text-gray-600 font-bold mt-2 line-clamp-3">
-                 ${cat.category_rate || "No description available."}/ 15 mins
-                </p>
-                 <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-                  {cat.Language }
-                </p>
-  </div>
-               
+            if (categoriesForSection.length === 0) return null;
 
-                       <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
-                         <span>❤️ {cat.category_rate || 0} likes</span>
-                         <span className="text-primary font-medium">
-                           {cat.teacher_name || "Unknown"}
-                         </span>
-                       </div>
-                     </div>
-                   </motion.div>
-                 ))}
-               </div>
+            return (
+              <div key={categoryTitle} className="space-y-4">
+                {/* Section Header */}
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">{categoryTitle}</h2>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const container = document.getElementById(`scroll-${categoryTitle}`);
+                        if (container) container.scrollBy({ left: -300, behavior: 'smooth' });
+                      }}
+                      className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50"
+                    >
+                      &lt;
+                    </button>
+                    <button
+                      onClick={() => {
+                        const container = document.getElementById(`scroll-${categoryTitle}`);
+                        if (container) container.scrollBy({ left: 300, behavior: 'smooth' });
+                      }}
+                      className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50"
+                    >
+                      &gt;
+                    </button>
+                  </div>
+                </div>
 
-               {/* Pagination controls */}
-               {total > perPage && (
-                 <div className="mt-6 flex items-center justify-between">
-                   <div className="flex items-center gap-2">
-                     <button
-                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                       disabled={page <= 1}
-                       className="px-3 py-1 rounded-md border bg-white text-sm disabled:opacity-50"
-                     >
-                       Prev
-                     </button>
-                     <div className="text-sm text-gray-600">
-                       Page {page} of {totalPages}
-                     </div>
-                     <button
-                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                       disabled={page >= totalPages}
-                       className="px-3 py-1 rounded-md border bg-white text-sm disabled:opacity-50"
-                     >
-                       Next
-                     </button>
-                   </div>
-
-                   <div className="flex items-center gap-2">
-                     <label className="text-sm text-gray-600">Per page:</label>
-                     <select
-                       value={perPage}
-                       onChange={(e) => {
-                         setPerPage(Number(e.target.value));
-                         setCurrentPage(1);
-                       }}
-                       className="text-sm border rounded px-2 py-1"
-                     >
-                       {[8, 12, 24, 48].map((n) => (
-                         <option key={n} value={n}>
-                           {n}
-                         </option>
-                       ))}
-                     </select>
-                   </div>
-                 </div>
-               )}
-             </>
-           );
-         })()}
-       </div>
+                {/* Horizontal Scrollable Cards */}
+                <div
+                  id={`scroll-${categoryTitle}`}
+                  className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {categoriesForSection.map((cat, index) => (
+                    <div key={cat.id} className="flex-shrink-0 w-72 snap-start">
+                      <CategoryCard cat={cat} index={index} openCategoryModal={openCategoryModal} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          });
+        })()}
+      </div>
 
       {/* Category Detail Dialog (shadcn) */}
       {selectedCategory && (
