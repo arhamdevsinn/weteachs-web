@@ -166,8 +166,8 @@ const createNewConversation = async (
       job_ref: null,
       
       // Stripe IDs (if available)
-      studentStripeID: currentUserData.stripeAccountId || "",
-      teacherStripeID: expertData.stripeAccountId || "",
+      studentStripeID: currentUserData.stripeAccountID || currentUserData.stripeAccountId || "",
+      teacherStripeID: expertData.stripeAccountID || expertData.stripeAccountId || "",
     });
 
     const conversationId = conversationRef.id;

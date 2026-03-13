@@ -22,6 +22,8 @@ import { Input } from "@/src/components/ui/input";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { log } from "console";
 import { useRequireCompleteProfile } from "@/src/hooks/useRequireCompleteProfile";
+import { db } from "@/src/lib/firebase/config";
+import { doc, getDoc } from "firebase/firestore";
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("images");
   const [selectedSection, setSelectedSection] = useState("all");
@@ -252,10 +254,12 @@ const UserProfile = () => {
   // always render using fetched username data (no storedId logic)
   const displayTeacher = fallbackTeacher;
   const displayProfile = fallbackProfile;
+  console.log("Displaying profile:", displayProfile);
   const displayCategories = fallbackCategories;
   const subcollections = subcollectionsData;
 
   const [shareUrl, setShareUrl] = useState("");
+  const [stripeDialogOpen, setStripeDialogOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -272,6 +276,51 @@ const UserProfile = () => {
     navigator.clipboard.writeText(shareUrl);
     setOpen(false);
     toast.success("Profile link copied successfully!");
+  };
+
+  const handleHireClick = async () => {
+    try {
+      const currentUserId = user?.uid || localStorage.getItem("userId");
+
+      if (!currentUserId) {
+        toast.error("Please log in to hire an expert");
+        router.push("/auth/login");
+        return;
+      }
+
+      if (!displayTeacher?.id) {
+        toast.error("Expert profile is missing required information");
+        return;
+      }
+
+      const limboSnap = await getDoc(doc(db, "LimboUserMode", currentUserId));
+      const limboData = limboSnap.exists() ? limboSnap.data() : null;
+      const studentStripeId =
+        limboData?.stripeAccountID ||
+        limboData?.stripeAccountId ||
+        limboData?.stripe_id ||
+        "";
+
+      if (!studentStripeId) {
+        setStripeDialogOpen(true);
+        return;
+      }
+
+      const hireParams = new URLSearchParams({
+        teacherId: String(displayTeacher.id || ""),
+        teacherUid: String(displayProfile?.uid || ""),
+        teacherName: String(displayProfile?.display_name || ""),
+        teacherPhoto: String(displayProfile?.photo_url || ""),
+        liveRate: String(displayTeacher?.Live_Chat_rate || "0"),
+        language: String(displayTeacher?.Language || "English"),
+        topic: String(displayTeacher?.topic || ""),
+      });
+
+      router.push(`/hire?${hireParams.toString()}`);
+    } catch (error) {
+      console.error("Failed to validate Stripe connection:", error);
+      toast.error("Unable to start hire flow right now. Please try again.");
+    }
   };
 
   if (dataLoading || loadingFallback) {
@@ -409,10 +458,10 @@ const UserProfile = () => {
                     }}
                     className="px-8 py-3 bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white transition"
                   >
-                    💬 Message
+                     Message
                   </Button>
                   <Button
-                    onClick={() => router.push('/download')}
+                    onClick={handleHireClick}
                     className="px-12 py-3"
                   >
                     Hire
@@ -561,6 +610,30 @@ const UserProfile = () => {
             </Dialog>
           </div>
         )}
+
+        <Dialog open={stripeDialogOpen} onOpenChange={setStripeDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Connect Stripe First</DialogTitle>
+              <DialogDescription>
+                You need to connect your Stripe account before hiring an expert.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setStripeDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setStripeDialogOpen(false);
+                  router.push(`/settings?userId=${encodeURIComponent(user?.uid || "")}`);
+                }}
+              >
+                Connect Stripe
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         {/* {profile.isTeacher && (
 <div>
    <Button className="my-5" onClick={handleClick}>

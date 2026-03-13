@@ -25,6 +25,10 @@ photo_url: string;
   isTeacher?: boolean;
   signupcomplete?: boolean;
   signupcompletepage2?: boolean;
+  stripeAccountID?: string;
+  stripeAccountId?: string;
+  stripeChargesEnabled?: boolean;
+  stripe_id?: string;
   
   // References (will need to be resolved)
   teacher_ref?: string; // Path to teacher document
@@ -53,6 +57,10 @@ export interface TeacherDetails {
   Total_amount_earned?: [string];
   availability?: string[];
   usernameT?:string;
+  stripeAccountID?: string;
+  stripeAccountId?: string;
+  stripeChargesEnabled?: boolean;
+  stripe_id?: string;
   // ... other teacher fields
 }
 

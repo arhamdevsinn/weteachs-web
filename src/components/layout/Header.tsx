@@ -13,6 +13,7 @@ import {
   UserPlus,
   User,
   GraduationCap,
+  Bell,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -41,6 +42,15 @@ const Header = () => {
   const [loading, setLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const mockNotifications = [
+    { id: 1, title: "New hire request", body: "Azan accepted your chat request." },
+    { id: 2, title: "Payment pending", body: "Complete payment to confirm session." },
+    { id: 3, title: "Schedule update", body: "Session moved to 3:30 PM." },
+    { id: 4, title: "Reminder", body: "Start chat 5 minutes before time." },
+    { id: 5, title: "Profile view", body: "An expert viewed your profile." },
+    { id: 6, title: "Receipt ready", body: "Download your latest receipt." },
+  ];
 
   const handleNavigate = (path: string) => {
     router.push(path);
@@ -120,6 +130,30 @@ const Header = () => {
                    <Link href="/chat" aria-label="Open chat" className="flex items-center justify-center rounded-full p-2 hover:bg-blue-100 transition focus:outline-none focus:ring-2 focus:ring-primary">
               <ChatIcon className="w-6 h-6 text-primary" />
             </Link>
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="relative flex items-center justify-center rounded-full p-2 hover:bg-blue-100 transition focus:outline-none focus:ring-2 focus:ring-primary">
+                  <Bell className="w-6 h-6 text-primary" />
+                  <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500" aria-hidden="true" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 p-0 overflow-hidden shadow-xl">
+                  <div className="max-h-96 overflow-y-auto divide-y">
+                    {mockNotifications.slice(0, 6).map((item) => (
+                      <div key={item.id} className="p-3 hover:bg-gray-50 cursor-pointer">
+                        <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                        <p className="text-xs text-gray-600 mt-1 leading-snug">{item.body}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => router.push("/notifications")}
+                    className="w-full px-3 py-2 text-sm font-semibold text-primary hover:bg-blue-50"
+                  >
+                    See more
+                  </button>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
        {user ? (
   <>
     <DropdownMenu>
