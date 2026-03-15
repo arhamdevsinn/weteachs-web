@@ -51,6 +51,7 @@ const HirePage = () => {
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
   const [jobStreamRef, setJobStreamRef] = useState(null);
+  const [receiver_ref, setReceiver_ref] = useState(null);
   const [studentRefState, setStudentRefState] = useState(null);
   const [limboRefState, setLimboRefState] = useState(null);
 
@@ -172,6 +173,7 @@ const HirePage = () => {
 
       toast.success("Hire request created successfully");
       setJobStreamRef(jobDocRef);
+      setReceiver_ref(teacherRef);
       setStudentRefState(studentRef);
       setLimboRefState(limboRef);
       setReceiptData({
@@ -440,23 +442,63 @@ const HirePage = () => {
                   }
 
                   try {
-                    await addDoc(collection(db, "Notifications"), {
+                    const studentLimboRef = limboRefState || doc(db, "LimboUserMode", user.uid);
+                    const teacherRef = doc(db, "TeacherDetails", teacherId);
+                    const studentRef = studentRefState || doc(db, "StudentDetails", user.uid);
+                    const teacherSnap = await getDoc(teacherRef);
+                    const teacherData = teacherSnap.exists() ? teacherSnap.data() : null;
+                    const teacherLimboRef =
+                      teacherData?.limbo_ref && typeof teacherData.limbo_ref === "object" && teacherData.limbo_ref.path
+                        ? teacherData.limbo_ref
+                        : typeof teacherData?.limbo_ref === "string" && teacherData.limbo_ref.trim()
+                          ? doc(db, teacherData.limbo_ref.replace(/^\//, ""))
+                          : doc(db, "LimboUserMode", teacherId);
+
+                    const studentNotificationRef = await addDoc(collection(db, "Notifications"), {
                       created_time: serverTimestamp(),
-                      did_didnt_accept: "Accepted",
+                      did_didnt_accept: "no",
                       hired_price: `$${(receiptData?.rate || 0).toFixed(2)}`,
                       hired_time_amount: receiptData?.lengthLabel || `${jobLength}min`,
                       joboffer: "Joboffer",
                       jobstream_ref: jobStreamRef,
-                      limbo_ref: limboRefState || doc(db, "LimboUserMode", user.uid),
+                      limbo_ref: studentLimboRef,
+                      receiver_ref: studentLimboRef,
                       questions: receiptData?.questions || "",
                       student_name: receiptData?.name || "Student",
                       student_profile_pic: receiptData?.studentProfilePic || "",
-                      student_ref: studentRefState || doc(db, "StudentDetails", user.uid),
+                      student_ref: studentRef,
                       teacher_name: teacherName,
-                      teacher_ref: doc(db, "TeacherDetails", teacherId),
+                      teacher_ref: teacherRef,
                       topic: receiptData?.topic || topic,
-                      type: videoOrChat === "Chat" ? "Chat!" : "Video!",
+                      type: "Hired",
                       when_job_date_time: receiptData?.availability || "",
+                      creater_ref: studentLimboRef,
+                      read_status: false,
+                      message: "Hire request sent.",
+                    });
+
+                    await addDoc(collection(db, "Notifications"), {
+                      created_time: serverTimestamp(),
+                      did_didnt_accept: "no",
+                      hired_price: `$${(receiptData?.rate || 0).toFixed(2)}`,
+                      hired_time_amount: receiptData?.lengthLabel || `${jobLength}min`,
+                      joboffer: "Joboffer",
+                      jobstream_ref: jobStreamRef,
+                      limbo_ref: teacherLimboRef,
+                      receiver_ref: teacherLimboRef,
+                      questions: receiptData?.questions || "",
+                      student_name: receiptData?.name || "Student",
+                      student_profile_pic: receiptData?.studentProfilePic || "",
+                      student_ref: studentRef,
+                      teacher_name: teacherName,
+                      teacher_ref: teacherRef,
+                      topic: receiptData?.topic || topic,
+                      type: "Hired",
+                      when_job_date_time: receiptData?.availability || "",
+                      creater_ref: studentLimboRef,
+                      read_status: false,
+                      message: "Hired you!",
+                      student_notification_ref: studentNotificationRef,
                     });
                     setSuccessDialogOpen(false);
                     router.push("/");

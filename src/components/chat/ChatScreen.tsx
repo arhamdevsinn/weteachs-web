@@ -12,7 +12,7 @@ import {
 import ReportDialog from "@/src/components/chat/ReportDialog";
 import { deleteMessage, editMessage } from "@/src/lib/api/chat-message-actions";
 import type { Conversation } from "@/src/lib/types/chat";
-import { MessageSquareDot, Video, Phone, Image as ImageIcon } from "lucide-react";
+import { MessageSquareDot, Video, Phone, Menu, Image as ImageIcon } from "lucide-react";
 import MessageDialog from "@/src/components/chat/MessageDialog";
 import { useUploadImage } from "@/src/hooks/useUploadImage";
 import { getUserCalls, subscribeToUserCalls } from "@/src/lib/api/calls";
@@ -1225,174 +1225,25 @@ const ChatScreen = () => {
                           : "Now"}
                       </span>
                       
-                      {/* Paid Chat Dialog Trigger */}
-                      <Dialog open={openPaidChatDialog} onOpenChange={setOpenPaidChatDialog}>
-                        <DialogTrigger asChild>
-                          <button className="p-2 hover:bg-amber-50 rounded-full transition-colors group">
-                            <MessageSquareDot className="w-5 h-5 text-amber-600 group-hover:text-amber-700" />
+                      {selectedChat.type === 'paid' && (
+                        <>
+                          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                            <Video className="w-5 h-5 text-gray-600" />
                           </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[500px]">
-                          <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold text-[#22542F] flex items-center gap-2">
-                               Upgrade to Paid Chat
-                            </DialogTitle>
-                            <DialogDescription>
-                              Get premium access with priority support and extended chat features
-                            </DialogDescription>
-                          </DialogHeader>
-                          
-                          {/* Coming Soon Message */}
-                          <div className="py-12 text-center">
-                            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                              <svg className="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
-                            <h3 className="text-3xl font-bold text-gray-900 mb-3">Coming Soon!</h3>
-                            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                              Paid chat feature with Stripe integration is under development. Stay tuned for premium features!
-                            </p>
-                            <button
-                              onClick={() => setOpenPaidChatDialog(false)}
-                              className="px-8 py-3 bg-gradient-to-r from-[#22542F] to-[#1a4023] text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105"
-                            >
-                              Got it
-                            </button>
-                          </div>
+                          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                            <Phone className="w-5 h-5 text-gray-600" />
+                          </button>
+                          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                            <Menu className="w-5 h-5 text-gray-600" />
+                          </button>
+                        </>
+                      )}
 
-                          {/* 
-                          <div className="py-6 space-y-6">
-                            {/* Pricing Card */}
-                            {/*
-                            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border-2 border-amber-200">
-                              <div className="flex items-baseline gap-2 mb-4">
-                                <span className="text-4xl font-bold text-gray-900">$9.99</span>
-                                <span className="text-gray-600">/session</span>
-                              </div>
-                              
-                              {/* Features List */}
-                              {/*
-                              <ul className="space-y-3 mb-6">
-                                <li className="flex items-start gap-2">
-                                  <svg className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  <span className="text-sm text-gray-700">Priority response from experts</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                  <svg className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  <span className="text-sm text-gray-700">Extended 60-minute sessions</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                  <svg className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  <span className="text-sm text-gray-700">Screen sharing & file attachments</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                  <svg className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  <span className="text-sm text-gray-700">Chat history saved indefinitely</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                  <svg className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  <span className="text-sm text-gray-700">Money-back guarantee</span>
-                                </li>
-                              </ul>
-                            </div>
-
-                            {/* Stripe Payment Form */}
-                            {/*
-                            <div className="space-y-4">
-                              <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Card Number</label>
-                                <input
-                                  type="text"
-                                  placeholder="1234 5678 9012 3456"
-                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#22542F]/30 focus:border-[#22542F] transition-all"
-                                />
-                              </div>
-                              
-                              <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">Expiry Date</label>
-                                  <input
-                                    type="text"
-                                    placeholder="MM/YY"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#22542F]/30 focus:border-[#22542F] transition-all"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">CVC</label>
-                                  <input
-                                    type="text"
-                                    placeholder="123"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#22542F]/30 focus:border-[#22542F] transition-all"
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Cardholder Name</label>
-                                <input
-                                  type="text"
-                                  placeholder="John Doe"
-                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#22542F]/30 focus:border-[#22542F] transition-all"
-                                />
-                              </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            {/*
-                            <div className="flex gap-3 pt-4">
-                              <button
-                                onClick={() => setOpenPaidChatDialog(false)}
-                                className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={() => {
-                                  toast.success("Payment successful! Paid chat activated 💎");
-                                  setOpenPaidChatDialog(false);
-                                }}
-                                className="flex-1 px-6 py-3 bg-gradient-to-r from-[#22542F] to-[#1a4023] text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105"
-                              >
-                                Pay $9.99
-                              </button>
-                            </div>
-
-                            {/* Trust Badges */}
-                            {/*
-                            <div className="flex items-center justify-center gap-4 pt-4 border-t border-gray-200">
-                              <div className="flex items-center gap-2 text-xs text-gray-500">
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-                                </svg>
-                                Secure Payment
-                              </div>
-                              <div className="flex items-center gap-2 text-xs text-gray-500">
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                </svg>
-                                SSL Encrypted
-                              </div>
-                            </div>
-                          */}
-                        </DialogContent>
-                      </Dialog>
-
-                      <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                      {/* <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                         <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                         </svg>
-                      </button>
+                      </button> */}
                     </div>
                   )}
                 </div>

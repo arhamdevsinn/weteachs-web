@@ -131,28 +131,14 @@ const Header = () => {
               <ChatIcon className="w-6 h-6 text-primary" />
             </Link>
             {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="relative flex items-center justify-center rounded-full p-2 hover:bg-blue-100 transition focus:outline-none focus:ring-2 focus:ring-primary">
-                  <Bell className="w-6 h-6 text-primary" />
-                  <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500" aria-hidden="true" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80 p-0 overflow-hidden shadow-xl">
-                  <div className="max-h-96 overflow-y-auto divide-y">
-                    {mockNotifications.slice(0, 6).map((item) => (
-                      <div key={item.id} className="p-3 hover:bg-gray-50 cursor-pointer">
-                        <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-                        <p className="text-xs text-gray-600 mt-1 leading-snug">{item.body}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <button
+            
+                     <button
                     onClick={() => router.push("/notifications")}
                     className="w-full px-3 py-2 text-sm font-semibold text-primary hover:bg-blue-50"
                   >
-                    See more
+                   <Bell className="w-6 h-6 text-primary" />
                   </button>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                
             )}
        {user ? (
   <>
