@@ -60,15 +60,15 @@ const Clients = () => {
               >
                 {/* Left Icon Section */}
                 <div className="w-48 bg-gray-300 flex flex-col items-center justify-center p-6 text-center">
-                  <Icon size={50} className="mb-4 text-black" />
-                  <p className="font-semibold text-black">
+                  <Icon  className="mb-4 text-black size-8 md:size-10" />
+                  <p className="font-semibold text-black text-md md:text-xl">
                     {item.title}
                   </p>
                 </div>
 
                 {/* Right Content */}
                 <div className="flex-1 p-8 text-center">
-                  <p className="text-2xl text-gray-800 leading-relaxed">
+                  <p className="md:text-xl text-md text-gray-800 leading-relaxed">
                     {item.description}
                   </p>
                 </div>

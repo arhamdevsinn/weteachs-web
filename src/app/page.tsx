@@ -33,14 +33,14 @@ import { RecentUsersSection } from "@/src/components/home/RecentUsersSection";
 import { RecentCategoriesSection } from "@/src/components/home/RecentCategoriesSection";
 import Helpers from "../components/home/Helpers";
 import Clients from "../components/home/Clients";
+import { Button } from "../components/ui/button";
+import Hero from "../components/home/Hero";
 
 export default function Page() {
   return (
     <main>
-      <HeroSection />
-      <div className="flex justify-center my-8">
-        <img src="/hi.jpeg" alt="Hi" className="rounded-xl shadow-lg max-w-full h-auto" />
-      </div>
+      {/* <HeroSection /> */}
+  <Hero/>
       {/* <RecentUsersSection /> */}
       <Clients />
       <Helpers />
