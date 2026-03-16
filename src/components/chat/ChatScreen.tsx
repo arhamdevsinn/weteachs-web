@@ -12,13 +12,13 @@ import {
 import ReportDialog from "@/src/components/chat/ReportDialog";
 import { deleteMessage, editMessage } from "@/src/lib/api/chat-message-actions";
 import type { Conversation } from "@/src/lib/types/chat";
-import { MessageSquareDot, Video, Phone, Menu, Image as ImageIcon } from "lucide-react";
+import { MessageSquareDot, Video, Phone, Menu, Star, Image as ImageIcon } from "lucide-react";
 import MessageDialog from "@/src/components/chat/MessageDialog";
 import { useUploadImage } from "@/src/hooks/useUploadImage";
 import { getUserCalls, subscribeToUserCalls } from "@/src/lib/api/calls";
 import type { CallRecord } from "@/src/lib/types/call";
 import { auth, db } from "@/src/lib/firebase/config";
-import { doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -166,6 +166,35 @@ const ChatScreen = () => {
   const [sendingMessage, setSendingMessage] = React.useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = React.useState(false);
   const [dialogPayload, setDialogPayload] = React.useState<any>(null);
+  const [reviewDialogOpen, setReviewDialogOpen] = React.useState(false);
+  const [expertRating, setExpertRating] = React.useState(4);
+  const [expertReview, setExpertReview] = React.useState("");
+  const [reviewCategory, setReviewCategory] = React.useState("");
+  const [completingJob, setCompletingJob] = React.useState(false);
+  const reviewCategories = [
+    "New",
+    "Arts",
+    "Business & Entrepreneur",
+    "Education",
+    "Family",
+    "Fashion & Beauty",
+    "Finance & Investing",
+    "Fitness",
+    "Foods & Cooking",
+    "Gaming",
+    "Health & Wellness",
+    "Home improvements & DIY",
+    "Language & Communication",
+    "Marketing & Social Media",
+    "Mental Health & Mindfulness",
+    "Music",
+    "Pet Care & Training",
+    "Relationships & Dating Advice",
+    "Spirituality & Religion",
+    "Technology",
+    "Travel & Culture",
+    "Random",
+  ];
   const [showChatSection, setShowChatSection] = React.useState(false); // For mobile view
   const [openPaidChatDialog, setOpenPaidChatDialog] = React.useState(false);
   const messagesEndRef = React.useRef(null);
@@ -604,6 +633,192 @@ const ChatScreen = () => {
 
   const handleBackToSidebar = () => {
     setShowChatSection(false); // Go back to sidebar on mobile
+  };
+
+  const handleSubmitExpertReview = async () => {
+    if (!selectedChat?.id || !currentUserId) {
+      toast.error("Missing chat information");
+      return;
+    }
+
+    try {
+      setCompletingJob(true);
+
+      const chatRef = doc(db, "chats", selectedChat.id);
+      const chatSnap = await getDoc(chatRef);
+      if (!chatSnap.exists()) {
+        toast.error("Chat document not found");
+        return;
+      }
+
+      const chatDoc = chatSnap.data() || {};
+      const isChatPaidFor = Boolean(chatDoc.chat_paid_for);
+
+      let transferCompleted = false;
+      let transferId = "";
+
+      if (!isChatPaidFor) {
+        // Stripe guard conditions for the expert account (recipient)
+        const expertUid = selectedChat?.otherParticipant?.uid || null;
+        let stripeAccountID = "";
+        let stripeChargesEnabled = false;
+        let expertData: any = null;
+
+        if (expertUid) {
+          const expertRef = doc(db, "LimboUserMode", expertUid);
+          const expertSnap = await getDoc(expertRef);
+          if (expertSnap.exists()) {
+            expertData = expertSnap.data() || {};
+            stripeAccountID = expertData.stripeAccountID || expertData.stripeAccountId || expertData.stripe_id || "";
+            stripeChargesEnabled = Boolean(expertData.stripeChargesEnabled || expertData.charges_enabled);
+          }
+        }
+
+        if (stripeAccountID && stripeChargesEnabled === true) {
+          // Action 1: read job stream doc (non-blocking)
+          let jobData: any = null;
+          let jobRef = chatDoc.job_ref || null;
+
+          try {
+            if (jobRef) {
+              const jobSnap = await getDoc(jobRef);
+              if (jobSnap.exists()) {
+                jobData = jobSnap.data() || {};
+              }
+            }
+          } catch (readJobError) {
+            console.warn("JobStream read failed (non-blocking):", readJobError);
+          }
+
+          const baseAmount = Number(jobData?.total_price ?? jobData?.job_price ?? 0);
+          const amountInCents = Math.max(0, Math.round(baseAmount * 100));
+
+          // Action block: stripePayment Transfer
+          if (amountInCents > 0) {
+            const transferResponse = await fetch("/api/stripe/transfers", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chatDocId: selectedChat.id,
+                destinationAccountId: stripeAccountID,
+                amount: amountInCents,
+                currency: "usd",
+              }),
+            });
+
+            const transferResult = await transferResponse.json();
+            if (!transferResponse.ok || !transferResult?.success) {
+              toast.error(transferResult?.error || "Stripe transfer failed");
+              return;
+            }
+
+            transferCompleted = true;
+            transferId = transferResult?.transferId || "";
+          }
+
+          // Action 2: create transactions doc
+          const totalAfterTaxes = Number(jobData?.total_after_taxes ?? 0);
+          const taxesInCents = Math.max(0, Math.round(totalAfterTaxes * 100));
+
+          await addDoc(collection(db, "transactions"), {
+            amount: amountInCents,
+            teacher_ref: chatDoc.teacher_ref || null,
+            student_ref: chatDoc.student_ref || null,
+            created_time: serverTimestamp(),
+            chatref: chatRef,
+            job_ref: jobRef || null,
+            paid: false,
+            limboref: chatDoc.limboref || null,
+            limboref2: chatDoc.limboref2 || null,
+            amount_taxes: taxesInCents,
+            "amount taxes": taxesInCents,
+            job_topic: jobData?.job_topic || jobData?.topic || "",
+            job_student_name: jobData?.Student_Name || jobData?.student_name || "",
+            refund_created: false,
+            stripe_transfer_id: transferId || null,
+          });
+
+          // Action 3: Backend Call API - Sessions
+          const sessionPayload = {
+            paymentfees: amountInCents,
+            cancelurl: "https://testurl.net.au/cancel",
+            successurl: "https://weteachs.com/idkwhattocallitathisp",
+            currency: "USD",
+            time: 1,
+            connected_account_ID: chatDoc.teacherStripeID || stripeAccountID,
+            teachersname:
+              selectedChat?.otherParticipant?.display_name ||
+              expertData?.display_name ||
+              "Teacher",
+            customer_email:
+              auth.currentUser?.email ||
+              (typeof window !== "undefined" ? localStorage.getItem("userEmail") : "") ||
+              "",
+            chatDocId: selectedChat.id,
+          };
+
+          const sessionRes = await fetch("/api/stripe/sessions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(sessionPayload),
+          });
+
+          const sessionOutput = await sessionRes.json();
+
+          // Action 4 + 5 when sessionoutput succeeded
+          if (sessionRes.ok && sessionOutput?.success) {
+            await updateDoc(chatRef, {
+              stripe_sessionId: sessionOutput?.sessionId || null,
+              stripe_sessionld: sessionOutput?.sessionId || null,
+            }).catch((err) => {
+              console.warn("Failed updating chat with stripe session id:", err);
+            });
+
+            if (jobRef) {
+              await updateDoc(jobRef, {
+                open_close: "close",
+              }).catch((err) => {
+                console.warn("Failed updating JobStream open_close:", err);
+              });
+            }
+
+            // Move to stripe session view
+            if (sessionOutput?.url) {
+              window.location.href = sessionOutput.url;
+              return;
+            }
+          }
+        } else {
+          toast.error("Stripe account is not ready (missing stripeAccountID or charges not enabled)");
+          return;
+        }
+      }
+
+      await updateDoc(chatRef, {
+        Reviewed: true,
+        completed: true,
+        review_text: expertReview,
+        review_category: reviewCategory,
+        review_rating: expertRating,
+        reviewed_time: serverTimestamp(),
+        ...(transferCompleted ? { chat_paid_for: true } : {}),
+      });
+
+      toast.success("Review submitted");
+      setReviewDialogOpen(false);
+      setExpertReview("");
+      setReviewCategory("");
+      setExpertRating(4);
+    } catch (error) {
+      console.error("Failed to complete job:", error);
+      toast.error("Failed to complete job");
+    } finally {
+      setCompletingJob(false);
+    }
+  };
+
+  const handleSkipExpertReview = () => {
+    setReviewDialogOpen(false);
   };
 
   const currentChats = getCurrentChats();
@@ -1233,7 +1448,12 @@ const ChatScreen = () => {
                           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                             <Phone className="w-5 h-5 text-gray-600" />
                           </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                          <button
+                            type="button"
+                            onClick={() => setReviewDialogOpen(true)}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            aria-label="Open review expert dialog"
+                          >
                             <Menu className="w-5 h-5 text-gray-600" />
                           </button>
                         </>
@@ -1451,6 +1671,88 @@ const ChatScreen = () => {
         onSubmit={handleSubmitReport}
         loading={reportLoading}
       />
+
+      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+        <DialogContent className="max-w-[470px] w-[95vw] p-0 gap-0 overflow-hidden bg-[#D6DBE0] border-0 [&>button]:hidden">
+          <div className="bg-primary text-white px-5 py-4 flex items-center justify-between">
+            <DialogTitle className="text-3xl font-bold leading-none">Review Your Expert</DialogTitle>
+            <button
+              type="button"
+              onClick={() => setReviewDialogOpen(false)}
+              className="w-12 h-12 rounded-2xl border border-white/70 text-white text-2xl flex items-center justify-center hover:bg-white/10 transition-colors"
+              aria-label="Close review dialog"
+            >
+              X
+            </button>
+          </div>
+
+          <div className="px-4 py-5">
+            <div className="flex items-center justify-center gap-1.5 mb-5">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  className="p-1"
+                  onClick={() => setExpertRating(value)}
+                  aria-label={`Rate ${value} star${value > 1 ? "s" : ""}`}
+                >
+                  <Star
+                    className={`w-9 h-9 ${value <= expertRating ? "text-[#B89A45] fill-[#B89A45]" : "text-[#A7A7A7] fill-[#A7A7A7]"}`}
+                  />
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              className="w-full min-h-[150px] rounded-2xl border-2 border-primary bg-white px-5 py-4 text-2xl text-black placeholder:text-black/90 focus:outline-none focus:ring-0"
+              placeholder="Review"
+              value={expertReview}
+              onChange={(e) => setExpertReview(e.target.value)}
+            />
+
+            <select
+              value={reviewCategory}
+              onChange={(e) => setReviewCategory(e.target.value)}
+              className="w-full h-16 mt-6 rounded-xl border-2 border-primary bg-white px-5 text-2xl text-black focus:outline-none"
+            >
+              <option value="">Categories</option>
+              {reviewCategories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+
+            <p className="text-center text-2xl text-black mt-8 leading-tight">
+              Leave a Review & Rating for your Expert to help them grow towards reaching others!
+            </p>
+
+            <button
+              type="button"
+              onClick={handleSubmitExpertReview}
+              className="w-full h-16 mt-8 rounded-xl bg-primary text-white text-2xl font-semibold shadow-[0_3px_10px_rgba(0,0,0,0.25)] hover:bg-[#255c31] transition-colors disabled:opacity-60"
+              disabled={completingJob}
+            >
+              {completingJob ? "Processing..." : "Complete Job"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSkipExpertReview}
+              className="w-full h-16 mt-6 rounded-xl bg-primary text-white text-2xl font-semibold shadow-[0_3px_10px_rgba(0,0,0,0.25)] hover:bg-[#255c31] transition-colors"
+            >
+              Skip
+            </button>
+
+            <button
+              type="button"
+              className="w-full mt-6 text-center text-lg text-[#2D45CE]"
+            >
+              Any issues contact support. or request a refund ticket
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Message Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
