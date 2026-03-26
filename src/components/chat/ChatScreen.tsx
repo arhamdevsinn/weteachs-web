@@ -18,7 +18,7 @@ import { useUploadImage } from "@/src/hooks/useUploadImage";
 import { getUserCalls, subscribeToUserCalls } from "@/src/lib/api/calls";
 import type { CallRecord } from "@/src/lib/types/call";
 import { auth, db } from "@/src/lib/firebase/config";
-import { addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -167,10 +167,13 @@ const ChatScreen = () => {
   const [messageDialogOpen, setMessageDialogOpen] = React.useState(false);
   const [dialogPayload, setDialogPayload] = React.useState<any>(null);
   const [reviewDialogOpen, setReviewDialogOpen] = React.useState(false);
-  const [expertRating, setExpertRating] = React.useState(4);
+  const [jobCompletedDialogOpen, setJobCompletedDialogOpen] = React.useState(false);
+  const [expertRating, setExpertRating] = React.useState(0);
   const [expertReview, setExpertReview] = React.useState("");
   const [reviewCategory, setReviewCategory] = React.useState("");
   const [completingJob, setCompletingJob] = React.useState(false);
+  const [isTeacherUser, setIsTeacherUser] = React.useState<boolean>(false);
+  const [loadingUserRole, setLoadingUserRole] = React.useState(true);
   const reviewCategories = [
     "New",
     "Arts",
@@ -201,6 +204,30 @@ const ChatScreen = () => {
 
   const currentUserId = auth.currentUser?.uid || (typeof window !== "undefined" ? localStorage.getItem("userId") : null);
   const currentUserName = auth.currentUser?.displayName || (typeof window !== "undefined" ? localStorage.getItem("userName") : "User");
+
+  // Fetch user role to determine if expert or student
+  React.useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!currentUserId) {
+        setLoadingUserRole(false);
+        return;
+      }
+      try {
+        const userDocRef = doc(db, "LimboUserMode", currentUserId);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setIsTeacherUser(userData?.isTeacher === true);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch user role:", error);
+      } finally {
+        setLoadingUserRole(false);
+      }
+    };
+    fetchUserRole();
+  }, [currentUserId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -635,9 +662,19 @@ const ChatScreen = () => {
     setShowChatSection(false); // Go back to sidebar on mobile
   };
 
+  const canCompleteJob =
+    expertRating > 0 &&
+    expertReview.trim().length > 0 &&
+    reviewCategory.trim().length > 0;
+
   const handleSubmitExpertReview = async () => {
     if (!selectedChat?.id || !currentUserId) {
       toast.error("Missing chat information");
+      return;
+    }
+
+    if (!canCompleteJob) {
+      toast.error("Please add a rating, review, and category");
       return;
     }
 
@@ -653,6 +690,52 @@ const ChatScreen = () => {
 
       const chatDoc = chatSnap.data() || {};
       const isChatPaidFor = Boolean(chatDoc.chat_paid_for);
+
+      if (isChatPaidFor) {
+        const teacherRef =
+          chatDoc.teacher_ref ||
+          chatDoc.teacherRef ||
+          (selectedChat?.otherParticipant?.uid ? doc(db, "LimboUserMode", selectedChat.otherParticipant.uid) : null);
+        const studentRef =
+          chatDoc.student_ref ||
+          chatDoc.studentRef ||
+          (currentUserId ? doc(db, "LimboUserMode", currentUserId) : null);
+
+        await addDoc(collection(db, "Reviews"), {
+          chatref: chatRef,
+          teacherRef: teacherRef || null,
+          rated_by: studentRef || null,
+          userid: teacherRef || null,
+          ratings: Number(expertRating),
+          dat: serverTimestamp(),
+          reviews: expertReview.trim(),
+          Category: reviewCategory,
+        });
+
+        await updateDoc(chatRef, {
+          Reviewed: true,
+          review_text: expertReview,
+          review_category: reviewCategory,
+          review_rating: expertRating,
+          reviewed_time: serverTimestamp(),
+        });
+
+        if (teacherRef) {
+          await updateDoc(teacherRef, {
+            rating: arrayUnion(Number(expertRating)),
+          }).catch((err) => {
+            console.warn("Non-blocking teacher rating update failed:", err);
+          });
+        }
+
+        toast.success("Review submitted");
+        setReviewDialogOpen(false);
+        setExpertReview("");
+        setReviewCategory("");
+        setExpertRating(0);
+        router.push("/chat");
+        return;
+      }
 
       let transferCompleted = false;
       let transferId = "";
@@ -674,7 +757,11 @@ const ChatScreen = () => {
           }
         }
 
-        if (stripeAccountID && stripeChargesEnabled === true) {
+        const hasStripeDestination =
+          String(stripeAccountID || "").trim().length > 0 &&
+          stripeChargesEnabled === true;
+
+        if (hasStripeDestination) {
           // Action 1: read job stream doc (non-blocking)
           let jobData: any = null;
           let jobRef = chatDoc.job_ref || null;
@@ -716,31 +803,44 @@ const ChatScreen = () => {
             transferId = transferResult?.transferId || "";
           }
 
-          // Action 2: create transactions doc
+          // Action 2: create transactions doc and capture reference
           const totalAfterTaxes = Number(jobData?.total_after_taxes ?? 0);
-          const taxesInCents = Math.max(0, Math.round(totalAfterTaxes * 100));
+          const taxesAmount = Math.max(0, Math.round(totalAfterTaxes));
 
-          await addDoc(collection(db, "transactions"), {
-            amount: amountInCents,
-            teacher_ref: chatDoc.teacher_ref || null,
-            student_ref: chatDoc.student_ref || null,
-            created_time: serverTimestamp(),
-            chatref: chatRef,
-            job_ref: jobRef || null,
-            paid: false,
-            limboref: chatDoc.limboref || null,
-            limboref2: chatDoc.limboref2 || null,
-            amount_taxes: taxesInCents,
-            "amount taxes": taxesInCents,
-            job_topic: jobData?.job_topic || jobData?.topic || "",
-            job_student_name: jobData?.Student_Name || jobData?.student_name || "",
-            refund_created: false,
-            stripe_transfer_id: transferId || null,
-          });
+          let transactionOutputRef: any = null;
+          try {
+            const transactionDocRef = await addDoc(collection(db, "transactions"), {
+              amount: amountInCents,
+              teacher_ref: chatDoc.teacher_ref || null,
+              student_ref: chatDoc.student_ref || null,
+              created_time: serverTimestamp(),
+              chatref: chatRef,
+              job_ref: jobRef || null,
+              paid: false,
+              limboref: chatDoc.limboref || null,
+              limboref2: chatDoc.limboref2 || null,
+              amount_taxes: taxesAmount,
+              "amount taxes": taxesAmount,
+              job_topic: jobData?.job_topic || jobData?.topic || "",
+              job_student_name: jobData?.Student_Name || jobData?.student_name || "",
+              refund_created: false,
+              stripe_transfer_id: transferId || null,
+            });
+            transactionOutputRef = transactionDocRef;
+          } catch (error) {
+            console.warn("Failed creating transactions document:", error);
+          }
+
+          const teacherRef =
+            chatDoc.teacher_ref ||
+            chatDoc.teacherRef ||
+            (selectedChat?.otherParticipant?.uid ? doc(db, "LimboUserMode", selectedChat.otherParticipant.uid) : null);
 
           // Action 3: Backend Call API - Sessions
           const sessionPayload = {
             paymentfees: amountInCents,
+            canceluri: "https://testurl.net.au/cancel",
+            successuri: "https://weteachs.com/idkwhattocallitathispoint",
             cancelurl: "https://testurl.net.au/cancel",
             successurl: "https://weteachs.com/idkwhattocallitathisp",
             currency: "USD",
@@ -757,37 +857,93 @@ const ChatScreen = () => {
             chatDocId: selectedChat.id,
           };
 
-          const sessionRes = await fetch("/api/stripe/sessions", {
+          fetch("/api/stripe/sessions", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(sessionPayload),
-          });
+          })
+            .then(async (res) => {
+              let sessionOutput: any = null;
+              try {
+                sessionOutput = await res.json();
+              } catch {
+                sessionOutput = null;
+              }
 
-          const sessionOutput = await sessionRes.json();
+              // Condition: sessionoutput succeeded
+              if (res.ok && sessionOutput?.success) {
+                // Update transaction document with stripe_sessionld
+                if (transactionOutputRef) {
+                  await updateDoc(transactionOutputRef, {
+                    stripe_sessionld: sessionOutput?.url || sessionOutput?.sessionId || null,
+                  }).catch((err) => {
+                    console.warn("Failed updating transaction with stripe session:", err);
+                  });
+                }
 
-          // Action 4 + 5 when sessionoutput succeeded
-          if (sessionRes.ok && sessionOutput?.success) {
-            await updateDoc(chatRef, {
-              stripe_sessionId: sessionOutput?.sessionId || null,
-              stripe_sessionld: sessionOutput?.sessionId || null,
-            }).catch((err) => {
-              console.warn("Failed updating chat with stripe session id:", err);
+                // Update chat document
+                await updateDoc(chatRef, {
+                  stripe_sessionId: sessionOutput?.sessionId || null,
+                  stripe_sessionld: sessionOutput?.sessionId || null,
+                }).catch((err) => {
+                  console.warn("Failed updating chat with stripe session id:", err);
+                });
+
+                // Update jobRef with open_close
+                if (jobRef) {
+                  await updateDoc(jobRef, {
+                    open_close: "close",
+                  }).catch((err) => {
+                    console.warn("Failed updating JobStream open_close:", err);
+                  });
+                }
+
+                // Navigate to stripeStudentPaymentSession with parameters
+                const studentRef =
+                  chatDoc.student_ref ||
+                  chatDoc.studentRef ||
+                  (currentUserId ? doc(db, "LimboUserMode", currentUserId) : null);
+
+                const queryParams = new URLSearchParams({
+                  url: sessionOutput?.url || "",
+                  ratingBar: String(expertRating),
+                  category: reviewCategory,
+                  description: expertReview,
+                }).toString();
+
+                router.push(
+                  `/stripeStudentPaymentSession?${queryParams}`,
+                  {
+                    chatDoc,
+                    expertRef: teacherRef,
+                    studentRef,
+                    transactionRef: transactionOutputRef,
+                  } as any
+                );
+              } else {
+                // Condition: sessionoutput failed
+                console.warn("Session creation failed:", sessionOutput);
+
+                // Delete the transaction document
+                if (transactionOutputRef) {
+                  await deleteDoc(transactionOutputRef).catch((err) => {
+                    console.warn("Failed deleting transaction document:", err);
+                  });
+                }
+
+                toast.error("Failed to create payment session. Please try again.");
+              }
+            })
+            .catch((error) => {
+              console.warn("Sessions API call failed:", error);
+              // Also delete transaction on API failure
+              if (transactionOutputRef) {
+                deleteDoc(transactionOutputRef).catch((err) => {
+                  console.warn("Failed deleting transaction document on API error:", err);
+                });
+              }
+              toast.error("Payment session error. Please try again.");
             });
-
-            if (jobRef) {
-              await updateDoc(jobRef, {
-                open_close: "close",
-              }).catch((err) => {
-                console.warn("Failed updating JobStream open_close:", err);
-              });
-            }
-
-            // Move to stripe session view
-            if (sessionOutput?.url) {
-              window.location.href = sessionOutput.url;
-              return;
-            }
-          }
         } else {
           toast.error("Stripe account is not ready (missing stripeAccountID or charges not enabled)");
           return;
@@ -808,7 +964,7 @@ const ChatScreen = () => {
       setReviewDialogOpen(false);
       setExpertReview("");
       setReviewCategory("");
-      setExpertRating(4);
+      setExpertRating(0);
     } catch (error) {
       console.error("Failed to complete job:", error);
       toast.error("Failed to complete job");
@@ -819,6 +975,73 @@ const ChatScreen = () => {
 
   const handleSkipExpertReview = () => {
     setReviewDialogOpen(false);
+  };
+
+  const handleCompleteJob = async () => {
+    if (!selectedChat?.id) {
+      toast.error("Missing chat information");
+      setJobCompletedDialogOpen(false);
+      return;
+    }
+
+    try {
+      setCompletingJob(true);
+
+      const chatRef = doc(db, "chats", selectedChat.id);
+      const chatSnap = await getDoc(chatRef);
+      
+      if (!chatSnap.exists()) {
+        toast.error("Chat document not found");
+        setJobCompletedDialogOpen(false);
+        return;
+      }
+
+      const chatDoc = chatSnap.data() || {};
+
+      // Step 1: Update chats collection with completed = true
+      await updateDoc(chatRef, {
+        completed: true,
+      });
+
+      // Step 2: Get teacherRef and total_price, then update TeacherDetails
+      const teacherRef =
+        chatDoc.teacher_ref ||
+        chatDoc.teacherRef ||
+        (selectedChat?.otherParticipant?.uid ? doc(db, "TeacherDetails", selectedChat.otherParticipant.uid) : null);
+
+      let totalPrice = 0;
+      const jobRef = chatDoc.job_ref;
+      if (jobRef) {
+        try {
+          const jobSnap = await getDoc(jobRef);
+          if (jobSnap.exists()) {
+            const jobData = jobSnap.data() || {};
+            totalPrice = Number(jobData.total_price ?? jobData.job_price ?? 0);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch job data:", err);
+        }
+      }
+
+      // Step 3: Update TeacherDetails with Number_of_completed_jobs and Total_amount_earned
+      if (teacherRef) {
+        await updateDoc(teacherRef, {
+          Number_of_completed_jobs: arrayUnion(1),
+          Total_amount_earned: arrayUnion(totalPrice),
+        });
+      } else {
+        console.warn("TeacherRef not found, skipping teacher stats update");
+      }
+
+      toast.success("Job marked as completed");
+      setJobCompletedDialogOpen(false);
+    } catch (error) {
+      console.error("Failed to complete job:", error);
+      toast.error("Failed to complete job");
+    } finally {
+      setCompletingJob(false);
+      setJobCompletedDialogOpen(false);
+    }
   };
 
   const currentChats = getCurrentChats();
@@ -1450,9 +1673,15 @@ const ChatScreen = () => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setReviewDialogOpen(true)}
+                            onClick={() => {
+                              if (isTeacherUser) {
+                                setJobCompletedDialogOpen(true);
+                              } else {
+                                setReviewDialogOpen(true);
+                              }
+                            }}
                             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                            aria-label="Open review expert dialog"
+                            aria-label={isTeacherUser ? "Open job completed dialog" : "Open review expert dialog"}
                           >
                             <Menu className="w-5 h-5 text-gray-600" />
                           </button>
@@ -1731,7 +1960,7 @@ const ChatScreen = () => {
               type="button"
               onClick={handleSubmitExpertReview}
               className="w-full h-16 mt-8 rounded-xl bg-primary text-white text-2xl font-semibold shadow-[0_3px_10px_rgba(0,0,0,0.25)] hover:bg-[#255c31] transition-colors disabled:opacity-60"
-              disabled={completingJob}
+              disabled={completingJob || !canCompleteJob}
             >
               {completingJob ? "Processing..." : "Complete Job"}
             </button>
@@ -1750,6 +1979,44 @@ const ChatScreen = () => {
             >
               Any issues contact support. or request a refund ticket
             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Job Completed Dialog - For Experts */}
+      <Dialog open={jobCompletedDialogOpen} onOpenChange={setJobCompletedDialogOpen}>
+        <DialogContent className="max-w-[470px] w-[95vw] p-0 gap-0 overflow-hidden bg-white border-0 [&>button]:hidden flex flex-col items-center justify-center min-h-[300px] rounded-2xl">
+          <div className="w-full flex flex-col items-center gap-6 p-8">
+            {/* Success Icon */}
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-3xl font-bold text-gray-900 text-center">Job Completed</h2>
+
+            <div className="w-full space-y-3">
+              {/* Job Completed Button */}
+              <button
+                type="button"
+                onClick={handleCompleteJob}
+                className="w-full h-14 rounded-xl bg-gradient-to-r from-[#22542F] to-[#1a4023] text-white text-lg font-semibold shadow-[0_3px_10px_rgba(0,0,0,0.25)] hover:shadow-lg transition-all"
+                disabled={completingJob}
+              >
+                {completingJob ? "Processing..." : "Job Completed"}
+              </button>
+
+              {/* Cancel Button */}
+              <button
+                type="button"
+                onClick={() => setJobCompletedDialogOpen(false)}
+                className="w-full h-14 rounded-xl border-2 border-gray-300 text-gray-700 text-lg font-semibold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

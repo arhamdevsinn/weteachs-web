@@ -429,7 +429,7 @@ const SettingsPage: React.FC = () => {
           className="w-[calc(100vw-2rem)] max-w-2xl overflow-hidden rounded-[28px] border-0 p-0 shadow-2xl"
         >
           <div className="overflow-hidden rounded-[28px] bg-white">
-            <div className="flex items-center justify-between bg-[#2d7b3e] px-5 py-4 text-white sm:px-6">
+            <div className="flex items-center justify-between bg-primary px-5 py-4 text-white sm:px-6">
               <div className="flex items-center gap-3">
                 <button
                   type="button"

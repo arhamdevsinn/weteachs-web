@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/src/components/ui/dialog";
 import { useAuth } from "@/src/hooks/useAuth";
+import { useUploadImage } from "@/src/hooks/useUploadImage";
 import { db, serverTimestamp } from "@/src/lib/firebase/config";
 import {
   addDoc,
@@ -54,8 +55,36 @@ const HirePage = () => {
   const [receiver_ref, setReceiver_ref] = useState(null);
   const [studentRefState, setStudentRefState] = useState(null);
   const [limboRefState, setLimboRefState] = useState(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+  const { uploadImage, uploading: imageUploading } = useUploadImage();
 
   const liveRatePer15 = Number.isFinite(teacherRate) && teacherRate > 0 ? teacherRate : 15;
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      const url = await uploadImage(file, `jobs/${user?.uid}`);
+      setUploadedImageUrl(url);
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      toast.error("Failed to upload image");
+    }
+  };
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      // Upload to Firebase
+      handleImageUpload(file);
+    }
+  };
 
   const computedPrice = useMemo(() => {
     const lengthMins = Number(jobLength) || 15;
@@ -131,13 +160,15 @@ const HirePage = () => {
       const lengthMins = Number(jobLength) || 15;
       const jobLengthPrice = Math.max(1, Math.round(lengthMins / 15));
       const totalPrice = Number(computedPrice.toFixed(2));
-      const weteachFee = 7;
+      const weteachFee = 1;
       const totalAfterTaxes = Number((totalPrice + weteachFee).toFixed(2));
 
       const parsedAvailability = new Date(availability);
       const jobDateTime = Number.isNaN(parsedAvailability.getTime())
         ? Timestamp.now()
         : Timestamp.fromDate(parsedAvailability);
+
+      const fixedPriceValue = fixedRate.trim() ? parseInt(fixedRate, 10) : null;
 
       const jobDocRef = await addDoc(collection(db, "JobStream"), {
         Expert_created: true,
@@ -150,7 +181,9 @@ const HirePage = () => {
           "Student",
         Unavailable: false,
         accepted: true,
+        fixed_price: fixedPriceValue,
         free_chat_Job_creation: videoOrChat === "Chat",
+        image_url: uploadedImageUrl || null,
         job_created_time: serverTimestamp(),
         job_date_time: jobDateTime,
         job_length_price: jobLengthPrice,
@@ -284,6 +317,40 @@ const HirePage = () => {
         />
       </div>
 
+      {/* Upload Image */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Upload Image (Optional)</label>
+        <div className="relative">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageFileChange}
+            disabled={imageUploading}
+            className="hidden"
+            id="image-upload"
+          />
+          <label
+            htmlFor="image-upload"
+            className="flex items-center justify-center gap-2 h-11 rounded-lg border border-dashed border-gray-300 cursor-pointer hover:bg-gray-50 transition"
+          >
+            <Camera className="w-5 h-5 text-gray-600" />
+            <span className="text-sm text-gray-600">
+              {imageUploading ? "Uploading..." : "Click to upload image"}
+            </span>
+          </label>
+        </div>
+        {imagePreview && (
+          <div className="relative w-full h-32 rounded-lg overflow-hidden border border-gray-200">
+            <Image
+              src={imagePreview}
+              alt="preview"
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
+      </div>
+
       {/* Topic */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Topic</label>
@@ -317,9 +384,9 @@ const HirePage = () => {
       {/* Price Box */}
       <div className="bg-slate-50 rounded-lg p-4 text-sm space-y-1">
         <p>Session Price: ${computedPrice.toFixed(2)}</p>
-        <p>Platform Fee: $7</p>
+        <p>Platform Fee: $1</p>
         <p className="font-semibold text-primary">
-          Total: ${(computedPrice + 7).toFixed(2)}
+          Total: ${(computedPrice + 1).toFixed(2)}
         </p>
       </div>
 
@@ -362,67 +429,67 @@ const HirePage = () => {
 
       <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
         <DialogContent className="max-w-3xl border-0 bg-transparent p-0">
-          <div className="rounded-3xl border-2 border-emerald-800 bg-[#e7ecef] p-6 shadow-xl">
+          <div className="rounded-3xl border-2 border-primary bg-[#e7ecef] p-6 shadow-xl">
             <div className="flex items-center justify-center">
-              <div className="w-full rounded-2xl border-2 border-emerald-800 bg-white py-4 text-center text-2xl font-bold text-emerald-900">
+              <div className="w-full rounded-2xl border-2 border-primary bg-white py-4 text-center text-2xl font-bold text-primary">
                 Receipt
               </div>
             </div>
 
-            <div className="mt-6 rounded-xl border-2 border-emerald-800 bg-white p-5 text-base leading-6 text-gray-900">
-              <h3 className="mb-4 text-center text-2xl font-bold text-emerald-900">
+            <div className="mt-6 rounded-xl border-2 border-primary bg-white p-5 text-base leading-6 text-gray-900">
+              <h3 className="mb-4 text-center text-2xl font-bold text-primary">
                 Payment Information
               </h3>
 
               <div className="space-y-2">
                 <p>
-                  <span className="font-semibold text-emerald-800">Name</span>
+                  <span className="font-semibold text-primary">Name</span>
                   <br />
                   {receiptData?.name || "-"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Date/Time :</span>{" "}
+                  <span className="font-semibold text-primary">Date/Time :</span>{" "}
                   {receiptData?.availability
                     ? new Date(receiptData.availability).toLocaleString()
                     : "Not selected"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Topic</span>
+                  <span className="font-semibold text-primary">Topic</span>
                   <br />
                   {receiptData?.topic || "-"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Description</span>
+                  <span className="font-semibold text-primary">Description</span>
                   <br />
                   {receiptData?.description || "-"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Questions</span>
+                  <span className="font-semibold text-primary">Questions</span>
                   <br />
                   {receiptData?.questions || "No questions"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Rate :</span> ${receiptData?.rate?.toFixed(2) || "0.00"}
+                  <span className="font-semibold text-primary">Rate :</span> ${receiptData?.rate?.toFixed(2) || "0.00"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Length :</span> {receiptData?.lengthLabel || "-"}
+                  <span className="font-semibold text-primary">Length :</span> {receiptData?.lengthLabel || "-"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Total :</span> ${receiptData?.total?.toFixed(2) || "0.00"}
+                  <span className="font-semibold text-primary">Total :</span> ${receiptData?.total?.toFixed(2) || "0.00"}
                 </p>
 
                 <p>
-                  <span className="font-semibold text-emerald-800">Tax/Fees :</span> ${receiptData?.fee?.toFixed(2) || "0.00"}
+                  <span className="font-semibold text-primary">Tax/Fees :</span> ${receiptData?.fee?.toFixed(2) || "0.00"}
                 </p>
 
-                <p className="font-semibold text-emerald-800">
+                <p className="font-semibold text-primary">
                   Total after Taxes/Fees : ${receiptData?.totalAfter?.toFixed(2) || "0.00"}
                 </p>
               </div>
@@ -434,7 +501,7 @@ const HirePage = () => {
 
             <div className="mt-6 grid gap-3 md:grid-cols-2">
               <Button
-                className="h-12 bg-emerald-800 text-white hover:bg-emerald-900"
+                className="h-12 bg-primary text-white hover:bg-primary"
                 onClick={async () => {
                   if (!jobStreamRef) {
                     toast.error("Missing job reference; please try again.");
