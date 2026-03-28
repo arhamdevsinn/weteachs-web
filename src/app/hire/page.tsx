@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Camera, ChevronDown, DollarSign, ShieldCheck, Timer } from "lucide-react";
+import { ArrowLeft, Camera, ChevronDown, DollarSign, Loader2, ShieldCheck, Timer } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import {
@@ -48,6 +48,7 @@ const HirePage = () => {
   const [questions, setQuestions] = useState("");
   const [videoOrChat, setVideoOrChat] = useState("Chat");
   const [submitting, setSubmitting] = useState(false);
+  const [notifyingExpert, setNotifyingExpert] = useState(false);
   const [stripeDialogOpen, setStripeDialogOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
@@ -333,7 +334,11 @@ const HirePage = () => {
             htmlFor="image-upload"
             className="flex items-center justify-center gap-2 h-11 rounded-lg border border-dashed border-gray-300 cursor-pointer hover:bg-gray-50 transition"
           >
-            <Camera className="w-5 h-5 text-gray-600" />
+            {imageUploading ? (
+              <Loader2 className="w-5 h-5 text-gray-600 animate-spin" />
+            ) : (
+              <Camera className="w-5 h-5 text-gray-600" />
+            )}
             <span className="text-sm text-gray-600">
               {imageUploading ? "Uploading..." : "Click to upload image"}
             </span>
@@ -393,10 +398,17 @@ const HirePage = () => {
       {/* Hire Button */}
       <Button
         onClick={createJob}
-        disabled={submitting}
+        disabled={submitting || imageUploading}
         className="w-full h-12 text-sm font-semibold"
       >
-        {submitting ? "Creating..." : "Hire Expert"}
+        {submitting ? (
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Creating...
+          </span>
+        ) : (
+          "Hire Expert"
+        )}
       </Button>
 
     </div>
@@ -509,6 +521,7 @@ const HirePage = () => {
                   }
 
                   try {
+                    setNotifyingExpert(true);
                     const studentLimboRef = limboRefState || doc(db, "LimboUserMode", user.uid);
                     const teacherRef = doc(db, "TeacherDetails", teacherId);
                     const studentRef = studentRefState || doc(db, "StudentDetails", user.uid);
@@ -568,14 +581,24 @@ const HirePage = () => {
                       student_notification_ref: studentNotificationRef,
                     });
                     setSuccessDialogOpen(false);
-                    router.push("/");
+                    router.push("/notifications");
                   } catch (err) {
                     console.error("Failed to notify expert", err);
                     toast.error("Failed to notify expert. Please try again.");
+                  } finally {
+                    setNotifyingExpert(false);
                   }
                 }}
+                disabled={notifyingExpert}
               >
-                Notify Expert
+                {notifyingExpert ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Notifying...
+                  </span>
+                ) : (
+                  "Notify Expert"
+                )}
               </Button>
               <Button
                 variant="outline"

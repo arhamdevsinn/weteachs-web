@@ -898,13 +898,28 @@ const ChatScreen = () => {
                   });
                 }
 
-                // Redirect directly to Stripe checkout URL
-                const stripeCheckoutUrl = sessionOutput?.url || "";
-                if (stripeCheckoutUrl) {
-                  window.location.href = stripeCheckoutUrl;
-                } else {
-                  toast.error("Failed to get Stripe checkout URL");
-                }
+                // Navigate to stripeStudentPaymentSession with parameters
+                const studentRef =
+                  chatDoc.student_ref ||
+                  chatDoc.studentRef ||
+                  (currentUserId ? doc(db, "LimboUserMode", currentUserId) : null);
+
+                const queryParams = new URLSearchParams({
+                  url: sessionOutput?.url || "",
+                  ratingBar: String(expertRating),
+                  category: reviewCategory,
+                  description: expertReview,
+                }).toString();
+
+                router.push(
+                  `/stripeStudentPaymentSession?${queryParams}`,
+                  {
+                    chatDoc,
+                    expertRef: teacherRef,
+                    studentRef,
+                    transactionRef: transactionOutputRef,
+                  } as any
+                );
               } else {
                 // Condition: sessionoutput failed
                 console.warn("Session creation failed:", sessionOutput);

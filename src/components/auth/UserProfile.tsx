@@ -300,8 +300,12 @@ const UserProfile = () => {
         limboData?.stripeAccountId ||
         limboData?.stripe_id ||
         "";
+      const stripeChargesEnabled =
+        limboData?.stripeChargesEnabled === true ||
+        limboData?.stripe_charges_enabled === true ||
+        limboData?.charges_enabled === true;
 
-      if (!studentStripeId) {
+      if (!studentStripeId && !stripeChargesEnabled) {
         setStripeDialogOpen(true);
         return;
       }

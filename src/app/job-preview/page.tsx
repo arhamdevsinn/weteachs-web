@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   doc,
@@ -59,6 +59,7 @@ type ChatData = {
   users: (DocumentReference | null)[];
   userNames: (string | undefined)[];
   last_message: string;
+  last_message_time: FieldValue;
   modified_time: FieldValue;
   limboref: DocumentReference | null;
   limboref2: DocumentReference | null;
@@ -113,6 +114,9 @@ const JobPreviewPage = () => {
   const [notification, setNotification] = useState<NotificationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accepting, setAccepting] = useState(false);
+  const [denying, setDenying] = useState(false);
+  const [startingChat, setStartingChat] = useState(false);
 
   const notificationId = searchParams.get("notificationId") || "";
 
@@ -168,6 +172,7 @@ const JobPreviewPage = () => {
   const handleAccept = async () => {
     if (!notificationId) return;
     try {
+      setAccepting(true);
       const jobStreamRef = getDocRef(notification?.jobstream_ref, "JobStream");
       if (jobStreamRef) {
         await updateDoc(jobStreamRef, { accepted: true });
@@ -195,17 +200,22 @@ const JobPreviewPage = () => {
     } catch (err) {
       console.error("Failed to accept job", err);
       toast.error("Failed to accept job. Please try again.");
+    } finally {
+      setAccepting(false);
     }
   };
 
   const handleDeny = async () => {
     if (!notificationId) return;
     try {
+      setDenying(true);
       const docRef = doc(db, "Notifications", notificationId);
       await updateDoc(docRef, { did_didnt_accept: "Denied", read_status: true });
       setNotification((prev) => (prev ? { ...prev, did_didnt_accept: "Denied" } : prev));
     } catch (err) {
       console.error("Failed to deny job", err);
+    } finally {
+      setDenying(false);
     }
   };
 
@@ -216,6 +226,7 @@ const JobPreviewPage = () => {
     }
 
     try {
+      setStartingChat(true);
       const studentDetailsRef = getDocRef(
         notification.student_ref,
         "StudentDetails"
@@ -262,6 +273,7 @@ const JobPreviewPage = () => {
         users: [studentLimboDocRef, teacherLimboDocRef],
         userNames: [notification.student_name, notification.teacher_name],
         last_message: "Say Hello!",
+        last_message_time: serverTimestamp(),
         modified_time: serverTimestamp(),
         limboref: studentLimboDocRef,
         limboref2: teacherLimboDocRef,
@@ -301,6 +313,8 @@ const JobPreviewPage = () => {
     } catch (err) {
       console.error("Failed to start chat", err);
       toast.error("Failed to start chat. Please try again.");
+    } finally {
+      setStartingChat(false);
     }
   };
 
@@ -380,16 +394,32 @@ const JobPreviewPage = () => {
                 <button
                   type="button"
                   onClick={handleAccept}
+                  disabled={accepting || denying || startingChat}
                   className="h-12 rounded-full bg-primary text-lg font-semibold text-white shadow"
                 >
-                  ACCEPT JOB
+                  {accepting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      ACCEPTING...
+                    </span>
+                  ) : (
+                    "ACCEPT JOB"
+                  )}
                 </button>
                 <button
                   type="button"
                   onClick={handleDeny}
+                  disabled={accepting || denying || startingChat}
                   className="h-12 rounded-full bg-[#cf3a2e] text-lg font-semibold text-white shadow"
                 >
-                  DENY JOB
+                  {denying ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      DENYING...
+                    </span>
+                  ) : (
+                    "DENY JOB"
+                  )}
                 </button>
               </div>
             ) : null}
@@ -415,10 +445,21 @@ const JobPreviewPage = () => {
                     </DialogHeader>
                     <DialogFooter>
                       <DialogClose asChild>
-                        <button type="button">Cancel</button>
+                        <button type="button" disabled={startingChat}>Cancel</button>
                       </DialogClose>
-                      <button type="button" onClick={handleStartChat}>
-                        Confirm
+                      <button
+                        type="button"
+                        onClick={handleStartChat}
+                        disabled={startingChat || accepting || denying}
+                      >
+                        {startingChat ? (
+                          <span className="inline-flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Starting...
+                          </span>
+                        ) : (
+                          "Confirm"
+                        )}
                       </button>
                     </DialogFooter>
                   </DialogContent>
@@ -426,6 +467,7 @@ const JobPreviewPage = () => {
                 <button
                   type="button"
                   onClick={() => router.push("/notifications")}
+                  disabled={startingChat}
                   className="h-12 w-full rounded-full bg-primary text-lg font-semibold text-white shadow"
                 >
                   Back

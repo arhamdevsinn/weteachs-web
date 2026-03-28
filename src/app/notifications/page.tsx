@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { Bell } from "lucide-react";
+import { Bell, Loader2 } from "lucide-react";
 import {
   collection,
   doc,
@@ -85,6 +85,7 @@ const Page = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTileId, setActiveTileId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -201,6 +202,9 @@ console.log("Fetched notifications snapshots:", {
 
   const handleNotificationClick = (item: NotificationItem) => {
     if (!canOpenJobPreview(item)) return;
+    if (activeTileId) return;
+
+    setActiveTileId(item.id);
     router.push(`/job-preview?notificationId=${item.id}`);
   };
 
@@ -253,22 +257,30 @@ console.log("Fetched notifications snapshots:", {
 
         {!loading && !error
           ? notifications.map((item) => (
+              (() => {
+                const executable = canOpenJobPreview(item);
+                const isOpening = activeTileId === item.id;
+
+                return (
               <article
                 key={item.id}
                 onClick={() => handleNotificationClick(item)}
                 onKeyDown={(event) => {
-                  if (!canOpenJobPreview(item)) return;
+                  if (!executable || isOpening) return;
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
                     handleNotificationClick(item);
                   }
                 }}
-                role={canOpenJobPreview(item) ? "button" : undefined}
-                tabIndex={canOpenJobPreview(item) ? 0 : undefined}
+                role={executable ? "button" : undefined}
+                tabIndex={executable ? 0 : undefined}
+                aria-disabled={isOpening}
                 className={`rounded-[10px] border-2 border-[#2f7b4f] bg-[#f5f5f5] px-3 py-3 ${
-                  canOpenJobPreview(item)
+                  executable
                     ? "cursor-pointer transition hover:border-[#1f6f3f] hover:bg-[#eef6f0]"
                     : ""
+                } ${
+                  isOpening ? "pointer-events-none opacity-80" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -286,6 +298,13 @@ console.log("Fetched notifications snapshots:", {
                     <p className="line-clamp-2 text-lg font-semibold leading-[1.1] text-black sm:text-xl">
                       {item.title}
                     </p>
+
+                    {isOpening ? (
+                      <p className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-[#1f6f3f]">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Opening...
+                      </p>
+                    ) : null}
 
                     {item.status ? (
                       <p className="mt-1 text-lg text-black/90 sm:text-md">
@@ -309,6 +328,8 @@ console.log("Fetched notifications snapshots:", {
                   </div>
                 </div>
               </article>
+                );
+              })()
             ))
           : null}
       </main>
