@@ -18,7 +18,7 @@ import { useUploadImage } from "@/src/hooks/useUploadImage";
 import { getUserCalls, subscribeToUserCalls } from "@/src/lib/api/calls";
 import type { CallRecord } from "@/src/lib/types/call";
 import { auth, db } from "@/src/lib/firebase/config";
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -168,6 +168,8 @@ const ChatScreen = () => {
   const [dialogPayload, setDialogPayload] = React.useState<any>(null);
   const [reviewDialogOpen, setReviewDialogOpen] = React.useState(false);
   const [jobCompletedDialogOpen, setJobCompletedDialogOpen] = React.useState(false);
+  const [startingPayment, setStartingPayment] = React.useState(false);
+  const [selectedChatPaymentStatus, setSelectedChatPaymentStatus] = React.useState<boolean | null>(null);
   const [expertRating, setExpertRating] = React.useState(0);
   const [expertReview, setExpertReview] = React.useState("");
   const [reviewCategory, setReviewCategory] = React.useState("");
@@ -518,6 +520,35 @@ const ChatScreen = () => {
     };
   }, [selectedChat?.id]);
 
+  React.useEffect(() => {
+    const syncSelectedChatPaymentStatus = async () => {
+      if (!selectedChat?.id) {
+        setSelectedChatPaymentStatus(null);
+        return;
+      }
+
+      try {
+        const chatSnap = await getDoc(doc(db, "chats", selectedChat.id));
+        if (!chatSnap.exists()) return;
+
+        const chatData = chatSnap.data() || {};
+        setSelectedChatPaymentStatus(Boolean(chatData.chat_paid_for));
+
+        setSelectedChat((prev) => {
+          if (!prev || prev.id !== selectedChat.id) return prev;
+          return {
+            ...prev,
+            ...chatData,
+          };
+        });
+      } catch (error) {
+        console.warn("Failed to refresh selected chat payment status:", error);
+      }
+    };
+
+    syncSelectedChatPaymentStatus();
+  }, [selectedChat?.id]);
+
   // Load and subscribe to calls for current user
   React.useEffect(() => {
     if (!currentUserId) return;
@@ -614,6 +645,14 @@ const ChatScreen = () => {
     if (!input.trim() || !selectedChat?.id || !currentUserId) {
       return;
     }
+
+    const paidConversation = Boolean(selectedChat?.paid_chat || selectedChat?.paid_chats || selectedChat?.type === "paid");
+    const chatPaidFor = selectedChatPaymentStatus ?? Boolean(selectedChat?.chat_paid_for);
+    if (paidConversation && !chatPaidFor) {
+      toast.error("This paid chat is locked. Complete payment to start messaging.");
+      return;
+    }
+
     try {
       setSendingMessage(true);
       let senderName = "User";
@@ -667,6 +706,248 @@ const ChatScreen = () => {
     expertReview.trim().length > 0 &&
     reviewCategory.trim().length > 0;
 
+  const isSelectedChatPaidType = Boolean(
+    selectedChat && (selectedChat.type === "paid" || selectedChat.paid_chat || selectedChat.paid_chats)
+  );
+  const isSelectedChatPaidFor = selectedChatPaymentStatus ?? Boolean(selectedChat?.chat_paid_for);
+  const isSelectedChatLockedForPayment = Boolean(selectedChat && isSelectedChatPaidType && !isSelectedChatPaidFor);
+  const isPaymentReleasedToExpert = Boolean(selectedChat?.payment_released_to_expert);
+
+  const handleOpenSupportTicket = () => {
+    const supportContext = selectedChat
+      ? `Payment/refund support request for chat ${selectedChat.id}`
+      : "Payment/refund support request";
+    setDialogPayload({ text: supportContext, message_text: supportContext });
+    setReportDialogOpen(true);
+  };
+
+  const handlePayToChat = async () => {
+    if (!selectedChat?.id || !currentUserId) {
+      toast.error("Missing chat information");
+      return;
+    }
+
+    if (isTeacherUser) {
+      toast.error("Only students can pay to unlock this chat");
+      return;
+    }
+
+    try {
+      setStartingPayment(true);
+
+      const chatRef = doc(db, "chats", selectedChat.id);
+      const chatSnap = await getDoc(chatRef);
+      if (!chatSnap.exists()) {
+        toast.error("Chat document not found");
+        return;
+      }
+
+      const chatDoc = chatSnap.data() || {};
+      if (chatDoc.chat_paid_for) {
+        setSelectedChatPaymentStatus(true);
+        toast.success("This chat is already paid and unlocked");
+        return;
+      }
+
+      const jobRef = chatDoc.job_ref || null;
+      let jobData: any = null;
+
+      if (jobRef) {
+        const jobSnap = await getDoc(jobRef);
+        if (jobSnap.exists()) {
+          jobData = jobSnap.data() || {};
+        }
+      }
+
+      const baseAmount = Number(jobData?.total_price ?? jobData?.job_price ?? 0);
+      const amountInCents = Math.max(0, Math.round(baseAmount * 100));
+      if (amountInCents <= 0) {
+        toast.error("Invalid job amount. Please contact support.");
+        return;
+      }
+
+      const existingTransactionQ = query(collection(db, "transactions"), where("chatref", "==", chatRef));
+      const existingTransactions = await getDocs(existingTransactionQ);
+
+      let transactionRef: any = null;
+      if (!existingTransactions.empty) {
+        transactionRef = existingTransactions.docs[0].ref;
+      } else {
+        transactionRef = await addDoc(collection(db, "transactions"), {
+          amount: amountInCents,
+          teacher_ref: chatDoc.teacher_ref || null,
+          student_ref: chatDoc.student_ref || null,
+          created_time: serverTimestamp(),
+          chatref: chatRef,
+          job_ref: jobRef || null,
+          paid: false,
+          payout_released: false,
+          refund_created: false,
+          limboref: chatDoc.limboref || null,
+          limboref2: chatDoc.limboref2 || null,
+          job_topic: jobData?.job_topic || jobData?.topic || "",
+          job_student_name: jobData?.Student_Name || jobData?.student_name || "",
+        });
+      }
+
+      const origin = typeof window !== "undefined" ? window.location.origin : "https://weteachs.com";
+      const sessionPayload = {
+        paymentfees: amountInCents,
+        cancelurl: `${origin}/chat?conversationId=${selectedChat.id}&payment=cancelled`,
+        successurl: `${origin}/chat?conversationId=${selectedChat.id}&payment=success`,
+        currency: "USD",
+        time: 1,
+        teachersname: selectedChat?.otherParticipant?.display_name || "Teacher",
+        customer_email:
+          auth.currentUser?.email ||
+          (typeof window !== "undefined" ? localStorage.getItem("userEmail") : "") ||
+          "",
+        chatDocId: selectedChat.id,
+      };
+
+      const sessionRes = await fetch("/api/stripe/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sessionPayload),
+      });
+
+      const sessionOutput = await sessionRes.json();
+      if (!sessionRes.ok || !sessionOutput?.success || !sessionOutput?.url) {
+        if (transactionRef && existingTransactions.empty) {
+          await deleteDoc(transactionRef).catch(() => undefined);
+        }
+        toast.error(sessionOutput?.error || "Failed to create payment session");
+        return;
+      }
+
+      await updateDoc(chatRef, {
+        stripe_sessionId: sessionOutput?.sessionId || null,
+        stripe_sessionld: sessionOutput?.sessionId || null,
+      }).catch(() => undefined);
+
+      if (transactionRef) {
+        await updateDoc(transactionRef, {
+          stripe_sessionld: sessionOutput?.sessionId || null,
+          stripe_checkout_url: sessionOutput?.url || null,
+          updated_time: serverTimestamp(),
+        }).catch(() => undefined);
+      }
+
+      window.location.href = sessionOutput.url;
+    } catch (error) {
+      console.error("Failed to start payment session:", error);
+      toast.error("Unable to start payment. Please try again.");
+    } finally {
+      setStartingPayment(false);
+    }
+  };
+
+  const releaseExpertPayout = async (chatDoc: any) => {
+    if (!selectedChat?.id) {
+      throw new Error("Missing chat information");
+    }
+
+    const chatRef = doc(db, "chats", selectedChat.id);
+    if (chatDoc?.payment_released_to_expert) {
+      return { alreadyReleased: true, transferId: chatDoc?.stripe_transfer_id || null };
+    }
+
+    const expertUid = selectedChat?.otherParticipant?.uid || null;
+    let stripeAccountID = "";
+    let stripeChargesEnabled = false;
+    if (expertUid) {
+      const expertSnap = await getDoc(doc(db, "LimboUserMode", expertUid));
+      if (expertSnap.exists()) {
+        const expertData = expertSnap.data() || {};
+        stripeAccountID = expertData.stripeAccountID || expertData.stripeAccountId || expertData.stripe_id || "";
+        stripeChargesEnabled = Boolean(expertData.stripeChargesEnabled || expertData.charges_enabled);
+      }
+    }
+
+    if (!stripeAccountID || !stripeChargesEnabled) {
+      throw new Error("Expert payout account is not ready. Please contact support.");
+    }
+
+    const transactionsQ = query(collection(db, "transactions"), where("chatref", "==", chatRef));
+    const transactionsSnap = await getDocs(transactionsQ);
+
+    let transactionDocRef: any = null;
+    let amountInCents = 0;
+    let existingTransferId: string | null = null;
+
+    if (!transactionsSnap.empty) {
+      const txDoc = transactionsSnap.docs[0];
+      const txData = txDoc.data() || {};
+      transactionDocRef = txDoc.ref;
+      amountInCents = Number(txData.amount || 0);
+      if (txData.payout_released || txData.paid === true) {
+        existingTransferId = txData.stripe_transfer_id || chatDoc?.stripe_transfer_id || null;
+      }
+    }
+
+    if (existingTransferId) {
+      await updateDoc(chatRef, {
+        payment_released_to_expert: true,
+        payment_released_time: serverTimestamp(),
+        stripe_transfer_id: existingTransferId,
+      }).catch(() => undefined);
+
+      return { alreadyReleased: true, transferId: existingTransferId };
+    }
+
+    if (amountInCents <= 0) {
+      let totalPrice = 0;
+      const jobRef = chatDoc.job_ref;
+      if (jobRef) {
+        const jobSnap = await getDoc(jobRef);
+        if (jobSnap.exists()) {
+          const jobData = jobSnap.data() || {};
+          totalPrice = Number(jobData.total_price ?? jobData.job_price ?? 0);
+        }
+      }
+      amountInCents = Math.max(0, Math.round(totalPrice * 100));
+    }
+
+    if (amountInCents <= 0) {
+      throw new Error("Unable to determine payout amount. Please contact support.");
+    }
+
+    const transferResponse = await fetch("/api/stripe/transfers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chatDocId: selectedChat.id,
+        destinationAccountId: stripeAccountID,
+        amount: amountInCents,
+        currency: "usd",
+      }),
+    });
+
+    const transferResult = await transferResponse.json();
+    if (!transferResponse.ok || !transferResult?.success) {
+      throw new Error(transferResult?.error || "Failed to release payout to expert");
+    }
+
+    await updateDoc(chatRef, {
+      payment_released_to_expert: true,
+      payment_released_time: serverTimestamp(),
+      stripe_transfer_id: transferResult?.transferId || null,
+    });
+
+    if (transactionDocRef) {
+      await updateDoc(transactionDocRef, {
+        paid: true,
+        payout_released: true,
+        paid_time: serverTimestamp(),
+        stripe_transfer_id: transferResult?.transferId || null,
+      }).catch((error) => {
+        console.warn("Failed updating transaction payout fields:", error);
+      });
+    }
+
+    return { alreadyReleased: false, transferId: transferResult?.transferId || null };
+  };
+
   const handleSubmitExpertReview = async () => {
     if (!selectedChat?.id || !currentUserId) {
       toast.error("Missing chat information");
@@ -678,6 +959,7 @@ const ChatScreen = () => {
       return;
     }
 
+    let payoutReleased = false;
     try {
       setCompletingJob(true);
 
@@ -691,268 +973,72 @@ const ChatScreen = () => {
       const chatDoc = chatSnap.data() || {};
       const isChatPaidFor = Boolean(chatDoc.chat_paid_for);
 
-      if (isChatPaidFor) {
-        const teacherRef =
-          chatDoc.teacher_ref ||
-          chatDoc.teacherRef ||
-          (selectedChat?.otherParticipant?.uid ? doc(db, "LimboUserMode", selectedChat.otherParticipant.uid) : null);
-        const studentRef =
-          chatDoc.student_ref ||
-          chatDoc.studentRef ||
-          (currentUserId ? doc(db, "LimboUserMode", currentUserId) : null);
-
-        await addDoc(collection(db, "Reviews"), {
-          chatref: chatRef,
-          teacherRef: teacherRef || null,
-          rated_by: studentRef || null,
-          userid: teacherRef || null,
-          ratings: Number(expertRating),
-          dat: serverTimestamp(),
-          reviews: expertReview.trim(),
-          Category: reviewCategory,
-        });
-
-        await updateDoc(chatRef, {
-          Reviewed: true,
-          review_text: expertReview,
-          review_category: reviewCategory,
-          review_rating: expertRating,
-          reviewed_time: serverTimestamp(),
-        });
-
-        if (teacherRef) {
-          await updateDoc(teacherRef, {
-            rating: arrayUnion(Number(expertRating)),
-          }).catch((err) => {
-            console.warn("Non-blocking teacher rating update failed:", err);
-          });
-        }
-
-        toast.success("Review submitted");
-        setReviewDialogOpen(false);
-        setExpertReview("");
-        setReviewCategory("");
-        setExpertRating(0);
-        router.push("/chat");
+      if (!isChatPaidFor) {
+        toast.error("Please pay to unlock chat before completing the review.");
         return;
       }
 
-      let transferCompleted = false;
-      let transferId = "";
+      const teacherRef =
+        chatDoc.teacher_ref ||
+        chatDoc.teacherRef ||
+        (selectedChat?.otherParticipant?.uid ? doc(db, "LimboUserMode", selectedChat.otherParticipant.uid) : null);
+      const studentRef =
+        chatDoc.student_ref ||
+        chatDoc.studentRef ||
+        (currentUserId ? doc(db, "LimboUserMode", currentUserId) : null);
 
-      if (!isChatPaidFor) {
-        // Stripe guard conditions for the expert account (recipient)
-        const expertUid = selectedChat?.otherParticipant?.uid || null;
-        let stripeAccountID = "";
-        let stripeChargesEnabled = false;
-        let expertData: any = null;
+      const payoutResult = await releaseExpertPayout(chatDoc);
+      payoutReleased = true;
 
-        if (expertUid) {
-          const expertRef = doc(db, "LimboUserMode", expertUid);
-          const expertSnap = await getDoc(expertRef);
-          if (expertSnap.exists()) {
-            expertData = expertSnap.data() || {};
-            stripeAccountID = expertData.stripeAccountID || expertData.stripeAccountId || expertData.stripe_id || "";
-            stripeChargesEnabled = Boolean(expertData.stripeChargesEnabled || expertData.charges_enabled);
-          }
-        }
-
-        const hasStripeDestination =
-          String(stripeAccountID || "").trim().length > 0 &&
-          stripeChargesEnabled === true;
-
-        if (hasStripeDestination) {
-          // Action 1: read job stream doc (non-blocking)
-          let jobData: any = null;
-          let jobRef = chatDoc.job_ref || null;
-
-          try {
-            if (jobRef) {
-              const jobSnap = await getDoc(jobRef);
-              if (jobSnap.exists()) {
-                jobData = jobSnap.data() || {};
-              }
-            }
-          } catch (readJobError) {
-            console.warn("JobStream read failed (non-blocking):", readJobError);
-          }
-
-          const baseAmount = Number(jobData?.total_price ?? jobData?.job_price ?? 0);
-          const amountInCents = Math.max(0, Math.round(baseAmount * 100));
-
-          // Action block: stripePayment Transfer
-          if (amountInCents > 0) {
-            const transferResponse = await fetch("/api/stripe/transfers", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                chatDocId: selectedChat.id,
-                destinationAccountId: stripeAccountID,
-                amount: amountInCents,
-                currency: "usd",
-              }),
-            });
-
-            const transferResult = await transferResponse.json();
-            if (!transferResponse.ok || !transferResult?.success) {
-              toast.error(transferResult?.error || "Stripe transfer failed");
-              return;
-            }
-
-            transferCompleted = true;
-            transferId = transferResult?.transferId || "";
-          }
-
-          // Action 2: create transactions doc and capture reference
-          const totalAfterTaxes = Number(jobData?.total_after_taxes ?? 0);
-          const taxesAmount = Math.max(0, Math.round(totalAfterTaxes));
-
-          let transactionOutputRef: any = null;
-          try {
-            const transactionDocRef = await addDoc(collection(db, "transactions"), {
-              amount: amountInCents,
-              teacher_ref: chatDoc.teacher_ref || null,
-              student_ref: chatDoc.student_ref || null,
-              created_time: serverTimestamp(),
-              chatref: chatRef,
-              job_ref: jobRef || null,
-              paid: false,
-              limboref: chatDoc.limboref || null,
-              limboref2: chatDoc.limboref2 || null,
-              amount_taxes: taxesAmount,
-              "amount taxes": taxesAmount,
-              job_topic: jobData?.job_topic || jobData?.topic || "",
-              job_student_name: jobData?.Student_Name || jobData?.student_name || "",
-              refund_created: false,
-              stripe_transfer_id: transferId || null,
-            });
-            transactionOutputRef = transactionDocRef;
-          } catch (error) {
-            console.warn("Failed creating transactions document:", error);
-          }
-
-          const teacherRef =
-            chatDoc.teacher_ref ||
-            chatDoc.teacherRef ||
-            (selectedChat?.otherParticipant?.uid ? doc(db, "LimboUserMode", selectedChat.otherParticipant.uid) : null);
-
-          // Action 3: Backend Call API - Sessions
-          const sessionPayload = {
-            paymentfees: amountInCents,
-            canceluri: "https://testurl.net.au/cancel",
-            successuri: "https://weteachs.com/idkwhattocallitathispoint",
-            cancelurl: "https://testurl.net.au/cancel",
-            successurl: "https://weteachs.com/idkwhattocallitathisp",
-            currency: "USD",
-            time: 1,
-            connected_account_ID: chatDoc.teacherStripeID || stripeAccountID,
-            teachersname:
-              selectedChat?.otherParticipant?.display_name ||
-              expertData?.display_name ||
-              "Teacher",
-            customer_email:
-              auth.currentUser?.email ||
-              (typeof window !== "undefined" ? localStorage.getItem("userEmail") : "") ||
-              "",
-            chatDocId: selectedChat.id,
-          };
-
-          fetch("/api/stripe/sessions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(sessionPayload),
-          })
-            .then(async (res) => {
-              let sessionOutput: any = null;
-              try {
-                sessionOutput = await res.json();
-              } catch {
-                sessionOutput = null;
-              }
-
-              // Condition: sessionoutput succeeded
-              if (res.ok && sessionOutput?.success) {
-                // Update transaction document with stripe_sessionld
-                if (transactionOutputRef) {
-                  await updateDoc(transactionOutputRef, {
-                    stripe_sessionld: sessionOutput?.url || sessionOutput?.sessionId || null,
-                  }).catch((err) => {
-                    console.warn("Failed updating transaction with stripe session:", err);
-                  });
-                }
-
-                // Update chat document
-                await updateDoc(chatRef, {
-                  stripe_sessionId: sessionOutput?.sessionId || null,
-                  stripe_sessionld: sessionOutput?.sessionId || null,
-                }).catch((err) => {
-                  console.warn("Failed updating chat with stripe session id:", err);
-                });
-
-                // Update jobRef with open_close
-                if (jobRef) {
-                  await updateDoc(jobRef, {
-                    open_close: "close",
-                  }).catch((err) => {
-                    console.warn("Failed updating JobStream open_close:", err);
-                  });
-                }
-
-                // Redirect directly to Stripe checkout URL
-                const stripeCheckoutUrl = sessionOutput?.url || "";
-                if (stripeCheckoutUrl) {
-                  window.location.href = stripeCheckoutUrl;
-                } else {
-                  toast.error("Failed to get Stripe checkout URL");
-                }
-              } else {
-                // Condition: sessionoutput failed
-                console.warn("Session creation failed:", sessionOutput);
-
-                // Delete the transaction document
-                if (transactionOutputRef) {
-                  await deleteDoc(transactionOutputRef).catch((err) => {
-                    console.warn("Failed deleting transaction document:", err);
-                  });
-                }
-
-                toast.error("Failed to create payment session. Please try again.");
-              }
-            })
-            .catch((error) => {
-              console.warn("Sessions API call failed:", error);
-              // Also delete transaction on API failure
-              if (transactionOutputRef) {
-                deleteDoc(transactionOutputRef).catch((err) => {
-                  console.warn("Failed deleting transaction document on API error:", err);
-                });
-              }
-              toast.error("Payment session error. Please try again.");
-            });
-        } else {
-          toast.error("Stripe account is not ready (missing stripeAccountID or charges not enabled)");
-          return;
-        }
-      }
+      await addDoc(collection(db, "Reviews"), {
+        chatref: chatRef,
+        teacherRef: teacherRef || null,
+        rated_by: studentRef || null,
+        userid: teacherRef || null,
+        ratings: Number(expertRating),
+        dat: serverTimestamp(),
+        reviews: expertReview.trim(),
+        Category: reviewCategory,
+      });
 
       await updateDoc(chatRef, {
         Reviewed: true,
-        completed: true,
+        student_completed: true,
         review_text: expertReview,
         review_category: reviewCategory,
         review_rating: expertRating,
         reviewed_time: serverTimestamp(),
-        ...(transferCompleted ? { chat_paid_for: true } : {}),
       });
 
-      toast.success("Review submitted");
+      if (teacherRef) {
+        await updateDoc(teacherRef, {
+          rating: arrayUnion(Number(expertRating)),
+        }).catch((err) => {
+          console.warn("Non-blocking teacher rating update failed:", err);
+        });
+      }
+
+      setSelectedChat((prev) => {
+        if (!prev || prev.id !== selectedChat.id) return prev;
+        return {
+          ...prev,
+          payment_released_to_expert: true,
+          stripe_transfer_id: payoutResult?.transferId || prev.stripe_transfer_id,
+        };
+      });
+
+      toast.success("Review submitted and payment released");
       setReviewDialogOpen(false);
       setExpertReview("");
       setReviewCategory("");
       setExpertRating(0);
     } catch (error) {
       console.error("Failed to complete job:", error);
-      toast.error("Failed to complete job");
+      if (payoutReleased) {
+        toast.error("Payment released, but review failed. Please contact support.");
+      } else {
+        toast.error(error?.message || "Failed to submit review");
+      }
     } finally {
       setCompletingJob(false);
     }
@@ -983,9 +1069,28 @@ const ChatScreen = () => {
 
       const chatDoc = chatSnap.data() || {};
 
+      if (!chatDoc.chat_paid_for) {
+        toast.error("Student payment is required before expert completion.");
+        setJobCompletedDialogOpen(false);
+        return;
+      }
+
+      if (!chatDoc.payment_released_to_expert) {
+        toast.error("Payment must be released by the student review before completing the job.");
+        setJobCompletedDialogOpen(false);
+        return;
+      }
+
+      if (chatDoc.completed) {
+        toast.success("This job is already completed.");
+        setJobCompletedDialogOpen(false);
+        return;
+      }
+
       // Step 1: Update chats collection with completed = true
       await updateDoc(chatRef, {
         completed: true,
+        expert_completed: true,
       });
 
       // Step 2: Get teacherRef and total_price, then update TeacherDetails
@@ -1804,6 +1909,36 @@ const ChatScreen = () => {
                   )}
                 </div>
 
+                {isSelectedChatLockedForPayment && (
+                  <div className="mx-6 mb-3 mt-1 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                    <p className="text-sm text-amber-800 font-semibold">This paid chat is locked until payment is completed.</p>
+                    <p className="text-xs text-amber-700 mt-1">
+                      {isTeacherUser
+                        ? "Waiting for the student to complete payment."
+                        : "Complete payment to unlock messaging with your expert."}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {!isTeacherUser && (
+                        <button
+                          type="button"
+                          onClick={handlePayToChat}
+                          className="h-10 px-4 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-[#255c31] transition-colors disabled:opacity-60"
+                          disabled={startingPayment}
+                        >
+                          {startingPayment ? "Redirecting..." : "Pay to Chat"}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleOpenSupportTicket}
+                        className="h-10 px-4 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
+                      >
+                        Report Payment/Refund Issue
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Input Area */}
                 {replyTo && (
                   <div className="flex items-center gap-2 px-6 py-2 bg-[#e6efe6] border-l-4 border-[#22542F] rounded-t-lg mb-[-8px]">
@@ -1828,7 +1963,7 @@ const ChatScreen = () => {
                     type="button"
                     onClick={handleMediaPick}
                     className="p-2.5 hover:bg-gray-100 rounded-full transition-colors"
-                    disabled={!selectedChat || uploadingMedia}
+                    disabled={!selectedChat || uploadingMedia || isSelectedChatLockedForPayment}
                     title="Attach image or video"
                   >
                     <ImageIcon className="w-6 h-6 text-gray-500" />
@@ -1840,13 +1975,13 @@ const ChatScreen = () => {
                     className="flex-1 rounded-full px-5 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#22542F]/30 focus:border-[#22542F] bg-gray-50 text-gray-900 disabled:opacity-50 transition-all"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    disabled={!selectedChat || sendingMessage}
+                    disabled={!selectedChat || sendingMessage || isSelectedChatLockedForPayment}
                   />
                   
                   <button
                     type="submit"
                     className="bg-gradient-to-r from-[#22542F] to-[#1a4023] hover:shadow-lg text-white rounded-full p-3 font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
-                    disabled={!selectedChat || sendingMessage || !input.trim()}
+                    disabled={!selectedChat || sendingMessage || !input.trim() || isSelectedChatLockedForPayment}
                   >
                     {sendingMessage ? (
                       <svg className="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1938,7 +2073,7 @@ const ChatScreen = () => {
             </select>
 
             <p className="text-center text-2xl text-black mt-8 leading-tight">
-              Leave a Review & Rating for your Expert to help them grow towards reaching others!
+              Leave a review and rating to release payment to your expert.
             </p>
 
             <button
@@ -1947,7 +2082,7 @@ const ChatScreen = () => {
               className="w-full h-16 mt-8 rounded-xl bg-primary text-white text-2xl font-semibold shadow-[0_3px_10px_rgba(0,0,0,0.25)] hover:bg-[#255c31] transition-colors disabled:opacity-60"
               disabled={completingJob || !canCompleteJob}
             >
-              {completingJob ? "Processing..." : "Complete Job"}
+              {completingJob ? "Processing..." : "Submit Review & Release Payment"}
             </button>
 
             <button
@@ -1960,6 +2095,7 @@ const ChatScreen = () => {
 
             <button
               type="button"
+              onClick={handleOpenSupportTicket}
               className="w-full mt-6 text-center text-lg text-[#2D45CE]"
             >
               Any issues contact support. or request a refund ticket
@@ -1982,13 +2118,19 @@ const ChatScreen = () => {
             {/* Title */}
             <h2 className="text-3xl font-bold text-gray-900 text-center">Job Completed</h2>
 
+            {!isPaymentReleasedToExpert && (
+              <p className="text-center text-sm text-gray-500">
+                Payment is released after the student submits a review.
+              </p>
+            )}
+
             <div className="w-full space-y-3">
               {/* Job Completed Button */}
               <button
                 type="button"
                 onClick={handleCompleteJob}
                 className="w-full h-14 rounded-xl bg-gradient-to-r from-[#22542F] to-[#1a4023] text-white text-lg font-semibold shadow-[0_3px_10px_rgba(0,0,0,0.25)] hover:shadow-lg transition-all"
-                disabled={completingJob}
+                disabled={completingJob || !isPaymentReleasedToExpert}
               >
                 {completingJob ? "Processing..." : "Job Completed"}
               </button>

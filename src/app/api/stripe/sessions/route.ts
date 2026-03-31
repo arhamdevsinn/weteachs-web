@@ -34,11 +34,11 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!cancelurl || !successurl || !connected_account_ID) {
+    if (!cancelurl || !successurl) {
       return NextResponse.json(
         {
           success: false,
-          error: "cancelurl, successurl and connected_account_ID are required",
+          error: "cancelurl and successurl are required",
         },
         { status: 400 }
       );
@@ -60,8 +60,11 @@ export async function POST(req: Request) {
       params.append("customer_email", String(customer_email));
     }
 
-    // Route captured funds to connected account
-    params.append("payment_intent_data[transfer_data][destination]", String(connected_account_ID));
+    // If a connected account is provided, route funds directly to that account.
+    // Without this value, funds stay in the platform (business) Stripe account.
+    if (connected_account_ID) {
+      params.append("payment_intent_data[transfer_data][destination]", String(connected_account_ID));
+    }
 
     if (chatDocId) {
       params.append("metadata[chatDocId]", String(chatDocId));
