@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { useAuth } from "@/src/hooks/useAuth";
 
 const publicFaqs = [
@@ -136,9 +137,11 @@ const WeTeachsFAQ = () => {
               <span className={`font-medium text-gray-900 ${openIndex === idx ? "text-primary" : ""}`}>
                 {faq.question}
               </span>
-              <span className="ml-2 text-primary text-xl">
-                {openIndex === idx ? "▲" : "▼"}
-              </span>
+              {openIndex === idx ? (
+                <ChevronUp className="ml-2 text-primary w-5 h-5" />
+              ) : (
+                <ChevronDown className="ml-2 text-primary w-5 h-5" />
+              )}
             </button>
             {openIndex === idx && (
               <div className="mt-2 text-gray-700 text-sm whitespace-pre-line">
