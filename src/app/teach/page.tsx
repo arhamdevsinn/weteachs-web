@@ -268,6 +268,110 @@ const Page: React.FC = () => {
       )}
 
       {isStudent && (
+        <div>
+           <section className="px-6 md:px-16 py-20 bg-gray-50">
+
+  {/* STEP 1 */}
+  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+    <h3 className="text-2xl font-bold">Step 1.</h3>
+    <p className="text-lg font-semibold">Create your free account</p>
+    <p className="text-white/80">Sign up in minutes</p>
+  </div>
+
+  {/* STEP 2 */}
+  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+    <h3 className="text-2xl font-bold">Step 2.</h3>
+    <p className="text-lg font-semibold">Start helping today!</p>
+    <p className="text-white/80">
+      Turn what you’re good at into income!
+    </p>
+  </div>
+
+  {/* ACTION CARDS */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
+    {[
+      "Assist",
+      "Mentor",
+      "Tutor",
+      "Guide",
+      "Help",
+      "Teach",
+      "Advise",
+      "More!",
+    ].map((item, i) => (
+      <div
+        key={i}
+        className="bg-secondary text-primary text-xl font-semibold rounded-xl p-10 text-center shadow-md hover:scale-105 transition"
+      >
+        {item}
+      </div>
+    ))}
+  </div>
+  {/* PROFILE PREVIEW CARD */}
+  <div className="bg-white rounded-xl mx-auto w-96 shadow-md p-6 mb-14">
+    <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
+      <img
+        src="/helper-categpry.jpg"
+        alt="Helper Category"
+        className="object-cover w-full h-full "
+      />
+      
+    </div>
+
+    <h4 className="text-xl font-bold text-green-700">
+      Topic (Math)
+    </h4>
+    <p className="text-gray-600">Category (Education)</p>
+    <p className="text-gray-600 mb-4">
+      Description (I can help you with algebra)
+    </p>
+
+    <div className="flex justify-between text-sm text-gray-700">
+      <span>$3 / 15min</span>
+      <span>Expertise Level (Advanced)</span>
+      <span>Helper Name</span>
+    </div>
+  </div>
+
+  {/* STEP 3 */}
+  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+    <h3 className="text-2xl font-bold">Step 3.</h3>
+    <p className="text-lg font-semibold">Customize your profile</p>
+    <p className="text-white/80">
+      Stand out from the competition with a unique profile
+    </p>
+  </div>
+
+  {/* IMAGES SECTION */}
+  <div className="grid md:grid-cols-2 gap-8 mb-14">
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+      <img
+        src="/help.jpeg"
+        alt="Picture of a person"
+        className="object-cover w-full h-full"
+      />
+    </div>
+
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+      <img
+        src="/image.png"
+        alt="Screenshot from web/app"
+        className="object-cover w-full h-full"
+      />
+    </div>
+  </div>
+
+  {/* STEP 4 */}
+  <div className="bg-primary text-white rounded-lg p-6">
+    <h3 className="text-2xl font-bold">Step 4.</h3>
+    <p className="text-lg font-semibold">GET HIRED!</p>
+    <p className="text-white/80">
+      The more Categories you have the better chance of getting hired
+    </p>
+  </div>
+
+</section>
+        
         <section className="px-6 md:px-16 py-14 bg-gradient-to-b from-white via-emerald-50/30 to-cyan-50/40">
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="grid lg:grid-cols-2 gap-6 items-stretch">
@@ -376,9 +480,114 @@ const Page: React.FC = () => {
             </Card>
           </div>
         </section>
+        </div>
       )}
 
       {isTeacher && (
+        <div>
+              <section className="px-6 md:px-16 py-20 bg-gray-50">
+
+  {/* STEP 1 */}
+  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+    <h3 className="text-2xl font-bold">Step 1.</h3>
+    <p className="text-lg font-semibold">Create your free account</p>
+    <p className="text-white/80">Sign up in minutes</p>
+  </div>
+
+  {/* STEP 2 */}
+  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+    <h3 className="text-2xl font-bold">Step 2.</h3>
+    <p className="text-lg font-semibold">Start helping today!</p>
+    <p className="text-white/80">
+      Turn what you’re good at into income!
+    </p>
+  </div>
+
+  {/* ACTION CARDS */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
+    {[
+      "Assist",
+      "Mentor",
+      "Tutor",
+      "Guide",
+      "Help",
+      "Teach",
+      "Advise",
+      "More!",
+    ].map((item, i) => (
+      <div
+        key={i}
+        className="bg-secondary text-primary text-xl font-semibold rounded-xl p-10 text-center shadow-md hover:scale-105 transition"
+      >
+        {item}
+      </div>
+    ))}
+  </div>
+  {/* PROFILE PREVIEW CARD */}
+  <div className="bg-white rounded-xl mx-auto w-96 shadow-md p-6 mb-14">
+    <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
+      <img
+        src="/helper-categpry.jpg"
+        alt="Helper Category"
+        className="object-cover w-full h-full "
+      />
+      
+    </div>
+
+    <h4 className="text-xl font-bold text-green-700">
+      Topic (Math)
+    </h4>
+    <p className="text-gray-600">Category (Education)</p>
+    <p className="text-gray-600 mb-4">
+      Description (I can help you with algebra)
+    </p>
+
+    <div className="flex justify-between text-sm text-gray-700">
+      <span>$3 / 15min</span>
+      <span>Expertise Level (Advanced)</span>
+      <span>Helper Name</span>
+    </div>
+  </div>
+
+  {/* STEP 3 */}
+  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+    <h3 className="text-2xl font-bold">Step 3.</h3>
+    <p className="text-lg font-semibold">Customize your profile</p>
+    <p className="text-white/80">
+      Stand out from the competition with a unique profile
+    </p>
+  </div>
+
+  {/* IMAGES SECTION */}
+  <div className="grid md:grid-cols-2 gap-8 mb-14">
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+      <img
+        src="/help.jpeg"
+        alt="Picture of a person"
+        className="object-cover w-full h-full"
+      />
+    </div>
+
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+      <img
+        src="/image.png"
+        alt="Screenshot from web/app"
+        className="object-cover w-full h-full"
+      />
+    </div>
+  </div>
+
+  {/* STEP 4 */}
+  <div className="bg-primary text-white rounded-lg p-6">
+    <h3 className="text-2xl font-bold">Step 4.</h3>
+    <p className="text-lg font-semibold">GET HIRED!</p>
+    <p className="text-white/80">
+      The more Categories you have the better chance of getting hired
+    </p>
+  </div>
+
+</section>
+       
         <section className="px-6 md:px-16 py-14 bg-gradient-to-b from-slate-50 via-white to-orange-50/30">
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="grid lg:grid-cols-2 gap-6 items-stretch">
@@ -473,6 +682,7 @@ const Page: React.FC = () => {
             </Card>
           </div>
         </section>
+         </div>
       )}
     </div>
   );
