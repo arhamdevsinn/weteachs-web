@@ -1,21 +1,13 @@
 "use client";
 
-import React, {useState} from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { Card, CardContent } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
 import { Button } from "@/src/components/ui/button";
-import { useAuth } from "@/src/hooks/useAuth";
 import Link from "next/link";
 
 const Page: React.FC = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-      const { user, profile } = useAuth();
-
-  const isLoggedIn = Boolean(user);
-  const isTeacher = Boolean(profile?.isTeacher);
-  const isStudent = isLoggedIn && !isTeacher;
-
   const exploreCategoriesCard = (
     <Link href="/categories" className="block mb-10 group">
       <motion.div
@@ -49,21 +41,42 @@ const Page: React.FC = () => {
     
   
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white text-gray-800">
-      {!isLoggedIn && (
-        <>
+    <div className="bg-[radial-gradient(1200px_480px_at_10%_-10%,rgba(20,184,166,0.14),transparent),radial-gradient(900px_420px_at_90%_0%,rgba(59,130,246,0.12),transparent)] bg-gradient-to-b from-slate-50 via-white to-white text-gray-800">
+      <section className="px-6 md:px-16 pt-14 pb-8">
+        <div className="max-w-6xl mx-auto rounded-3xl border border-white/70 bg-white/80 backdrop-blur-sm shadow-[0_30px_80px_-40px_rgba(15,23,42,0.45)] p-8 md:p-10 relative overflow-hidden">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-cyan-200/40 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 -bottom-24 h-60 w-60 rounded-full bg-emerald-200/40 blur-3xl" />
+          <div className="relative">
+            <p className="inline-flex mb-4 rounded-full border border-cyan-200 bg-cyan-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
+              WeTeachs Guide
+            </p>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+              Learn the platform. Start helping. Get hired.
+            </h1>
+            <p className="mt-4 max-w-3xl text-base md:text-lg text-slate-600">
+              A complete walkthrough for both students and teachers, from your first step to real outcomes.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ================= STEPS SECTION ================= */}
-    <section className="px-6 md:px-16 py-20 bg-gray-50">
+    <section className="px-6 md:px-16 py-14">
+  <div className="max-w-6xl mx-auto rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-6 md:p-8 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)]">
+  <div className="mb-8">
+    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Creator Journey</p>
+    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Start Teaching In 4 Steps</h2>
+  </div>
 
   {/* STEP 1 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 mb-6 shadow-lg">
     <h3 className="text-2xl font-bold">Step 1.</h3>
     <p className="text-lg font-semibold">Create your free account</p>
     <p className="text-white/80">Sign up in minutes</p>
   </div>
 
   {/* STEP 2 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
     <h3 className="text-2xl font-bold">Step 2.</h3>
     <p className="text-lg font-semibold">Start helping today!</p>
     <p className="text-white/80">
@@ -72,7 +85,7 @@ const Page: React.FC = () => {
   </div>
 
   {/* ACTION CARDS */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
     {[
       "Assist",
       "Mentor",
@@ -85,14 +98,14 @@ const Page: React.FC = () => {
     ].map((item, i) => (
       <div
         key={i}
-        className="bg-secondary text-primary text-xl font-semibold rounded-xl p-10 text-center shadow-md hover:scale-105 transition"
+        className="bg-gradient-to-b from-secondary to-white text-primary text-lg md:text-xl font-semibold rounded-2xl p-8 text-center shadow-sm border border-primary/10 hover:-translate-y-1 hover:shadow-lg transition"
       >
         {item}
       </div>
     ))}
   </div>
   {/* PROFILE PREVIEW CARD */}
-  <div className="bg-white rounded-xl mx-auto w-96 shadow-md p-6 mb-14">
+  <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">
     <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
       <img
         src="/helper-categpry.jpg"
@@ -119,7 +132,7 @@ const Page: React.FC = () => {
   {exploreCategoriesCard}
   
   {/* STEP 3 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
+  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
     <h3 className="text-2xl font-bold">Step 3.</h3>
     <p className="text-lg font-semibold">Customize your profile</p>
     <p className="text-white/80">
@@ -128,7 +141,7 @@ const Page: React.FC = () => {
   </div>
 
   {/* IMAGES SECTION */}
-  <div className="grid md:grid-cols-2 gap-8 mb-14">
+  <div className="grid md:grid-cols-2 gap-6 mb-12">
     <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
       <img
         src="/help.jpeg"
@@ -147,158 +160,27 @@ const Page: React.FC = () => {
   </div>
 
   {/* STEP 4 */}
-  <div className="bg-primary text-white rounded-lg p-6">
+  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 shadow-lg">
     <h3 className="text-2xl font-bold">Step 4.</h3>
     <p className="text-lg font-semibold">GET HIRED!</p>
     <p className="text-white/80">
       The more Categories you have the better chance of getting hired
     </p>
   </div>
+  </div>
 
 </section>
 
 
-{!user && (
-  <>
     <Separator className="my-10 max-w-4xl mx-auto" />
-    <section className="px-6 md:px-16 py-20 text-center bg-primary text-white rounded-t-3xl">
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-3xl md:text-4xl font-extrabold mb-4"
-      >
-        Start Teaching Today
-      </motion.h2>
-      <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">
-        Weteachs gives you the tools to share your skills, earn money, and
-        build your reputation. Whether you’re looking for a side hustle or a
-        full-time business — this is the place to start.
-      </p>
-      <Button
-     
-        size="lg"
-        onClick={() => {
-          setMenuOpen(false);
-          window.open("/auth/signup", "_blank");
-        }}
-        variant="secondary"
-        className="font-semibold text-primary bg-white hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl"
-      >
-        👉 Sign Up & Start Teaching
-      </Button>
-    </section>
-  </>
-)}
-        </>
-      )}
+ 
 
-      {isStudent && (
-        <div>
-           <section className="px-6 md:px-16 py-20 bg-gray-50">
-
-  {/* STEP 1 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
-    <h3 className="text-2xl font-bold">Step 1.</h3>
-    <p className="text-lg font-semibold">Create your free account</p>
-    <p className="text-white/80">Sign up in minutes</p>
-  </div>
-
-  {/* STEP 2 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
-    <h3 className="text-2xl font-bold">Step 2.</h3>
-    <p className="text-lg font-semibold">Start helping today!</p>
-    <p className="text-white/80">
-      Turn what you’re good at into income!
-    </p>
-  </div>
-
-  {/* ACTION CARDS */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
-    {[
-      "Assist",
-      "Mentor",
-      "Tutor",
-      "Guide",
-      "Help",
-      "Teach",
-      "Advise",
-      "More!",
-    ].map((item, i) => (
-      <div
-        key={i}
-        className="bg-secondary text-primary text-xl font-semibold rounded-xl p-10 text-center shadow-md hover:scale-105 transition"
-      >
-        {item}
-      </div>
-    ))}
-  </div>
-  {/* PROFILE PREVIEW CARD */}
-  <div className="bg-white rounded-xl mx-auto w-96 shadow-md p-6 mb-14">
-    <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
-      <img
-        src="/helper-categpry.jpg"
-        alt="Helper Category"
-        className="object-cover w-full h-full "
-      />
-      
-    </div>
-
-    <h4 className="text-xl font-bold text-green-700">
-      Topic (Math)
-    </h4>
-    <p className="text-gray-600">Category (Education)</p>
-    <p className="text-gray-600 mb-4">
-      Description (I can help you with algebra)
-    </p>
-
-    <div className="flex justify-between text-sm text-gray-700">
-      <span>$3 / 15min</span>
-      <span>Expertise Level (Advanced)</span>
-      <span>Helper Name</span>
-    </div>
-  </div>
-
-  {exploreCategoriesCard}
-
-  {/* STEP 3 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
-    <h3 className="text-2xl font-bold">Step 3.</h3>
-    <p className="text-lg font-semibold">Customize your profile</p>
-    <p className="text-white/80">
-      Stand out from the competition with a unique profile
-    </p>
-  </div>
-
-  {/* IMAGES SECTION */}
-  <div className="grid md:grid-cols-2 gap-8 mb-14">
-    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-      <img
-        src="/help.jpeg"
-        alt="Picture of a person"
-        className="object-cover w-full h-full"
-      />
-    </div>
-
-    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-      <img
-        src="/image.png"
-        alt="Screenshot from web/app"
-        className="object-cover w-full h-full"
-      />
-    </div>
-  </div>
-
-  {/* STEP 4 */}
-  <div className="bg-primary text-white rounded-lg p-6">
-    <h3 className="text-2xl font-bold">Step 4.</h3>
-    <p className="text-lg font-semibold">GET HIRED!</p>
-    <p className="text-white/80">
-      The more Categories you have the better chance of getting hired
-    </p>
-  </div>
-
-</section>
+      <div>
+        <div className="px-6 md:px-16 mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">For Learners</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-1">Student Steps</h2>
+        </div>
+    
         
         <section className="px-6 md:px-16 py-14 bg-gradient-to-b from-white via-emerald-50/30 to-cyan-50/40">
           <div className="max-w-6xl mx-auto space-y-8">
@@ -399,123 +281,22 @@ const Page: React.FC = () => {
               </Card>
             </div>
 
-            <Card className="rounded-2xl shadow-lg border-0 bg-gradient-to-r from-gray-900 to-gray-700 text-white">
+            {/* <Card className="rounded-2xl shadow-lg border-0 bg-gradient-to-r from-gray-900 to-gray-700 text-white">
               <CardContent className="p-8 md:p-10 text-center">
                 <h3 className="text-2xl md:text-3xl font-bold mb-3">Ready to Ask?</h3>
                 <p className="text-white/90 text-lg">Stop searching. Start asking.</p>
                 <p className="text-white/90">Get real answers from real people right when you need them.</p>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </section>
         </div>
-      )}
 
-      {isTeacher && (
-        <div>
-              <section className="px-6 md:px-16 py-20 bg-gray-50">
-
-  {/* STEP 1 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
-    <h3 className="text-2xl font-bold">Step 1.</h3>
-    <p className="text-lg font-semibold">Create your free account</p>
-    <p className="text-white/80">Sign up in minutes</p>
-  </div>
-
-  {/* STEP 2 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
-    <h3 className="text-2xl font-bold">Step 2.</h3>
-    <p className="text-lg font-semibold">Start helping today!</p>
-    <p className="text-white/80">
-      Turn what you’re good at into income!
-    </p>
-  </div>
-
-  {/* ACTION CARDS */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
-    {[
-      "Assist",
-      "Mentor",
-      "Tutor",
-      "Guide",
-      "Help",
-      "Teach",
-      "Advise",
-      "More!",
-    ].map((item, i) => (
-      <div
-        key={i}
-        className="bg-secondary text-primary text-xl font-semibold rounded-xl p-10 text-center shadow-md hover:scale-105 transition"
-      >
-        {item}
-      </div>
-    ))}
-  </div>
-  {/* PROFILE PREVIEW CARD */}
-  <div className="bg-white rounded-xl mx-auto w-96 shadow-md p-6 mb-14">
-    <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
-      <img
-        src="/helper-categpry.jpg"
-        alt="Helper Category"
-        className="object-cover w-full h-full "
-      />
-      
-    </div>
-
-    <h4 className="text-xl font-bold text-green-700">
-      Topic (Math)
-    </h4>
-    <p className="text-gray-600">Category (Education)</p>
-    <p className="text-gray-600 mb-4">
-      Description (I can help you with algebra)
-    </p>
-
-    <div className="flex justify-between text-sm text-gray-700">
-      <span>$3 / 15min</span>
-      <span>Expertise Level (Advanced)</span>
-      <span>Helper Name</span>
-    </div>
-  </div>
-
-  {/* STEP 3 */}
-  <div className="bg-primary text-white rounded-lg p-6 mb-10">
-    <h3 className="text-2xl font-bold">Step 3.</h3>
-    <p className="text-lg font-semibold">Customize your profile</p>
-    <p className="text-white/80">
-      Stand out from the competition with a unique profile
-    </p>
-  </div>
-
-  {/* IMAGES SECTION */}
-  <div className="grid md:grid-cols-2 gap-8 mb-14">
-    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-      <img
-        src="/help.jpeg"
-        alt="Picture of a person"
-        className="object-cover w-full h-full"
-      />
-    </div>
-
-    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-      <img
-        src="/image.png"
-        alt="Screenshot from web/app"
-        className="object-cover w-full h-full"
-      />
-    </div>
-  </div>
-
-  {/* STEP 4 */}
-  <div className="bg-primary text-white rounded-lg p-6">
-    <h3 className="text-2xl font-bold">Step 4.</h3>
-    <p className="text-lg font-semibold">GET HIRED!</p>
-    <p className="text-white/80">
-      The more Categories you have the better chance of getting hired
-    </p>
-  </div>
-
-</section>
-       
+      <div>
+        <div className="px-6 md:px-16 mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-700">For Experts</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-1">Teacher Steps</h2>
+        </div>
         <section className="px-6 md:px-16 py-14 bg-gradient-to-b from-slate-50 via-white to-orange-50/30">
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="grid lg:grid-cols-2 gap-6 items-stretch">
@@ -611,7 +392,32 @@ const Page: React.FC = () => {
           </div>
         </section>
          </div>
-      )}
+   <section className="px-6 md:px-16 py-20 text-center bg-primary text-white rounded-t-3xl">
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-3xl md:text-4xl font-extrabold mb-4"
+      >
+        Start Teaching Today
+      </motion.h2>
+      <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">
+        Weteachs gives you the tools to share your skills, earn money, and
+        build your reputation. Whether you’re looking for a side hustle or a
+        full-time business — this is the place to start.
+      </p>
+      <Button
+     
+        size="lg"
+        onClick={() => {
+          window.open("/auth/signup", "_blank");
+        }}
+        variant="secondary"
+        className="font-semibold text-primary bg-white hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl"
+      >
+        👉 Sign Up & Start Teaching
+      </Button>
+    </section>
     </div>
   );
 };
