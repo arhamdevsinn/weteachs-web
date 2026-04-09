@@ -16,7 +16,6 @@ import Image from "next/image";
 import { Skeleton } from "@/src/components/ui/skeleton";
 
 const CommunityPost = () => {
-  
   const [questions, setQuestions] = useState<[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
