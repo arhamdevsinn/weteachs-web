@@ -162,8 +162,8 @@ const WeTeachsFAQ = () => {
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
             Find quick answers about how WeTeachs works for both students and experts. Still need help? Email{" "}
-            <a href="mailto:weteachsaat@gmail.com" className="font-medium text-[#265A32] underline decoration-[#45ba61] underline-offset-4 hover:text-[#265A32]">
-              weteachsaat@gmail.com
+            <a href="mailto:weteachat@gmail.com" className="font-medium text-[#265A32] underline decoration-[#45ba61] underline-offset-4 hover:text-[#265A32]">
+              weteachat@gmail.com
             </a>
             .
           </p>

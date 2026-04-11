@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { BookOpen, Users, Clock, DollarSign, Video, Star } from "lucide-react";
 import { useAuth } from "@/src/hooks/useAuth";
 import Link from "next/link";
+import { Card, CardContent } from "@/src/components/ui/card";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -16,7 +18,57 @@ const fadeUp = {
   }),
 };
 
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+type FaqSection = {
+  id: string;
+  badge: string;
+  title: string;
+  description: string;
+  items: FaqItem[];
+};
+const studentFaqs = [
+  {
+    question: "How fast will i get a response?",
+    answer:
+      "Most questions are answered quickly, depending on the helper you choose.",
+  },
+  {
+    question: "What if i don't like the answer?",
+    answer:
+      "You can choose who to ask based on their category and experience. You have the option to freely chat before hiring your helper.",
+  },
+  {
+    question: "Do i have to commit to anything?",
+    answer:
+      "No. You only pay for each session at a time. Hire someone for as low as 15 minutes",
+  },
+  {
+    question: "Can i ask follow-up questions?",
+    answer:
+      "You can always chat with your helper in the free chat.",
+  },
+  {
+    question: "How do i know who to choose?",
+    answer:
+      "You can browse helpers based on their category, pricing, and what they offer.",
+  },
+];
+const faqSections: FaqSection[] = [
+  {
+    id: "student",
+    badge: "For Learners",
+    title: "Student FAQs",
+    description: "Everything students need to know before hiring and chatting.",
+    items: studentFaqs,
+  },
+];
 const Page = () => {
+    const [openFaqKey, setOpenFaqKey] = useState<string | null>(null);
+  
     const exploreCategoriesCard = (
     <Link href="/categories" className="block mb-10 group">
       <motion.div
@@ -183,6 +235,115 @@ const Page = () => {
   </div>
 
 </section>
+<div>
+        <div className="px-6 md:px-16 mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">For Learners</p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-1">Student Steps</h2>
+        </div>
+    
+        
+        <section className="px-6 md:px-16 py-14 bg-gradient-to-b from-white via-emerald-50/30 to-cyan-50/40">
+          <div className="max-w-6xl mx-auto space-y-8">
+            <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+              <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-3xl">
+                <CardContent className="p-8">
+                  <p className="text-sm font-semibold text-primary mb-3">For Students</p>
+                  <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">How Does It Work?</h2>
+                  <p className="text-lg text-gray-700 mb-4">Getting help is simple.</p>
+                  <ol className="list-decimal list-inside space-y-2 text-gray-700 font-medium">
+                    <li>Ask a question</li>
+                    <li>Choose a helper</li>
+                    <li>Get a real answer-fast</li>
+                  </ol>
+                  <p className="text-gray-700 mt-4">No long-term commitments. No endless searching.</p>
+                </CardContent>
+              </Card>
+
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-emerald-100 bg-white">
+                <img src="/student.png" alt="Student asking for expert guidance" className="w-full h-full object-cover min-h-[320px]" />
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-6">
+              <Card className="rounded-2xl shadow-lg border-emerald-100">
+                <CardContent className="p-7">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">What Can You Ask?</h3>
+                  <p className="text-gray-700 mb-3">You can ask about anything you need help with.</p>
+                  <p className="text-gray-700 font-semibold mb-2">Common examples:</p>
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    <li>"Why am I not losing weight?"</li>
+                    <li>"How do I start boxing as a beginner?"</li>
+                    <li>"Can you review my resume?"</li>
+                    <li>"How do I stay consistent with the gym?"</li>
+                    <li>"What&apos;s the best way to learn this skill?"</li>
+                  </ul>
+                  <p className="text-gray-700 mt-4">If someone out there knows it-you can ask it.</p>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-2xl shadow-lg border-cyan-100 bg-gradient-to-br from-cyan-50 to-white">
+                <CardContent className="p-7">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Why Not Just Use Google or YouTube?</h3>
+                  <p className="text-gray-700 mb-3">
+                    Because they give you general answers, Weteachs gives you personalized answers.
+                  </p>
+                  <p className="text-gray-700 mb-2">Instead of watching multiple videos or reading articles, you can:</p>
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Ask your exact situation</li>
+                    <li>Get a direct response</li>
+                    <li>Save time and confusion</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid lg:grid-cols-5 gap-6">
+              <Card className="lg:col-span-3 rounded-2xl shadow-lg border-green-100">
+                <CardContent className="p-7">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Who Are the Helpers?</h3>
+                  <p className="text-gray-700 mb-3">Helpers are real people with experience in specific areas.</p>
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Fitness coaches</li>
+                    <li>Students and Graduates</li>
+                    <li>Hobbyists and Specialists</li>
+                  </ul>
+                  <p className="text-gray-700 mt-4">People who&apos;ve already solved the problem you have.</p>
+                  <p className="text-gray-700 mt-2">No bots. No generic responses.</p>
+                  <p className="text-gray-700">Just real people helping you move forward.</p>
+                </CardContent>
+              </Card>
+
+              <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-lg border border-green-100 bg-white">
+                <img src="/help.jpeg" alt="Helper providing one-on-one support" className="w-full h-full object-cover min-h-[280px]" />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="rounded-2xl shadow-lg border-amber-100 bg-gradient-to-br from-amber-50 to-white">
+                <CardContent className="p-7">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">How Much Does It Cost?</h3>
+                  <p className="text-gray-700">Each helper sets their own price.</p>
+                  <p className="text-gray-700">Many questions start at just a few dollars.</p>
+                  <p className="text-gray-700">You only pay for what you need no subscriptions required.</p>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-2xl shadow-lg border-primary/20 bg-primary text-white">
+                <CardContent className="p-7">
+                  <h3 className="text-2xl font-bold mb-3">Why Use Weteachs?</h3>
+                  <ul className="list-disc list-inside space-y-2 text-white/95">
+                    <li>Get answers faster</li>
+                    <li>Learn from real people</li>
+                    <li>Skip the trial and error</li>
+                    <li>Get help specific to YOU</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+          </div>
+        </section>
+        </div>
 
       <section className="py-20 px-6 text-center max-w-5xl mx-auto">
         <motion.h2
@@ -335,6 +496,67 @@ const Page = () => {
           ))}
         </div>
       </section>
+        <div className="space-y-6">
+          {faqSections.map((section) => (
+            <article key={section.id} className="rounded-2xl border border-[#45ba61] bg-white p-5 shadow-sm sm:p-6">
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-[#45ba61] pb-4">
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#265A32]">
+                    {section.badge}
+                  </p>
+                  <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+                    {section.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-600">{section.description}</p>
+                </div>
+                <span className="rounded-full bg-[#45ba61] px-3 py-1 text-xs font-medium text-white">
+                  {section.items.length} questions
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {section.items.map((faq, idx) => {
+                  const itemKey = `${section.id}-${idx}`;
+                  const isOpen = openFaqKey === itemKey;
+
+                  return (
+                    <div
+                      key={itemKey}
+                      className={`rounded-xl border px-4 py-3 transition-colors sm:px-5 ${
+                        isOpen
+                          ? "border-[#45ba61] bg-cyan-50/60"
+                          : "border-[#45ba61] bg-white hover:border-[#45ba61] hover:bg-cyan-50/30"
+                      }`}
+                    >
+                      <button
+                        className="flex w-full items-center justify-between gap-4 text-left"
+                        onClick={() => setOpenFaqKey(isOpen ? null : itemKey)}
+                        aria-expanded={isOpen}
+                      >
+                        <span className={`text-sm font-medium sm:text-base ${isOpen ? "text-[#265A32]" : "text-slate-800"}`}>
+                          {faq.question}
+                        </span>
+                        <span
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
+                            isOpen ? "bg-cyan-100 text-[#265A32]" : "bg-[#45ba61] text-white"
+                          }`}
+                        >
+                          {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </span>
+                      </button>
+
+                      {isOpen && (
+                        <div className="mt-3 border-t border-[#45ba61]/70 pt-3 text-sm leading-6 text-slate-700 whitespace-pre-line">
+                          {faq.answer || <span className="italic text-slate-400">Answer coming soon...</span>}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
+          ))}
+        </div>
       {!user && (
   <>
       <section className="py-20 px-6 text-center bg-gradient-to-r from-primary to-primary/80 text-white">

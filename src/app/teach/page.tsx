@@ -1,13 +1,67 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
 import { Button } from "@/src/components/ui/button";
 import Link from "next/link";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
+
+const teacherAndGuestFaqs = [
+  {
+    question: "When do i get my first client?",
+    answer:
+      "Most Helpers get their first questions shortly after setting up a clear category and fair price.",
+  },
+  {
+    question: "Do i need to be an Expert?",
+    answer:
+      "No. If you can help someone solve a problem or answer a question clearly, you can earn.",
+  },
+  {
+    question: "How much can i charge?",
+    answer:
+      "You set your own prices. Many helpers start low to get their first clients, then increase over time.",
+  },
+  {
+    question: "What if i don't get clients right away?",
+    answer:
+      "Make sure your category is clear multiple categories to increase visibility",
+  },
+  {
+    question: "What kind of questions will i receive?",
+    answer:
+      "Anything related to your category from beginner questions to more detailed advice.",
+  },
+];
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+type FaqSection = {
+  id: string;
+  badge: string;
+  title: string;
+  description: string;
+  items: FaqItem[];
+};
+
+const faqSections: FaqSection[] = [
+
+  {
+    id: "teacher",
+    badge: "For Experts",
+    title: "Teacher FAQs",
+    description: "Common questions for helpers, mentors, and experts on the platform.",
+    items: teacherAndGuestFaqs,
+  },
+
+];
 const Page: React.FC = () => {
+   const [openFaqKey, setOpenFaqKey] = useState<string | null>(null); 
   const exploreCategoriesCard = (
     <Link href="/categories" className="block mb-10 group">
       <motion.div
@@ -175,7 +229,7 @@ const Page: React.FC = () => {
     <Separator className="my-10 max-w-4xl mx-auto" />
  
 
-      <div>
+      {/* <div>
         <div className="px-6 md:px-16 mb-3">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">For Learners</p>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-1">Student Steps</h2>
@@ -281,16 +335,9 @@ const Page: React.FC = () => {
               </Card>
             </div>
 
-            {/* <Card className="rounded-2xl shadow-lg border-0 bg-gradient-to-r from-gray-900 to-gray-700 text-white">
-              <CardContent className="p-8 md:p-10 text-center">
-                <h3 className="text-2xl md:text-3xl font-bold mb-3">Ready to Ask?</h3>
-                <p className="text-white/90 text-lg">Stop searching. Start asking.</p>
-                <p className="text-white/90">Get real answers from real people right when you need them.</p>
-              </CardContent>
-            </Card> */}
           </div>
         </section>
-        </div>
+        </div> */}
 
       <div>
         <div className="px-6 md:px-16 mb-3">
@@ -391,7 +438,67 @@ const Page: React.FC = () => {
             </Card>
           </div>
         </section>
-         </div>
+         </div><div className="space-y-6">
+          {faqSections.map((section) => (
+            <article key={section.id} className="rounded-2xl border border-[#45ba61] bg-white p-5 shadow-sm sm:p-6">
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-[#45ba61] pb-4">
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#265A32]">
+                    {section.badge}
+                  </p>
+                  <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+                    {section.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-600">{section.description}</p>
+                </div>
+                <span className="rounded-full bg-[#45ba61] px-3 py-1 text-xs font-medium text-white">
+                  {section.items.length} questions
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {section.items.map((faq, idx) => {
+                  const itemKey = `${section.id}-${idx}`;
+                  const isOpen = openFaqKey === itemKey;
+
+                  return (
+                    <div
+                      key={itemKey}
+                      className={`rounded-xl border px-4 py-3 transition-colors sm:px-5 ${
+                        isOpen
+                          ? "border-[#45ba61] bg-cyan-50/60"
+                          : "border-[#45ba61] bg-white hover:border-[#45ba61] hover:bg-cyan-50/30"
+                      }`}
+                    >
+                      <button
+                        className="flex w-full items-center justify-between gap-4 text-left"
+                        onClick={() => setOpenFaqKey(isOpen ? null : itemKey)}
+                        aria-expanded={isOpen}
+                      >
+                        <span className={`text-sm font-medium sm:text-base ${isOpen ? "text-[#265A32]" : "text-slate-800"}`}>
+                          {faq.question}
+                        </span>
+                        <span
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
+                            isOpen ? "bg-cyan-100 text-[#265A32]" : "bg-[#45ba61] text-white"
+                          }`}
+                        >
+                          {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </span>
+                      </button>
+
+                      {isOpen && (
+                        <div className="mt-3 border-t border-[#45ba61]/70 pt-3 text-sm leading-6 text-slate-700 whitespace-pre-line">
+                          {faq.answer || <span className="italic text-slate-400">Answer coming soon...</span>}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
+          ))}
+        </div>
    <section className="px-6 md:px-16 py-20 text-center bg-primary text-white rounded-t-3xl">
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
@@ -418,6 +525,7 @@ const Page: React.FC = () => {
          Sign Up & Start Teaching
       </Button>
     </section>
+    
     </div>
   );
 };

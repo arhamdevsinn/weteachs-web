@@ -9,7 +9,7 @@ const team = [
     image: "/isaiah.png",
     socials: [
       { type: "twitter", label: "@Hobofasho", url: "https://twitter.com/Hobofasho" },
-      { type: "email", label: "weteachchat@gmail.com", url: "mailto:weteachchat@gmail.com" },
+      { type: "email", label: "weteachat@gmail.com", url: "mailto:weteachat@gmail.com" },
     ],
   },
   {

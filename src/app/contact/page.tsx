@@ -62,7 +62,7 @@ const Page = () => {
             <div className="space-y-4 pt-4">
               <div className="flex items-center gap-3 text-gray-700">
                 <Mail className="text-primary" />
-                <span>weteachchat@gmail.com</span>
+                <span>weteachat@gmail.com</span>
               </div>
               {/* <div className="flex items-center gap-3 text-gray-700">
                 <Phone className="text-primary" />
