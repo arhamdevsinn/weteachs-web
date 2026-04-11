@@ -438,7 +438,8 @@ const Page: React.FC = () => {
             </Card>
           </div>
         </section>
-         </div><div className="space-y-6">
+         </div>
+         <div className="space-y-6 p-6">
           {faqSections.map((section) => (
             <article key={section.id} className="rounded-2xl border border-[#45ba61] bg-white p-5 shadow-sm sm:p-6">
               <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-[#45ba61] pb-4">
