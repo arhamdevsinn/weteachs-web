@@ -209,7 +209,7 @@ const Page = () => {
   <div className="grid md:grid-cols-2 gap-6 mb-12">
     <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
       <img
-        src="/help.jpeg"
+        src="/help2.jpeg"
         alt="Picture of a person"
         className="object-cover w-full h-full"
       />
@@ -217,7 +217,7 @@ const Page = () => {
 
     <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
       <img
-        src="/image.png"
+        src="/image2.png"
         alt="Screenshot from web/app"
         className="object-cover w-full h-full"
       />
