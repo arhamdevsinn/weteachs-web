@@ -65,18 +65,18 @@ const Page: React.FC = () => {
   <div className="max-w-6xl mx-auto rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-6 md:p-8 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)]">
   <div className="mb-8">
     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Creator Journey</p>
-    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Start Teaching In 4 Steps</h2>
+    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Start Learning In 4 Steps</h2>
   </div>
 
   {/* STEP 1 */}
-  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 mb-6 shadow-lg">
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-6 shadow-lg">
     <h3 className="text-2xl font-bold">Step 1.</h3>
     <p className="text-lg font-semibold">Create your free account</p>
     <p className="text-white/80">Sign up in minutes</p>
   </div>
 
   {/* STEP 2 */}
-  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
     <h3 className="text-2xl font-bold">Step 2.</h3>
     <p className="text-lg font-semibold">Start helping today!</p>
     <p className="text-white/80">
@@ -132,7 +132,7 @@ const Page: React.FC = () => {
   {exploreCategoriesCard}
   
   {/* STEP 3 */}
-  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
     <h3 className="text-2xl font-bold">Step 3.</h3>
     <p className="text-lg font-semibold">Customize your profile</p>
     <p className="text-white/80">
@@ -160,7 +160,7 @@ const Page: React.FC = () => {
   </div>
 
   {/* STEP 4 */}
-  <div className="bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl p-6 md:p-7 shadow-lg">
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 shadow-lg">
     <h3 className="text-2xl font-bold">Step 4.</h3>
     <p className="text-lg font-semibold">GET HIRED!</p>
     <p className="text-white/80">
@@ -377,7 +377,7 @@ const Page: React.FC = () => {
               </div>
             </div>
 
-            <Card className="rounded-2xl shadow-lg border-0 bg-gradient-to-r from-primary to-teal-600 text-white">
+            <Card className="rounded-2xl shadow-lg border-0 bg-primary text-white">
               <CardContent className="p-8 md:p-10">
                 <h3 className="text-2xl md:text-3xl font-bold mb-3">Tips to Get Hired Faster</h3>
                 <ul className="list-disc list-inside space-y-2 text-white/95">
@@ -415,7 +415,7 @@ const Page: React.FC = () => {
         variant="secondary"
         className="font-semibold text-primary bg-white hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl"
       >
-        👉 Sign Up & Start Teaching
+         Sign Up & Start Teaching
       </Button>
     </section>
     </div>

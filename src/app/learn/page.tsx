@@ -5,6 +5,7 @@ import React, {useState} from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Users, Clock, DollarSign, Video, Star } from "lucide-react";
 import { useAuth } from "@/src/hooks/useAuth";
+import Link from "next/link";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -16,6 +17,37 @@ const fadeUp = {
 };
 
 const Page = () => {
+    const exploreCategoriesCard = (
+    <Link href="/categories" className="block mb-10 group">
+      <motion.div
+        whileHover={{ y: -4, scale: 1.01 }}
+        transition={{ type: "spring", stiffness: 280, damping: 22 }}
+        className="relative overflow-hidden rounded-2xl bg-primary p-6 md:p-7 text-white shadow-lg ring-1 ring-white/20"
+      >
+        <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+        <div className="pointer-events-none absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-black/10 blur-2xl" />
+
+        <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/80">Discover</p>
+            <h3 className="text-3xl font-extrabold leading-tight">Explore Categories</h3>
+            <p className="mt-2 text-base md:text-lg font-medium text-white/95">
+              Find your niche and see what others are teaching right now.
+            </p>
+            <p className="mt-1 text-sm md:text-base text-white/80">
+              Browse popular topics, spot demand, and shape your own unique offer.
+            </p>
+          </div>
+
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition group-hover:bg-white/25">
+            Browse now
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
+          </span>
+        </div>
+      </motion.div>
+    </Link>
+  );
+    
     const [menuOpen, setMenuOpen] = useState(false);
           const { user } = useAuth();
     
@@ -42,6 +74,116 @@ const Page = () => {
           Instantly connect with real people ready to help you master any skill — from cooking to coding, fitness to freelancing.
         </motion.p>
       </section>
+ <section className="px-6 md:px-16 py-14">
+  <div className="max-w-6xl mx-auto rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-6 md:p-8 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)]">
+  <div className="mb-8">
+    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Creator Journey</p>
+    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Start Learning In 4 Steps</h2>
+  </div>
+
+  {/* STEP 1 */}
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-6 shadow-lg">
+    <h3 className="text-2xl font-bold">Step 1.</h3>
+    <p className="text-lg font-semibold">Create your free account</p>
+    <p className="text-white/80">Sign up in minutes</p>
+  </div>
+
+  {/* STEP 2 */}
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
+    <h3 className="text-2xl font-bold">Step 2.</h3>
+    <p className="text-lg font-semibold">Start helping today!</p>
+    <p className="text-white/80">
+      Turn what you’re good at into income!
+    </p>
+  </div>
+
+  {/* ACTION CARDS */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
+    {[
+      "Assist",
+      "Mentor",
+      "Tutor",
+      "Guide",
+      "Help",
+      "Teach",
+      "Advise",
+      "More!",
+    ].map((item, i) => (
+      <div
+        key={i}
+        className="bg-gradient-to-b from-secondary to-white text-primary text-lg md:text-xl font-semibold rounded-2xl p-8 text-center shadow-sm border border-primary/10 hover:-translate-y-1 hover:shadow-lg transition"
+      >
+        {item}
+      </div>
+    ))}
+  </div>
+  {/* PROFILE PREVIEW CARD */}
+  <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">
+    <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
+      <img
+        src="/helper-categpry.jpg"
+        alt="Helper Category"
+        className="object-cover w-full h-full "
+      />
+      
+    </div>
+
+    <h4 className="text-xl font-bold text-green-700">
+      Topic (Math)
+    </h4>
+    <p className="text-gray-600">Category (Education)</p>
+    <p className="text-gray-600 mb-4">
+      Description (I can help you with algebra)
+    </p>
+
+    <div className="flex justify-between text-sm text-gray-700">
+      <span>$3 / 15min</span>
+      <span>Expertise Level (Advanced)</span>
+      <span>Helper Name</span>
+    </div>
+  </div>
+  {exploreCategoriesCard}
+  
+  {/* STEP 3 */}
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
+    <h3 className="text-2xl font-bold">Step 3.</h3>
+    <p className="text-lg font-semibold">Customize your profile</p>
+    <p className="text-white/80">
+      Stand out from the competition with a unique profile
+    </p>
+  </div>
+
+  {/* IMAGES SECTION */}
+  <div className="grid md:grid-cols-2 gap-6 mb-12">
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+      <img
+        src="/help.jpeg"
+        alt="Picture of a person"
+        className="object-cover w-full h-full"
+      />
+    </div>
+
+    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+      <img
+        src="/image.png"
+        alt="Screenshot from web/app"
+        className="object-cover w-full h-full"
+      />
+    </div>
+  </div>
+
+  {/* STEP 4 */}
+  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 shadow-lg">
+    <h3 className="text-2xl font-bold">Step 4.</h3>
+    <p className="text-lg font-semibold">GET HIRED!</p>
+    <p className="text-white/80">
+      The more Categories you have the better chance of getting hired
+    </p>
+  </div>
+  </div>
+
+</section>
+
       <section className="py-20 px-6 text-center max-w-5xl mx-auto">
         <motion.h2
           initial="hidden"
