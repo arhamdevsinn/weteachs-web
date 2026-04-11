@@ -143,23 +143,23 @@ const Page = () => {
   {/* STEP 2 */}
   <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
     <h3 className="text-2xl font-bold">Step 2.</h3>
-    <p className="text-lg font-semibold">Start helping today!</p>
+    <p className="text-lg font-semibold">What do you need help with?</p>
     <p className="text-white/80">
-      Turn what you’re good at into income!
+     Browse through Helpers to find exactly who you need.
     </p>
   </div>
 
   {/* ACTION CARDS */}
   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
     {[
-      "Assist",
-      "Mentor",
-      "Tutor",
-      "Guide",
-      "Help",
-      "Teach",
-      "Advise",
-      "More!",
+      "Cooking",
+      "Fitness",
+      "Education",
+      "Gaming",
+      "Sports",
+      "Business",
+      "Health",
+      "Art",
     ].map((item, i) => (
       <div
         key={i}
@@ -170,7 +170,7 @@ const Page = () => {
     ))}
   </div>
   {/* PROFILE PREVIEW CARD */}
-  <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">
+  {/* <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">
     <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
       <img
         src="/helper-categpry.jpg"
@@ -193,15 +193,15 @@ const Page = () => {
       <span>Expertise Level (Advanced)</span>
       <span>Helper Name</span>
     </div>
-  </div>
+  </div> */}
   {exploreCategoriesCard}
   
   {/* STEP 3 */}
   <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
     <h3 className="text-2xl font-bold">Step 3.</h3>
-    <p className="text-lg font-semibold">Customize your profile</p>
+    <p className="text-lg font-semibold">Chat with them.</p>
     <p className="text-white/80">
-      Stand out from the competition with a unique profile
+      Chat with your Helper to see if they are the right fit for you.
     </p>
   </div>
 
@@ -227,9 +227,9 @@ const Page = () => {
   {/* STEP 4 */}
   <div className="bg-primary text-white rounded-2xl p-6 md:p-7 shadow-lg">
     <h3 className="text-2xl font-bold">Step 4.</h3>
-    <p className="text-lg font-semibold">GET HIRED!</p>
+    <p className="text-lg font-semibold">Hire them.</p>
     <p className="text-white/80">
-      The more Categories you have the better chance of getting hired
+      Chat with your Helper to see if they are the right fit for you.
     </p>
   </div>
   </div>
