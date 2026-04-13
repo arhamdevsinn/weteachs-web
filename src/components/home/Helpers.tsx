@@ -1,24 +1,27 @@
 import React from "react";
 import { Clock, Smartphone, DollarSign, Search } from "lucide-react";
+import Image from "next/image";
+import { MessageCircle, Settings, Bot } from "lucide-react";
+
 
 const helpersData = [
   {
-    icon: Clock,
+    imageSrc: "/clock.png",
     title: "Answer When You’re Available",
     description: "No Fixed Schedule Required",
   },
   {
-    icon: Smartphone,
+    imageSrc: "/smartphone.png",
     title: "Work From Your Phone",
     description: "Help from anywhere, anytime.",
   },
   {
-    icon: DollarSign,
+    imageSrc: "/dollar-sign.png",
     title: "Set Your Own Price",
     description: "Charge what your knowledge is worth",
   },
   {
-    icon: Search,
+    imageSrc: "/search.png",
     title: "Turn Your Knowledge Into Income",
     description:
       "Get paid to answer real questions helping others.",
@@ -35,7 +38,7 @@ const Helpers = () => {
 
         <div className="space-y-6">
           {helpersData.map((item, index) => {
-            const Icon = item.icon;
+            const Icon = item.imageSrc ? null : Bot; // Default icon if no imageSrc provided
             return (
               <div
                 key={index}
@@ -43,7 +46,17 @@ const Helpers = () => {
               >
                 {/* Left Icon Box */}
                 <div className="w-48 bg-primary/20 flex flex-col items-center justify-center p-6 text-center">
-                  <Icon size={50} className="mb-4 text-black" />
+                  {item.imageSrc ? (
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.title}
+                      width={80}
+                      height={80}
+                      className="mb-4"
+                    />
+                  ) : (
+                    Icon && <Icon size={50} className="mb-4 text-black" />
+                  )}
                   <p className="font-semibold text-black">
                     {item.title}
                   </p>
