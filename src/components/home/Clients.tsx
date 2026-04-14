@@ -26,7 +26,6 @@ const clientsData = [
     description: (
       <>
         No general tips, real feedback for YOU!
-        <br />
         Advice based on your exact situation
       </>
     ),
@@ -78,7 +77,7 @@ const Clients = () => {
                 </div>
 
                 {/* Right Content */}
-                <div className="flex-1 p-8 text-center">
+                <div className="flex-1 p-4 text-center">
                   <p className="md:text-xl text-md text-gray-800 leading-relaxed">
                     {item.description}
                   </p>

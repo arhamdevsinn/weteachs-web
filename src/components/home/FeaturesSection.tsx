@@ -25,7 +25,7 @@ const features = [
     image: "/student.png",
     buttonText: "Learn More",
     accent: "from-primary to-primary",
-    reverse: true,
+    reverse: false,
     onClick: () =>
       window.open("/learn", "_blank", "noopener,noreferrer"),
   },
@@ -105,7 +105,7 @@ const FeaturesSection = () => {
                 <Image  priority={true}
                   src={feature.image}
                   alt={feature.title}
-                  width={550}
+                  width={400}
                   height={400}
                   className="rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-white/50"
                 />
