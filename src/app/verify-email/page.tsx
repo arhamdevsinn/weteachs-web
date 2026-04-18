@@ -9,35 +9,51 @@ import { AuthService } from "@/src/lib/firebase/auth";
 import { Button } from "@/src/components/ui/button";
 import { toast } from "sonner";
 
+type VerificationDialogState = "idle" | "verifying" | "verified" | "error";
+
 const VerifyEmailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [dialogState, setDialogState] = useState<VerificationDialogState>("idle");
   const pollRef = useRef<number | null>(null);
+
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // Handle direct email verification via oobCode
   useEffect(() => {
     const oobCode = searchParams.get("oobCode");
 
     if (oobCode) {
-      applyActionCode(auth, oobCode)
-        .then(() => {
+      const verifyByOobCode = async () => {
+        try {
+          setDialogState("verifying");
+          await applyActionCode(auth, oobCode);
+
+          // Keep a visible "verifying" state for at least ~2s for better UX.
+          await sleep(2200);
+
+          setDialogState("verified");
           toast.success("✅ Email verified successfully!");
+
+          // Keep success state visible briefly before redirect.
+          await sleep(2200);
+
           const origin = localStorage.getItem("pending_origin");
           localStorage.removeItem("pending_verification_email");
           localStorage.removeItem("pending_verification_password");
           localStorage.removeItem("pending_origin");
 
-          // Redirect based on origin
-          setTimeout(() => {
-            if (origin === "signup") router.push("/auth/login");
-            else router.push("/profile");
-          }, 1500);
-        })
-        .catch((err) => {
+          if (origin === "signup") router.push("/auth/login");
+          else router.push("/profile");
+        } catch (err) {
           console.error("Email verification failed:", err);
+          setDialogState("error");
           toast.error("❌ Verification link is invalid or expired. Please request a new one.");
-        });
+        }
+      };
+
+      verifyByOobCode();
     }
   }, [searchParams, router]);
 
@@ -78,6 +94,8 @@ const VerifyEmailPage = () => {
   };
 
   useEffect(() => {
+    if (searchParams.get("oobCode")) return;
+
     const startPolling = () => {
       if (pollRef.current) return;
       checkVerification();
@@ -96,17 +114,20 @@ const VerifyEmailPage = () => {
       else stopPolling();
     });
 
-    window.addEventListener("focus", checkVerification);
-    document.addEventListener("visibilitychange", () => {
+    const handleVisibilityChange = () => {
       if (!document.hidden) checkVerification();
-    });
+    };
+
+    window.addEventListener("focus", checkVerification);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       unsubscribe();
       stopPolling();
       window.removeEventListener("focus", checkVerification);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [searchParams]);
 
   const handleResendEmail = async () => {
     setLoading(true);
@@ -122,6 +143,37 @@ const VerifyEmailPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-green-100 px-4">
+      {(dialogState === "verifying" || dialogState === "verified") && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl border border-gray-100 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-50">
+              {dialogState === "verifying" ? (
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M20 7L10 17L4 11"
+                    stroke="#059669"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </div>
+
+            <h2 className="text-lg font-semibold text-green-900">
+              {dialogState === "verifying" ? "Verifying..." : "Successfully Verified"}
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              {dialogState === "verifying"
+                ? "Please wait while we confirm your email address."
+                : "Your email is verified. Redirecting you now..."}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 max-w-md w-full flex flex-col items-center">
         <svg className="mb-6 text-primary" width={64} height={64} fill="none" viewBox="0 0 64 64">
           <rect width="64" height="64" rx="16" fill="#D1FAE5" />
