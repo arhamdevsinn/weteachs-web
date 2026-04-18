@@ -60,7 +60,7 @@ pnpm run lint
 
 2. **Authentication**
    - Users must sign up or log in to access most features.
-   - Auth pages: `/auth/login`, `/auth/signup`, `/auth/forgot-password`, `/auth/verify-email`.
+   - Auth pages: `/auth/login`, `/auth/signup`, `/auth/forgot-password`, `/verify-email`.
 
 3. **Profile Creation**
    - New users are prompted to complete their profile at `/create-profile`.

@@ -125,7 +125,7 @@ const usernameProfile = localStorage.getItem("usernameT") || "user";
     } catch (err) {
       if (err.message?.includes("verify your email")) {
         toast.error("Please verify your email before logging in!");
-        router.push("/auth/verify-email");
+        router.push("/verify-email");
       } else {
         toast.error(err.message || "Login failed!");
       }

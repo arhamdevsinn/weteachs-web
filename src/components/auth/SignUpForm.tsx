@@ -87,7 +87,7 @@ function SignUpForm() {
       }
       
       toast.success(res.message); // ✅ "Go to your email and verify first"
-      router.push('/auth/verify-email');
+      router.push('/verify-email');
     } catch (err) {
       setError(isErrorWithMessage(err) ? err.message : 'An unexpected error occurred.');
       toast.error(isErrorWithMessage(err) ? err.message : 'Signup failed.');

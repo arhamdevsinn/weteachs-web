@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { onAuthStateChanged, signInWithEmailAndPassword, applyActionCode } from "firebase/auth";
 import { auth } from "@/src/lib/firebase/config";
 import { AuthService } from "@/src/lib/firebase/auth";
 import { Button } from "@/src/components/ui/button";
@@ -11,8 +11,35 @@ import { toast } from "sonner";
 
 const VerifyEmailPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const pollRef = useRef<number | null>(null);
+
+  // Handle direct email verification via oobCode
+  useEffect(() => {
+    const oobCode = searchParams.get("oobCode");
+
+    if (oobCode) {
+      applyActionCode(auth, oobCode)
+        .then(() => {
+          toast.success("✅ Email verified successfully!");
+          const origin = localStorage.getItem("pending_origin");
+          localStorage.removeItem("pending_verification_email");
+          localStorage.removeItem("pending_verification_password");
+          localStorage.removeItem("pending_origin");
+
+          // Redirect based on origin
+          setTimeout(() => {
+            if (origin === "signup") router.push("/auth/login");
+            else router.push("/profile");
+          }, 1500);
+        })
+        .catch((err) => {
+          console.error("Email verification failed:", err);
+          toast.error("❌ Verification link is invalid or expired. Please request a new one.");
+        });
+    }
+  }, [searchParams, router]);
 
   const checkVerification = async () => {
     let user = auth.currentUser;

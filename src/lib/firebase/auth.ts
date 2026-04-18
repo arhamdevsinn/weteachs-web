@@ -37,7 +37,7 @@ export class AuthService {
         }
 
         await signOut(auth);
-        if (typeof window !== "undefined") window.location.href = "/auth/verify-email";
+        if (typeof window !== "undefined") window.location.href = "/verify-email";
         throw new Error("Email not verified. Verification email sent.");
       }
 
