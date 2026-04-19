@@ -91,7 +91,6 @@ const StudentDialog = () => {
                 usernameS: formData.display_name,
             };
             await setDoc(studentRef, studentData, { merge: true });
-            console.log("Student data to be saved:", studentData);
             const payload = {
                 Birthday: formData.birthday ? new Date(formData.birthday) : null,
                 Howd_you_here_of_us: formData.Howd_you_here_of_us,
@@ -114,7 +113,6 @@ const StudentDialog = () => {
             if (user?.email) {
                 payload.email = user.email;
             }
-            console.log("Limbo payload to be saved:", payload);
             const limboRef = doc(db, "LimboUserMode", resolvedUserId);
             await setDoc(
                 limboRef,
