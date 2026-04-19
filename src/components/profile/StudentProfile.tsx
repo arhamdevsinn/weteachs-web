@@ -81,8 +81,8 @@ const StudentDialog = () => {
                 student_profile_picture: photoURL,
                 usernameS: formData.display_name,
             };
-
             await setDoc(studentRef, studentData, { merge: true });
+            console.log("Student data to be saved:", studentData);
             const payload = {
                 Birthday: formData.birthday ? new Date(formData.birthday) : null,
                 Howd_you_here_of_us: formData.Howd_you_here_of_us,
@@ -101,9 +101,12 @@ const StudentDialog = () => {
             if (userId) {
                 payload.uid = userId;
             }
-            if(useruser?.email){
+            // if(useruser?.email){
+
+            if (user?.email) {
                 payload.email = user.email;
             }
+            console.log("Limbo payload to be saved:", payload);
             const limboRef = doc(db, "LimboUserMode", userId);
             await setDoc(
                 limboRef,
@@ -115,6 +118,7 @@ const StudentDialog = () => {
             setOpenProfile(false);
             router.push('/congratulations?expert=false');
         } catch (err) {
+            console.log("eroor. -----_>>>>>>");
             console.error("Error creating student profile:", err);
             toast.error("Error creating student profile");
         } finally {
