@@ -58,25 +58,34 @@ const StudentDialog = () => {
     };
 
     const handleProfileSubmit = async () => {
-        if (!userId) return toast.error("User ID not found. Please log in.");
+        // if (!userId) return toast.error("User ID not found. Please log in.");
+
+        const resolvedUserId =
+            user?.uid ||
+            userId ||
+            (typeof window !== "undefined"
+                ? localStorage.getItem("userId") || localStorage.getItem("user_id")
+                : null);
+
+        if (!resolvedUserId) return toast.error("User ID not found. Please log in.");
         try {
             setLoading(true);
             let photoURL = preview;
 
             if (formData.imageFile) {
-                const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
+                const storageRef = ref(storage, `users/${resolvedUserId}/uploads/${formData.imageFile.name}`);
                 await uploadBytes(storageRef, formData.imageFile);
                 photoURL = await getDownloadURL(storageRef);
             }
 
-            const studentRef = doc(db, "StudentDetails", userId);
+            const studentRef = doc(db, "StudentDetails", resolvedUserId);
             const studentData = {
                 Language: "Eng",
                 bio_S: formData.bio_S || "",
                 created_time_t: serverTimestamp(),
                 iSAvailable: false,
                 isOnline: true,
-                limbo_ref: doc(db, "LimboUserMode", userId),
+                limbo_ref: doc(db, "LimboUserMode", resolvedUserId),
                 student: true,
                 student_profile_picture: photoURL,
                 usernameS: formData.display_name,
@@ -96,18 +105,17 @@ const StudentDialog = () => {
                 signupcomplete: true,
                 signupcompletepage2: true,
                 student_ref: studentRef.path,
-                uid: userId,
+                uid: resolvedUserId,
             };
-            if (userId) {
-                payload.uid = userId;
+            if (resolvedUserId) {
+                payload.uid = resolvedUserId;
             }
-            // if(useruser?.email){
 
             if (user?.email) {
                 payload.email = user.email;
             }
             console.log("Limbo payload to be saved:", payload);
-            const limboRef = doc(db, "LimboUserMode", userId);
+            const limboRef = doc(db, "LimboUserMode", resolvedUserId);
             await setDoc(
                 limboRef,
                 payload,
