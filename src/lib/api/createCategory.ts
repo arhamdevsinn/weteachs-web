@@ -22,7 +22,6 @@ export const CategoryAPI = {
       { cat_refs: arrayUnion(categoryRef) },
       { merge: true }
     );
-
     return { id: categoryRef.id, ...data };
   },
 };
