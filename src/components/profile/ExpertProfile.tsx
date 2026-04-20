@@ -70,6 +70,7 @@ const ExpertDialog = () => {
   const { userId } = useUserIdFromUrl();
 
   const { user } = useAuth();
+  const effectiveUserId = userId || user?.uid || null;
 
   const [limboUser, setLimboUser] = useState< | null>(null);
   const [limboLoading, setLimboLoading] = useState(false);
@@ -138,11 +139,17 @@ const ExpertDialog = () => {
     return null;
   };
 
+  const checkIfProfileExists = async (uid: string) => {
+    const teacherRef = doc(db, "TeacherDetails", uid);
+    const teacherSnap = await getDoc(teacherRef);
+    return teacherSnap.exists();
+  };
+
   useEffect(() => {
     const verifyProfileStatus = async () => {
-      if (!userId) return;
+      if (!effectiveUserId) return;
 
-      const exists = await checkIfProfileExists(userId);
+      const exists = await checkIfProfileExists(effectiveUserId);
       if (exists) {
         // ✅ Profile exists → Skip profile dialog, maybe go directly to category or close both
         setOpenProfile(false);
@@ -155,7 +162,7 @@ const ExpertDialog = () => {
     };
 
     verifyProfileStatus();
-  }, [userId]);
+  }, [effectiveUserId]);
 
   // === 🟣 Submit Teacher Profile ===
   const handleProfileSubmit = async () => {
@@ -165,7 +172,7 @@ const ExpertDialog = () => {
       return;
     }
 
-    if (!userId) return toast.error("User ID not found. Please log in.");
+    if (!effectiveUserId) return toast.error("User ID not found. Please log in.");
 
     try {
       setLoading(true);
@@ -178,7 +185,7 @@ const ExpertDialog = () => {
         );
         const usernameSnap = await getDocs(usernameQuery);
         if (!usernameSnap.empty) {
-          const other = usernameSnap.docs.find((d) => d.id !== userId);
+          const other = usernameSnap.docs.find((d) => d.id !== effectiveUserId);
           if (other) {
             setLoading(false);
             toast.error("Display name already in use. Choose another name.");
@@ -189,12 +196,12 @@ const ExpertDialog = () => {
       let photoURL = preview;
 
       if (formData.imageFile) {
-        const storageRef = ref(storage, `users/${userId}/uploads/${formData.imageFile.name}`);
+        const storageRef = ref(storage, `users/${effectiveUserId}/uploads/${formData.imageFile.name}`);
         await uploadBytes(storageRef, formData.imageFile);
         photoURL = await getDownloadURL(storageRef);
       }
 
-      const teacherRef = doc(db, "TeacherDetails", userId);
+      const teacherRef = doc(db, "TeacherDetails", effectiveUserId);
       const teacherData = {
         Language: categoryData.Language || "Eng",
         Live_Chat_rate: categoryData.category_rate || 0,
@@ -205,7 +212,7 @@ const ExpertDialog = () => {
         created_time_t: serverTimestamp(),
         iSAvailable: false,
         isOnline: true,
-        limbo_ref: doc(db, "LimboUserMode", userId),
+        limbo_ref: doc(db, "LimboUserMode", effectiveUserId),
         teacher: true,
         teacher_profile_picture: photoURL,
         usernameT: formData.display_name,
@@ -230,9 +237,9 @@ const ExpertDialog = () => {
       };
       if (!limboUser && user?.email) {
         payload.email = user.email;
-        payload.uid = userId;
+        payload.uid = effectiveUserId;
       }
-      const limboRef = doc(db, "LimboUserMode", userId);
+      const limboRef = doc(db, "LimboUserMode", effectiveUserId);
       await setDoc(
         limboRef,
         payload,
@@ -260,14 +267,14 @@ const ExpertDialog = () => {
       return;
     }
 
-    if (!userId) return toast.error("User ID missing");
+    if (!effectiveUserId) return toast.error("User ID missing");
 
     try {
       setLoading(true);
       let imageURL = preview;
 
       if (categoryData.imageFile) {
-        const storageRef = ref(storage, `users/${userId}/uploads/${categoryData.imageFile.name}`);
+        const storageRef = ref(storage, `users/${effectiveUserId}/uploads/${categoryData.imageFile.name}`);
         await uploadBytes(storageRef, categoryData.imageFile);
         imageURL = await getDownloadURL(storageRef);
       }
@@ -279,19 +286,19 @@ const ExpertDialog = () => {
         description: categoryData.description,
         image: imageURL,
         teacher_name: formData.display_name,
-        teacher_ref: doc(db, "TeacherDetails", userId),
+        teacher_ref: doc(db, "TeacherDetails", effectiveUserId),
         title: categoryData.title,
         topic: categoryData.topic,
         upload_time: serverTimestamp(),
-        who_created_ref: doc(db, `LimboUserMode/${userId}`),
+        who_created_ref: doc(db, `LimboUserMode/${effectiveUserId}`),
       });
 
-      const teacherRef = doc(db, "TeacherDetails", userId);
+      const teacherRef = doc(db, "TeacherDetails", effectiveUserId);
       await setDoc(teacherRef, {
         cat_refs: arrayUnion(categoryRef.path),
       }, { merge: true });
 
-      const limboRef = doc(db, "LimboUserMode", userId);
+      const limboRef = doc(db, "LimboUserMode", effectiveUserId);
       await setDoc(
         limboRef,
         {

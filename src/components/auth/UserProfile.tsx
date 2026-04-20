@@ -153,7 +153,7 @@ const UserProfile = () => {
           response = await UserProfileAPI.getProfileByUsername(username);
         } else if (user?.uid) {
           // Fallback to user ID if no username
-          response = await UserProfileAPI.getProfileByUseId(user.uid);
+          response = await UserProfileAPI.getProfileByUserId(user.uid);
           console.log("Fetched profile by user ID: -------------->", response);
         }
 
@@ -197,6 +197,7 @@ const UserProfile = () => {
         }
 
       } catch (error) {
+        console.log("Error during profile fetch: ", user?.uid);
         // Only handle errors for the current request
         if (isMounted && currentReqRef.current === reqId) {
           console.error("Error fetching profile:", error);

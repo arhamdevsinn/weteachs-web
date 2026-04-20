@@ -11,6 +11,19 @@ import {
 import { getDocWithRetry, getDocsWithRetry } from "@/src/lib/firebase/firestoreRetry";
 
 export const UserProfileAPI = {
+  resolveDocRef(refValue: unknown) {
+    if (!refValue) return null;
+    if (typeof refValue === "string") {
+      return doc(db, refValue.replace(/^\//, ""));
+    }
+    if (refValue instanceof DocumentReference) {
+      return refValue;
+    }
+    if (typeof refValue === "object" && refValue !== null && "path" in refValue) {
+      return refValue as DocumentReference;
+    }
+    return null;
+  },
 
   getProfile: async (uid: string) => {
 
@@ -300,20 +313,16 @@ export const UserProfileAPI = {
 
 
 
-  async getProfileByUseId(uid: string) {
-    // Try teacher first
-    try {
-      const user = await this.getLimboUser(uid);
-      if (!user) {
-        console.warn("User not found");
-        return null;
-      }
+  async getProfileByUserId(uid: string) {
+    const user = await this.getLimboUser(uid);
+    if (!user) {
+      throw new Error("No profile found for provided user ID");
+    }
 
-      if (user.isTeacher && user.teacher_ref instanceof DocumentReference) {
-  // const teacherDoc = await user.teacher_ref.get();
-  const teacherDoc =  await getDocWithRetry(user.teacher_ref)  ;
-        
-
+    const teacherRef = this.resolveDocRef(user.teacher_ref);
+    if (user.isTeacher && teacherRef) {
+      try {
+        const teacherDoc = await getDocWithRetry(teacherRef);
         if (teacherDoc.exists()) {
           const teacherData = {
             id: teacherDoc.id,
@@ -322,35 +331,31 @@ export const UserProfileAPI = {
           const result = await this.getTeacherByUsername(teacherData.usernameT);
           return { role: "teacher", ...result };
         }
-      } else if (user.isStudent && user.student_ref instanceof DocumentReference) {
+      } catch (e) {
+        console.warn("Teacher lookup by user ID failed", e);
+      }
+    }
 
-  const sSnap = await getDocWithRetry(user.student_ref) ;
+    const studentRef = this.resolveDocRef(user.student_ref);
+    if (user.isStudent && studentRef) {
+      try {
+        const sSnap = await getDocWithRetry(studentRef);
         if (sSnap.exists()) {
           const studentData = { id: sSnap.id, ...sSnap.data() };
 
-          // resolve limbo profile if present (similar to teacher)
           let userProfile = null;
-          if (studentData?.limbo_ref) { 
-            let limboRef;
-            if (typeof studentData.limbo_ref === "string") {
-              limboRef = doc(db, studentData.limbo_ref.replace(/^\//, ""));
-            } else if (
-              typeof studentData.limbo_ref === "object" &&
-              "path" in studentData.limbo_ref
-            ) {
-              limboRef = studentData.limbo_ref;
-            }
-            if (limboRef) {
-              const limboSnap = await getDocWithRetry(limboRef);
-              if (limboSnap.exists()) userProfile = { id: limboRef.id, ...limboSnap.data() };
+          const limboRef = this.resolveDocRef(studentData?.limbo_ref);
+          if (limboRef) {
+            const limboSnap = await getDocWithRetry(limboRef);
+            if (limboSnap.exists()) {
+              userProfile = { id: limboRef.id, ...limboSnap.data() };
             }
           }
 
-          // collect student subcollections if any (optional)
           const studentDocRef = doc(db, "StudentDetails", studentData.id);
           const [reviewSnap, gallerySnap] = await Promise.all([
-            getDocs(collection(studentDocRef, "StudentReviews").withConverter?.() || collection(studentDocRef, "StudentReviews")),
-            getDocs(collection(studentDocRef, "StudentGalleryCollection").withConverter?.() || collection(studentDocRef, "StudentGalleryCollection")),
+            getDocsWithRetry(collection(studentDocRef, "StudentReviews").withConverter?.() || collection(studentDocRef, "StudentReviews")),
+            getDocsWithRetry(collection(studentDocRef, "StudentGalleryCollection").withConverter?.() || collection(studentDocRef, "StudentGalleryCollection")),
           ]).catch(() => [null, null]);
 
           const studentReviews = reviewSnap ? reviewSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
@@ -366,66 +371,19 @@ export const UserProfileAPI = {
             role: "student",
           };
         }
-
+      } catch (e) {
+        console.warn("Student lookup by user ID failed", e);
       }
-    } catch (e) {
-      // Continue to student check on error
-      console.warn("Teacher lookup failed", e);
     }
 
-    // Try student
-    // try {
-    //   const sQuery = query(
-    //     collection(db, "StudentDetails"),
-    //     where("usernameS", "==", username)
-    //   );
-    //   const sSnap = await getDocs(sQuery);
-    //   if (!sSnap.empty) {
-    //     const sDoc = sSnap.docs[0];
-    //     const studentData = { id: sDoc.id, ...sDoc.data() };
+    return {
+      role: "limbo",
+      userProfile: user,
+      subcollections: {},
+    };
+  },
 
-    //     // resolve limbo profile if present (similar to teacher)
-    //     let userProfile = null;
-    //     if (studentData.limbo_ref) {
-    //       let limboRef;
-    //       if (typeof studentData.limbo_ref === "string") {
-    //         limboRef = doc(db, studentData.limbo_ref.replace(/^\//, ""));
-    //       } else if (
-    //         typeof studentData.limbo_ref === "object" &&
-    //         "path" in studentData.limbo_ref
-    //       ) {
-    //         limboRef = studentData.limbo_ref;
-    //       }
-    //       if (limboRef) {
-    //         const limboSnap = await getDoc(limboRef);
-    //         if (limboSnap.exists()) userProfile = { id: limboRef.id, ...limboSnap.data() };
-    //       }
-    //     }
-
-    //     // collect student subcollections if any (optional)
-    //     const studentDocRef = doc(db, "StudentDetails", studentData.id);
-    //     const [reviewSnap, gallerySnap] = await Promise.all([
-    //       getDocs(collection(studentDocRef, "StudentReviews").withConverter?.() || collection(studentDocRef, "StudentReviews")),
-    //       getDocs(collection(studentDocRef, "StudentGalleryCollection").withConverter?.() || collection(studentDocRef, "StudentGalleryCollection")),
-    //     ]).catch(() => [null, null]);
-
-    //     const studentReviews = reviewSnap ? reviewSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
-    //     const studentGallery = gallerySnap ? gallerySnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
-
-    //     return {
-    //       student: studentData,
-    //       userProfile,
-    //       subcollections: {
-    //         reviews: studentReviews,
-    //         galleryCollection: studentGallery,
-    //       },
-    //       role: "student",
-    //     };
-    //   }
-    // } catch (e) {
-    //   console.warn("Student lookup failed", e);
-    // }
-
-    throw new Error("No profile found for provided username");
+  async getProfileByUseId(uid: string) {
+    return this.getProfileByUserId(uid);
   },
 };
