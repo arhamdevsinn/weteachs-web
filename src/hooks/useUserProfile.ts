@@ -198,7 +198,7 @@ export const useUserProfile = (uid?: string) => {
 
       // ✅ Append to teacher
       const teacherRef = doc(db, "TeacherDetails", user.uid);
-      await setDoc(teacherRef, { cat_refs: arrayUnion(categoryRef.path) }, { merge: true });
+      await setDoc(teacherRef, { cat_refs: arrayUnion(categoryRef) }, { merge: true });
 
       toast.success("Category created successfully!");
       await fetchProfile(); // Refresh after category creation

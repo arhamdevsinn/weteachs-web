@@ -295,7 +295,7 @@ const ExpertDialog = () => {
 
       const teacherRef = doc(db, "TeacherDetails", effectiveUserId);
       await setDoc(teacherRef, {
-        cat_refs: arrayUnion(categoryRef.path),
+        cat_refs: arrayUnion(categoryRef),
       }, { merge: true });
 
       const limboRef = doc(db, "LimboUserMode", effectiveUserId);

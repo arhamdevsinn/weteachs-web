@@ -19,7 +19,7 @@ export const CategoryAPI = {
     const teacherRef = doc(db, "TeacherGallery", teacherId);
     await setDoc(
       teacherRef,
-      { cat_refs: arrayUnion(categoryRef.id) }, // ✅ save ID not ref
+      { cat_refs: arrayUnion(categoryRef) },
       { merge: true }
     );
 
