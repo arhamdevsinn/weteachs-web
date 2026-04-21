@@ -233,9 +233,9 @@ const StripePage: React.FC = () => {
                <div></div>
                 )}
               </div>
-              <div className="absolute -right-2 bottom-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm ring-1 ring-slate-200">
+              {/* <div className="absolute -right-2 bottom-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm ring-1 ring-slate-200">
                 <BadgeInfo className="h-4.5 w-4.5" />
-              </div>
+              </div> */}
             </div>
 
             <p className="mt-5 text-3xl font-semibold tracking-tight text-[#2d7b3e]">{profileName}</p>

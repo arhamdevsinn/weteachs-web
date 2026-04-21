@@ -32,6 +32,10 @@ const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedTransactionId, setExpandedTransactionId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
+  const totalPages = Math.max(1, Math.ceil(transactions.length / pageSize));
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -75,6 +79,7 @@ const TransactionsPage: React.FC = () => {
 
         console.log("Fetched transactions:", sortedTransactions);
         setTransactions(sortedTransactions);
+        setCurrentPage(1);
       } catch (err) {
         console.error("Error fetching transactions:", err);
         setError("Unable to load transactions.");
@@ -111,63 +116,101 @@ console.log("Current transactions state:", transactions);
               <p className="text-gray-500">No transactions found.</p>
             </div>
           ) : (
-            transactions.map((transaction, index) => (
-              <div key={transaction.id || index} className="rounded-lg border border-gray-200 bg-white p-4">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm text-slate-500">Topic</p>
-                    <p className="text-lg font-semibold text-slate-900">{transaction.job_topic || "Unknown"}</p>
-                  </div>
-                  <div
-                    className={
-                      `rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white ${
-                        transaction.paid ? "bg-emerald-600" : "bg-rose-600"
-                      }`
-                    }
-                  >
-                    {transaction.paid ? "Paid" : "Unpaid"}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-slate-500">Amount</p>
-                    <p className="text-lg font-semibold text-slate-900">${transaction.amount ?? 0}</p>
+            <>
+              {transactions
+                .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                .map((transaction, index) => {
+                  const id = transaction.id || String(index);
+                  const isExpanded = expandedTransactionId === id;
+
+                  return (
+                    <div
+                      key={id}
+                      className="rounded-lg border border-gray-200 bg-white"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setExpandedTransactionId(isExpanded ? null : id)}
+                        className="w-full p-4 text-left"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm text-slate-500">Topic</p>
+                            <p className="text-lg font-semibold text-slate-900">{transaction.job_topic || "Unknown"}</p>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white ${
+                                transaction.paid ? "bg-emerald-600" : "bg-rose-600"
+                              }`}
+                            >
+                              {transaction.paid ? "Paid" : "Unpaid"}
+                            </span>
+                            <div className="text-right">
+                              <p className="text-sm text-slate-500">Amount</p>
+                              <p className="text-lg font-semibold text-slate-900">${transaction.amount ?? 0}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+
+                      {isExpanded && (
+                        <div className="border-t border-gray-200 bg-slate-50 p-4 text-sm text-slate-700">
+                          <div className="grid gap-3 md:grid-cols-2">
+                            <div>
+                              <p className="font-medium text-slate-900">Taxes</p>
+                              <p>${transaction.amount_taxes ?? transaction["amount taxes"] ?? 0}</p>
+                            </div>
+                            <div>
+                              <p className="font-medium text-slate-900">Student</p>
+                              <p>{transaction.job_student_name || "N/A"}</p>
+                            </div>
+                            <div>
+                              <p className="font-medium text-slate-900">Created</p>
+                              <p>
+                                {transaction.created_time?.toDate
+                                  ? transaction.created_time.toDate().toLocaleString()
+                                  : transaction.created_time || "Unknown"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="font-medium text-slate-900">Stripe transfer ID</p>
+                              <p>{transaction.stripe_transfer_id || "N/A"}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+              {totalPages > 1 && (
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm text-slate-600">
+                    Page {currentPage} of {totalPages}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Next
+                    </button>
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-700">
-                  <div>
-                    <p className="font-medium">Taxes</p>
-                    <p>${transaction.amount_taxes ?? transaction["amount taxes"] ?? 0}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Student</p>
-                    <p>{transaction.job_student_name || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Paid</p>
-                    <p className={transaction.paid ? "text-emerald-600" : "text-rose-600"}>
-                      {transaction.paid ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Created</p>
-                    <p>
-                      {transaction.created_time?.toDate
-                        ? transaction.created_time.toDate().toLocaleString()
-                        : transaction.created_time || "Unknown"}
-                    </p>
-                  </div>
-                </div>
-                {/* <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <p className="text-sm text-slate-500">Stripe transfer ID: {transaction.stripe_transfer_id || "N/A"}</p>
-                  <Button
-                    type="button"
-                    onClick={() => window.open(transaction.stripe_sessionld || "#", "_blank")}
-                    className="rounded-full bg-primary px-4 py-2 text-white hover:bg-primary/90"
-                  >
-                    View Session
-                  </Button>
-                </div> */}
-              </div>
-            ))
+              )}
+            </>
           )}
         </div>
       </div>
