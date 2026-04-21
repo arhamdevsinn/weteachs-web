@@ -260,7 +260,7 @@ const Page = () => {
               </Card>
 
               <div className="rounded-3xl overflow-hidden shadow-xl border border-emerald-100 bg-white">
-                <img src="/student.png" alt="Student asking for expert guidance" className="w-full h-full object-cover min-h-[320px]" />
+                <img src="/learn10.png" alt="Student asking for expert guidance" className="w-full h-full object-cover min-h-[320px]" />
               </div>
             </div>
 
@@ -314,7 +314,7 @@ const Page = () => {
               </Card>
 
               <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-lg border border-green-100 bg-white">
-                <img src="/help.jpeg" alt="Helper providing one-on-one support" className="w-full h-full object-cover min-h-[280px]" />
+                <img src="/learn11.png" alt="Helper providing one-on-one support" className="w-full h-full object-cover min-h-[280px]" />
               </div>
             </div>
 

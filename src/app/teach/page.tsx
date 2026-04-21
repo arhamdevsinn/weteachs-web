@@ -392,7 +392,7 @@ const Page: React.FC = () => {
               </Card>
 
               <div className="rounded-2xl overflow-hidden shadow-lg border border-indigo-100 bg-white">
-                <img src="/creator.png" alt="Creator and payment setup visual" className="w-full h-full object-cover min-h-[280px]" />
+                <img src="/stripe.png" alt="Creator and payment setup visual" className="w-full h-full object-cover min-h-[280px]" />
               </div>
             </div>
 
