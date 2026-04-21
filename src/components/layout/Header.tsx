@@ -43,6 +43,14 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const storedId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("user_id") ||
+        localStorage.getItem("userId") ||
+        user?.uid ||
+        null
+      : null;
+
   const mockNotifications = [
     { id: 1, title: "New hire request", body: "Azan accepted your chat request." },
     { id: 2, title: "Payment pending", body: "Complete payment to confirm session." },
@@ -156,6 +164,12 @@ const Header = () => {
           className="cursor-pointer"
         >
           My Profile
+        </DropdownMenuItem>
+         <DropdownMenuItem
+          onClick={() => router.push(`/stripe?userId=${encodeURIComponent(storedId || "")}`)}
+          className="cursor-pointer"
+        >
+Add Payment Gateway
         </DropdownMenuItem>
         {/* <DropdownMenuItem
           onClick={() => handleNavigate("/edit-profile")}

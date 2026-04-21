@@ -168,6 +168,38 @@ const Page = () => {
             </motion.div>
           </div>
 
+<section className="grid gap-6 lg:grid-cols-2 items-center my-12 p-6 rounded-3xl bg-gradient-to-br from-slate-100 to-white border border-slate-200 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)]">
+    <div className="space-y-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Payments</p>
+      <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">How Payments Work</h2>
+      <p className="text-gray-700 text-base md:text-lg leading-relaxed">
+        We use Stripe to handle all payments — a secure and trusted platform used worldwide.
+      </p>
+      <p className="text-gray-700 leading-relaxed">
+        To start earning, simply connect your Stripe account.
+      </p>
+      <ul className="list-disc list-inside space-y-2 text-gray-700 font-medium">
+        <li>You can receive payments directly</li>
+        <li>Transactions are safe and reliable</li>
+        <li>Payouts are handled automatically</li>
+      </ul>
+      <p className="text-gray-700 leading-relaxed">
+        After setup, you’re officially ready to get hired.
+      </p>
+      <a
+        href="https://stripe.com"
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary/90"
+      >
+        Visit stripe.com
+      </a>
+    </div>
+
+    <div className="rounded-3xl overflow-hidden bg-slate-100 shadow-inner">
+      <img src="/chat4.png" alt="Payment overview on mobile" className="w-full h-full object-cover min-h-[320px]" />
+    </div>
+  </section>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

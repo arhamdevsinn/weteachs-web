@@ -52,7 +52,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gradient-to-br from-[#111827] via-[#1f2937] to-[#111827] text-gray-300 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+      <div className="absolute inset-0 bg-slate-900/10"></div>
 
       <div className="container mx-auto px-6 py-16 relative z-10">
         <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-10">
