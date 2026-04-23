@@ -16,20 +16,27 @@ const CongratulationsPage = () => {
   const isAfterCategory = searchParams.get('category') === 'true';
 
   useEffect(() => {
-    // Add Google Analytics conversion script
-    const script = document.createElement('script');
-    script.innerHTML = `
-      gtag('event', 'conversion', {'send_to': 'AW-11114959066/JckvCPnY6-8bENqhg7Qp'});
-      fbq('track', 'CompleteRegistration');
-    `;
-    document.head.appendChild(script);
+    //     // Add Google Analytics conversion script
+    // const script = document.createElement('script');
+    // script.innerHTML = `
+    //   gtag('event', 'conversion', {'send_to': 'AW-11114959066/JckvCPnY6-8bENqhg7Qp'});
+    //   fbq('track', 'CompleteRegistration');
+    // `;
+    // document.head.appendChild(script);
 
-    return () => {
-      // Cleanup script on unmount
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
+
+    if (typeof window === "undefined") return;
+    // return () => {
+    //   // Cleanup script on unmount
+    //   if (script.parentNode) {
+    //     script.parentNode.removeChild(script);
+    //   }
+    // };
+    window.gtag?.("event", "conversion", {
+      send_to: "AW-11114959066/JckvCPnY6-8bENqhg7Qp",
+    });
+    window.fbq?.("track", "CompleteRegistration");
+    window.rdt?.("track", "CompleteRegistration");
   }, []);
 
   const handleContinue = () => {
