@@ -20,6 +20,8 @@ import { algoliasearch } from "algoliasearch";
 import { auth } from "@/src/lib/firebase/config";
 import SignupPromptDialog from "./SignupPromptDialog";
 
+const getAvatarFallbackUrl = () => "/cat5.jpeg";
+
 
 // Skeleton Loader
 const SkeletonCard = () => (
@@ -33,60 +35,60 @@ const SkeletonCard = () => (
 );
 
 // Category Card Component
-const CategoryCard = ({ cat, index, openCategoryModal }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-    animate={{ opacity: 1, scale: 1, y: 0 }}
-    transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
-    whileHover={{ scale: 1.03, y: -5 }}
-    className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition h-full"
-    onClick={() => openCategoryModal(cat)}
-  >
-    {cat.image ? (
+const CategoryCard = ({ cat, index, openCategoryModal }) => {
+  const [imageError, setImageError] = useState(false);
+  const imageSrc = !imageError && cat.image ? cat.image : getAvatarFallbackUrl(cat);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
+      whileHover={{ scale: 1.03, y: -5 }}
+      className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition h-full"
+      onClick={() => openCategoryModal(cat)}
+    >
       <motion.img
-        src={cat.image}
+        src={imageSrc}
         alt={cat.title || "Category"}
         className="h-40 w-full object-cover"
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.3 }}
+        onError={() => setImageError(true)}
       />
-    ) : (
-      <div className="bg-gray-200 h-40 w-full flex items-center justify-center text-gray-400">
-        No Image
-      </div>
-    )}
 
-    <div className="p-4 flex flex-col flex-1">
-      <div className="text-xs uppercase tracking-wide text-primary font-medium">
-        {cat.topic || "No topic"}
-      </div>
+      <div className="p-4 flex flex-col flex-1">
+        <div className="text-xs uppercase tracking-wide text-primary font-medium">
+          {cat.topic || "No topic"}
+        </div>
 
-      <div className="text-xl font-semibold mt-1 text-gray-800">
-        {cat.title || "Untitled"}
-      </div>
+        <div className="text-xl font-semibold mt-1 text-gray-800">
+          {cat.title || "Untitled"}
+        </div>
 
-      <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-        {cat.description || "No description available."}
-      </p>
-
-      <div className="flex justify-between items-center mt-2">
-        <p className="text-sm text-gray-600 font-bold">
-          ${cat.category_rate || 0} / 15 mins
+        <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+          {cat.description || "No description available."}
         </p>
-        <p className="text-sm text-gray-600">
-          {cat.Language}
-        </p>
-      </div>
 
-      <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
-        <span>❤️ {cat.category_rate || 0} likes</span>
-        <span className="text-primary font-medium">
-          {cat.teacher_name || "Unknown"}
-        </span>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-sm text-gray-600 font-bold">
+            ${cat.category_rate || 0} / 15 mins
+          </p>
+          <p className="text-sm text-gray-600">
+            {cat.Language}
+          </p>
+        </div>
+
+        <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
+          <span>❤️ {cat.category_rate || 0} likes</span>
+          <span className="text-primary font-medium">
+            {cat.teacher_name || "Unknown"}
+          </span>
+        </div>
       </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 const CategoriesCard = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -208,6 +210,7 @@ const CategoriesCard = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [open, setOpen] = useState(false);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+  const [modalImageError, setModalImageError] = useState(false);
 
   // Check if user is authenticated
   const isAuthenticated = () => {
@@ -225,6 +228,7 @@ const CategoriesCard = () => {
 
   const openCategoryModal = (cat) => {
     // Check authentication before opening modal
+    setModalImageError(false);
     if (isAuthenticated()) {
       // User is logged in - show category details
       setSelectedCategory(cat);
@@ -566,17 +570,16 @@ const CategoriesCard = () => {
 
             <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-1 flex items-center justify-center">
-                {selectedCategory.image ? (
-                  <img
-                    src={selectedCategory.image}
-                    alt={selectedCategory.title}
-                    className="w-full h-48 object-cover rounded-lg border"
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-lg border">
-                    No image
-                  </div>
-                )}
+                <img
+                  src={
+                    !modalImageError && selectedCategory.image
+                      ? selectedCategory.image
+                      : getAvatarFallbackUrl(selectedCategory)
+                  }
+                  alt={selectedCategory.title}
+                  className="w-full h-48 object-cover rounded-lg border"
+                  onError={() => setModalImageError(true)}
+                />
               </div>
 
               <div className="md:col-span-2">

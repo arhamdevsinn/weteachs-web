@@ -371,7 +371,7 @@ const Page: React.FC = () => {
               </Card>
 
               <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-100 bg-white">
-                <img src="/expert.png" alt="Expert profile and earning opportunities" className="w-full h-full object-cover min-h-[320px]" />
+                <img src="/chat4.png" alt="Expert profile and earning opportunities" className="w-full h-full object-cover min-h-[320px]" />
               </div>
             </div>
 

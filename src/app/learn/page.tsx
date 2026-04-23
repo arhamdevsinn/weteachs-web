@@ -152,22 +152,31 @@ const Page = () => {
   {/* ACTION CARDS */}
   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
     {[
-      "Cooking",
-      "Fitness",
-      "Education",
-      "Gaming",
-      "Sports",
-      "Business",
-      "Health",
-      "Art",
-    ].map((item, i) => (
-      <div
-        key={i}
-        className="bg-gradient-to-b from-secondary to-white text-primary text-lg md:text-xl font-semibold rounded-2xl p-8 text-center shadow-sm border border-primary/10 hover:-translate-y-1 hover:shadow-lg transition"
-      >
-        {item}
-      </div>
-    ))}
+      { label: "Cooking" },
+      { label: "Fitness", href: "/fitness" },
+      { label: "Education" },
+      { label: "Gaming" },
+      { label: "Sports" },
+      { label: "Business" },
+      { label: "Health" },
+      { label: "Art" },
+    ].map((item, i) => {
+      const tileClasses = "bg-gradient-to-b from-secondary to-white text-primary text-lg md:text-xl font-semibold rounded-2xl p-8 text-center shadow-sm border border-primary/10 hover:-translate-y-1 hover:shadow-lg transition block";
+
+      if (item.href) {
+        return (
+          <Link key={i} href={item.href} className={tileClasses}>
+            {item.label}
+          </Link>
+        );
+      }
+
+      return (
+        <div key={i} className={tileClasses}>
+          {item.label}
+        </div>
+      );
+    })}
   </div>
   {/* PROFILE PREVIEW CARD */}
   {/* <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">

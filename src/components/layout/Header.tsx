@@ -81,7 +81,7 @@ const Header = () => {
     { href: "/learn", label: "Clients" },
     { href: "/about", label: "Learn" },
     { href: "/categories", label: "Explore" },
-    { href: "/fitness", label: "Fitness" },
+    // { href: "/fitness", label: "Fitness" },
     // ...(user ? [{ href: "/community", label: "Community" }] : []),
     // ...(user ? [{ href: "/categories", label: "Explore" }] : []),
     // ...(user ? [{ href: "/profile", label: "Profile" }] : []),
@@ -169,7 +169,7 @@ const Header = () => {
           onClick={() => router.push(`/stripe?userId=${encodeURIComponent(storedId || "")}`)}
           className="cursor-pointer"
         >
-Add Payment Gateway
+Payments
         </DropdownMenuItem>
         {/* <DropdownMenuItem
           onClick={() => handleNavigate("/edit-profile")}
