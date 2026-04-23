@@ -1,13 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Button } from "@/src/components/ui/button";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRedditPixel } from "@/src/hooks/useRedditPixel";
 
 const Page = () => {
+  const { trackLead } = useRedditPixel();
+  const [name, setName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSendMessage = () => {
+    if (!contactEmail) return;
+    // Track Lead — fires Pixel + CAPI in parallel
+    trackLead({
+      email: contactEmail,
+      conversionId: `lead_${Date.now()}`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 via-secondary to-primary/10 flex flex-col items-center py-20 px-6">
       <div className="max-w-6xl w-full">
@@ -37,10 +52,31 @@ const Page = () => {
             </h2>
 
             <div className="space-y-5">
-              <Input type="text" placeholder="Your Name" className="bg-white" />
-              <Input type="email" placeholder="Your Email*" className="bg-white" />
-              <Textarea placeholder="Your Message" rows={5} className="bg-white" />
-              <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-full py-2 text-lg">
+              <Input
+                type="text"
+                placeholder="Your Name"
+                className="bg-white"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Input
+                type="email"
+                placeholder="Your Email*"
+                className="bg-white"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+              />
+              <Textarea
+                placeholder="Your Message"
+                rows={5}
+                className="bg-white"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+              <Button
+                onClick={handleSendMessage}
+                className="w-full bg-primary hover:bg-primary/90 text-white rounded-full py-2 text-lg"
+              >
                 Send Message
               </Button>
             </div>
@@ -52,7 +88,7 @@ const Page = () => {
             className="flex flex-col justify-center bg-white/60 backdrop-blur-lg rounded-2xl shadow-md p-8 border border-gray-100 space-y-6"
           >
             <h2 className="text-2xl font-semibold text-gray-900">
-              The <span className="text-primary">WeTeachs</span> team is here to help you 
+              The <span className="text-primary">WeTeachs</span> team is here to help you
             </h2>
             <p className="text-gray-600 leading-relaxed">
               Whether you have questions, suggestions, or just want to say hi —
@@ -64,14 +100,6 @@ const Page = () => {
                 <Mail className="text-primary" />
                 <span>weteachat@gmail.com</span>
               </div>
-              {/* <div className="flex items-center gap-3 text-gray-700">
-                <Phone className="text-primary" />
-                <span>00000000000</span>
-              </div>
-              <div className="flex items-center gap-3 text-gray-700">
-                <MapPin className="text-primary" />
-                <span>Usa, USA</span>
-              </div> */}
             </div>
           </motion.div>
         </div>

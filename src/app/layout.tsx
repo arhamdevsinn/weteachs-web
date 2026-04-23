@@ -128,8 +128,23 @@ export default function RootLayout({
                     s.parentNode.insertBefore(t,s);
                   }
                 }(window,document);
-                rdt('init', '${redditPixelId}');
-                rdt('track', 'PageVisit');
+
+                /* Capture Reddit click ID (rclid) from the URL if present */
+                var _rdtClickId = (function(){
+                  try { return new URLSearchParams(window.location.search).get('rclid') || undefined; }
+                  catch(e) { return undefined; }
+                })();
+
+                rdt('init', '${redditPixelId}', {
+                  optOut: false,
+                  useDecimalCurrencyValues: true,
+                  clickId: _rdtClickId,
+                });
+
+                /* PageVisit — use a stable conversionId for deduplication with CAPI */
+                rdt('track', 'PageVisit', {
+                  conversionId: 'pv_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+                });
               `,
             }}
           />

@@ -23,7 +23,6 @@ export const RecentCategoriesSection = () => {
         setLoading(true);
         const recentCategories = await getRecentCategories(CATEGORIES_TO_FETCH);
         setCategories(recentCategories);
-        console.log("Fetched recent categories:", recentCategories);
       } catch (error) {
         console.error("Error fetching recent categories:", error);
       } finally {
@@ -71,7 +70,7 @@ export const RecentCategoriesSection = () => {
         >
           <div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">
-            What are People <span className="text-primary">Helping</span> with?
+              What are People <span className="text-primary">Helping</span> with?
             </h2>
             <p className="text-gray-600 text-base">
               Explore our latest learning topics and subjects
@@ -83,11 +82,10 @@ export const RecentCategoriesSection = () => {
             <button
               onClick={handlePrev}
               disabled={currentPage === 0}
-              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
-                currentPage === 0
-                  ? "border-gray-200 text-gray-300 cursor-not-allowed"
-                  : "border-gray-300 text-gray-700 hover:bg-primary hover:text-white hover:border-primary"
-              }`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${currentPage === 0
+                ? "border-gray-200 text-gray-300 cursor-not-allowed"
+                : "border-gray-300 text-gray-700 hover:bg-primary hover:text-white hover:border-primary"
+                }`}
               aria-label="Previous"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -95,11 +93,10 @@ export const RecentCategoriesSection = () => {
             <button
               onClick={handleNext}
               disabled={currentPage === totalPages - 1}
-              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
-                currentPage === totalPages - 1
-                  ? "border-gray-200 text-gray-300 cursor-not-allowed"
-                  : "border-gray-300 text-gray-700 hover:bg-primary hover:text-white hover:border-primary"
-              }`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${currentPage === totalPages - 1
+                ? "border-gray-200 text-gray-300 cursor-not-allowed"
+                : "border-gray-300 text-gray-700 hover:bg-primary hover:text-white hover:border-primary"
+                }`}
               aria-label="Next"
             >
               <ChevronRight className="w-6 h-6" />
@@ -148,11 +145,10 @@ export const RecentCategoriesSection = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentPage(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    currentPage === index
-                      ? "w-8 bg-primary"
-                      : "w-2 bg-gray-300 hover:bg-gray-400"
-                  }`}
+                  className={`h-2 rounded-full transition-all duration-300 ${currentPage === index
+                    ? "w-8 bg-primary"
+                    : "w-2 bg-gray-300 hover:bg-gray-400"
+                    }`}
                   aria-label={`Go to page ${index + 1}`}
                 />
               ))}

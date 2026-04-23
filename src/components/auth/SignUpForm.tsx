@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { CircleArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { AuthService } from '@/src/lib/firebase/auth';
+import { useRedditPixel } from '@/src/hooks/useRedditPixel';
 
 declare global {
   interface Window {
@@ -24,6 +25,7 @@ function SignUpForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { trackSignUp } = useRedditPixel();
 
   useEffect(() => {
     // Add conversion tracking script
@@ -77,7 +79,7 @@ function SignUpForm() {
     try {
       const res = await AuthService.signup(email, password);
       
-      // Track conversion
+      // Track Google Ads conversion
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', 'conversion', {
           'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
@@ -85,6 +87,14 @@ function SignUpForm() {
           'currency': 'USD'
         });
       }
+
+      // Track Reddit SignUp — fires Pixel + CAPI in parallel
+      trackSignUp({
+        email,           // hashed server-side in CAPI route
+        conversionId: `signup_${Date.now()}`,
+        value: 0.27,
+        currency: 'USD',
+      });
       
       toast.success(res.message); // ✅ "Go to your email and verify first"
       router.push('/verify-email');

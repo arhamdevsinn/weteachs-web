@@ -19,6 +19,7 @@ import { Search } from "lucide-react";
 import { algoliasearch } from "algoliasearch";
 import { auth } from "@/src/lib/firebase/config";
 import SignupPromptDialog from "./SignupPromptDialog";
+import { useRedditPixel } from "@/src/hooks/useRedditPixel";
 
 const getAvatarFallbackUrl = () => "/cat5.jpeg";
 
@@ -94,6 +95,7 @@ const CategoriesCard = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { trackSearch } = useRedditPixel();
   
   // Get uid for teacher profile features (optional - not needed for viewing categories)
   const uid = typeof window !== "undefined"
@@ -191,6 +193,12 @@ const CategoriesCard = () => {
         setAlgoliaHits(res.hits || []);
         setAlgoliaTotal(res.nbHits ?? 0);
         setAlgoliaPages(res.nbPages ?? 1);
+
+        // Track Reddit Search event after results are confirmed
+        trackSearch(searchQuery, {
+          itemCount: res.nbHits ?? 0,
+          conversionId: `search_${Date.now()}`,
+        });
       } catch (err) {
         console.error("Algolia search failed:", err);
         setAlgoliaHits([]);
