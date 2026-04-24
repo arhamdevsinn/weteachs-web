@@ -79,16 +79,21 @@ const StudentDialog = () => {
             }
 
             const studentRef = doc(db, "StudentDetails", resolvedUserId);
+            const limboRef = doc(db, "LimboUserMode", resolvedUserId);
+            const userCallManageRef = doc(db, "UserCallManagement", resolvedUserId);
             const studentData = {
-                Language: "Eng",
                 bio_S: formData.bio_S || "",
+                created_time: serverTimestamp(),
+                limbo_ref: limboRef,
+                nameS: formData.display_name || "",
+                user_call_manage: userCallManageRef,
+                usernameS: formData.display_name || "",
+                Language: "Eng",
                 created_time_t: serverTimestamp(),
                 iSAvailable: false,
                 isOnline: true,
-                limbo_ref: doc(db, "LimboUserMode", resolvedUserId),
                 student: true,
                 student_profile_picture: photoURL,
-                usernameS: formData.display_name,
             };
             await setDoc(studentRef, studentData, { merge: true });
             const payload = {
@@ -113,7 +118,6 @@ const StudentDialog = () => {
             if (user?.email) {
                 payload.email = user.email;
             }
-            const limboRef = doc(db, "LimboUserMode", resolvedUserId);
             await setDoc(
                 limboRef,
                 payload,

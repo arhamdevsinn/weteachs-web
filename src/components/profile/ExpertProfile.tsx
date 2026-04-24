@@ -155,9 +155,6 @@ const ExpertDialog = () => {
         setOpenProfile(false);
         setOpenCategory(false);
         localStorage.setItem("profileCreated", "true");
-      } else {
-        // 🟢 No profile yet → Open profile creation dialog
-        setOpenProfile(true);
       }
     };
 
