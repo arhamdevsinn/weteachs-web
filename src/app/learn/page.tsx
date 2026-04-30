@@ -1,13 +1,14 @@
 // @ts-nocheck
 "use client";
 
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
+import { getRecentCategories, RecentCategory } from "@/src/lib/api/recentCategories";
 import { motion } from "framer-motion";
 import { BookOpen, Users, Clock, DollarSign, Video, Star } from "lucide-react";
 import { useAuth } from "@/src/hooks/useAuth";
 import Link from "next/link";
 import { Card, CardContent } from "@/src/components/ui/card";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -66,10 +67,70 @@ const faqSections: FaqSection[] = [
     items: studentFaqs,
   },
 ];
+
+const newHowItWorks = [
+  {
+    step: "1.",
+    image: "/question.png",
+    title: "Search your topic",
+    desc: "Find experts who understand your problem.",
+  },
+  {
+    step: "2.",
+    image: "/verify.png",
+    title: "Start a chat ⭐",
+    desc: "Ask questions and see if they're the right fit—no commitment",
+  },
+  {
+    step: "3.",
+    image: "/chat.png",
+    title: "Work with your expert",
+    desc: "Get clear answers and real guidance.",
+  },
+];
+
+const newQuestions = [
+  "“How do I start a small online business?”",
+  "“What's the smartest way to invest my money right now?”",
+  "“Can you review my resume and suggest improvements?”",
+  "“What's the best way to learn guitar as a beginner?”",
+  "“How do I fix this error in my code?”",
+  "“What should I do to improve my credit score?”",
+  "“How can I train my dog to stop barking?”",
+  "“What's the best workout plan for beginners?”",
+  "“Can you help me plan a trip to Japan?”",
+  "“How do I grow my Instagram or TikTok account?”",
+];
+
+const newExpertCategories = [
+  { name: "Education" },
+  { name: "Family" },
+  { name: "Ex" },
+  { name: "Ex" },
+  { name: "Ex" },
+];
+
 const Page = () => {
-    const [openFaqKey, setOpenFaqKey] = useState<string | null>(null);
-  
-    const exploreCategoriesCard = (
+  const [openFaqKey, setOpenFaqKey] = useState<string | null>(null);
+  const [categories, setCategories] = useState<RecentCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const data = await getRecentCategories(7);
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const exploreCategoriesCard = (
     <Link href="/categories" className="block mb-10 group">
       <motion.div
         whileHover={{ y: -4, scale: 1.01 }}
@@ -99,14 +160,16 @@ const Page = () => {
       </motion.div>
     </Link>
   );
-    
-    const [menuOpen, setMenuOpen] = useState(false);
-          const { user } = useAuth();
-    
-  
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
+
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-800">
-      <section className="relative flex flex-col items-center justify-center text-center px-6 py-20 bg-gradient-to-r from-primary/90 to-primary text-white">
+      {/* <section className="relative flex flex-col items-center justify-center text-center px-6 py-20 bg-gradient-to-r from-primary/90 to-primary text-white">
+
+
         <motion.h1
           initial="hidden"
           animate="visible"
@@ -125,61 +188,228 @@ const Page = () => {
         >
           Instantly connect with real people ready to help you master any skill — from cooking to coding, fitness to freelancing.
         </motion.p>
-      </section>
- <section className="px-6 md:px-16 py-14">
-  <div className="max-w-6xl mx-auto rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-6 md:p-8 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)]">
-  <div className="mb-8">
-    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Creator Journey</p>
-    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Start Learning In 4 Steps</h2>
-  </div>
+      </section> */}
+      <div className="mx-auto max-w-[1180px] px-4 pb-8 pt-10 sm:px-6 lg:pt-14">
+        <div className="relative aspect-[1.45/1] w-full overflow-hidden rounded-[8px] bg-gray-200 shadow-[0_0_0_1px_rgba(0,0,0,0.16)] sm:aspect-[1.75/1] lg:aspect-[1.91/1]">
+          <picture>
+            <source media="(min-width: 768px)" srcSet="/learn_image.png" />
+            <source media="(min-width: 480px)" srcSet="/hi2.png" />
+            <img
+              src="/learn_image.png"
+              alt="A person smiling while talking with an expert on a laptop"
+              className="h-full w-full object-cover"
+            />
+          </picture>
 
-  {/* STEP 1 */}
-  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-6 shadow-lg">
-    <h3 className="text-2xl font-bold">Step 1.</h3>
-    <p className="text-lg font-semibold">Create your free account</p>
-    <p className="text-white/80">Sign up in minutes</p>
-  </div>
+          <div className="absolute inset-0 bg-black/20" />
 
-  {/* STEP 2 */}
-  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
-    <h3 className="text-2xl font-bold">Step 2.</h3>
-    <p className="text-lg font-semibold">What do you need help with?</p>
-    <p className="text-white/80">
-     Browse through Helpers to find exactly who you need.
-    </p>
-  </div>
 
-  {/* ACTION CARDS */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
-    {[
-      { label: "Cooking" },
-      { label: "Fitness", href: "/fitness" },
-      { label: "Education" },
-      { label: "Gaming" },
-      { label: "Sports" },
-      { label: "Business" },
-      { label: "Health" },
-      { label: "Art" },
-    ].map((item, i) => {
-      const tileClasses = "bg-gradient-to-b from-secondary to-white text-primary text-lg md:text-xl font-semibold rounded-2xl p-8 text-center shadow-sm border border-primary/10 hover:-translate-y-1 hover:shadow-lg transition block";
-
-      if (item.href) {
-        return (
-          <Link key={i} href={item.href} className={tileClasses}>
-            {item.label}
-          </Link>
-        );
-      }
-
-      return (
-        <div key={i} className={tileClasses}>
-          {item.label}
         </div>
-      );
-    })}
-  </div>
-  {/* PROFILE PREVIEW CARD */}
-  {/* <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">
+      </div>
+
+      {/* New Learn Page Design Sections */}
+      <div className="w-full pb-20">
+        {/* How Does It Work? */}
+        <section className="py-12 px-6 max-w-[900px] mx-auto text-center">
+          <h2 className="text-[40px] md:text-[48px] font-black text-black mb-10">
+            How Does It Work?
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {newHowItWorks.map((item, i) => (
+              <div key={i} className="relative bg-[#9fbfa4] rounded-sm p-4 text-center shadow-[4px_4px_10px_rgba(0,0,0,0.2)] border-2 border-[#1B4323] flex flex-col items-center">
+                <span className="absolute top-2 left-3 text-[22px] font-bold text-white drop-shadow-sm">{item.step}</span>
+                <div className="h-[140px] w-full flex items-center justify-center mt-2 mb-2">
+                  <img src={item.image} alt={item.title} width={120} height={120} className="object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)]" />
+                </div>
+                <h3 className="text-white font-bold text-[16px] leading-tight drop-shadow-sm">{item.title}</h3>
+                <p className="text-white/95 mt-1 text-[13px] font-medium leading-snug drop-shadow-sm px-1">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex items-center justify-start max-w-[900px] mx-auto">
+            <Link href="/auth/signup" className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-6 py-2.5 rounded-full font-bold text-[17px] hover:bg-[#112a16] transition shadow-md">
+              Get Started <ArrowRight size={20} strokeWidth={2.5} />
+            </Link>
+          </div>
+        </section>
+
+        {/* What Can You Ask? */}
+        <section className="py-10 bg-white">
+          <div className="text-center mb-6 px-6">
+            <h2 className="text-[32px] md:text-[38px] font-black text-black">What Can You Ask?</h2>
+          </div>
+
+          {/* Non-scrollable list */}
+          <div className="max-w-[700px] mx-auto px-6">
+            <div className="flex flex-col gap-3">
+              {newQuestions.map((q, i) => (
+                <div key={i} className="bg-white rounded-full px-6 py-3 shadow-[0_2px_10px_rgba(0,0,0,0.1)] border border-gray-100 text-center w-full">
+                  <span className="text-gray-800 font-semibold text-[15px]">{q}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Who are the Experts? */}
+        <section className="py-12 px-6 max-w-[1000px] mx-auto">
+          <h2 className="text-[32px] md:text-[38px] font-black text-black mb-6 text-center md:text-left">Who are the Experts?</h2>
+
+          <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+            {loadingCategories
+              ? Array.from({ length: 7 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-[154px] animate-pulse rounded-[7px] bg-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
+                  />
+                ))
+              : categories.map((category) => {
+                  const title =
+                    category.title || category.category_name || "Category";
+                  const teacherName = category.teacher_name || "Name";
+
+                  return (
+                    <a
+                      key={category.id}
+                      href={`/categories?categoryId=${encodeURIComponent(category.id)}`}
+                      className="group overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
+                    >
+                      <div className="flex h-[78px] flex-col justify-between px-3 py-2">
+                        <span className="line-clamp-1 text-left text-lg font-normal leading-none text-white">
+                          {title}
+                        </span>
+                        <span className="line-clamp-1 self-end text-[8px] font-semibold text-white/80">
+                          {teacherName}
+                        </span>
+                      </div>
+                      <img
+                        src={category.category_image_url || "/sample.png"}
+                        alt={title}
+                        className="h-[76px] w-full object-cover"
+                      />
+                    </a>
+                  );
+                })}
+          </div>
+
+          <div className="flex justify-end mt-2">
+            <Link href="/explore" className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-6 py-2.5 rounded-full font-bold text-[16px] hover:bg-[#112a16] transition shadow-md">
+              Ask Now <ArrowRight size={20} strokeWidth={2.5} />
+            </Link>
+          </div>
+
+          {/* Text Area */}
+          <div className="mt-16 flex flex-col md:flex-row gap-8 md:gap-16 items-start">
+            <h3 className="text-[26px] md:text-[32px] font-black text-black shrink-0">“Experts”</h3>
+            <div className="flex-1">
+              <p className="text-[19px] md:text-[22px] text-[#5c7a6b] mb-6 font-medium">
+                Helpers are real people with experience in specific areas.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-8 text-[17px] font-bold text-black mb-8">
+                <div>
+                  <ul className="space-y-3 list-disc list-outside ml-5 text-[#5c7a6b] font-medium">
+                    <li>Fitness coaches</li>
+                    <li>Students and Graduates</li>
+                    <li>Hobbyists and Specialists</li>
+                  </ul>
+                </div>
+                <div>
+                  <ul className="space-y-3 list-disc list-outside ml-5 text-black">
+                    <li>Industry professionals</li>
+                    <li>Experienced freelancers</li>
+                    <li>Skilled specialists and creators</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="space-y-1 text-[18px] text-[#5c7a6b] font-medium">
+                <p>People who've already solved the problem you have.</p>
+                <p>No bots. No generic responses.</p>
+                <p>Just real people helping you move forward.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing & Stripe */}
+        <section className="py-12 px-6 max-w-[850px] mx-auto grid md:grid-cols-2 gap-6 mt-4">
+          <div className="bg-[#113118] rounded-[16px] p-8 flex flex-col justify-between min-h-[260px] shadow-xl">
+            <div>
+              <h3 className="text-[28px] text-white font-bold mb-4">Pricing</h3>
+              <div className="text-[48px] text-white font-black transform -rotate-3 leading-none mt-2" style={{ fontFamily: 'cursive' }}>
+                15MIN - 1HR
+              </div>
+            </div>
+            <p className="text-white text-[18px] font-bold mt-10 leading-snug">
+              Pay per session—quick questions or deeper help.
+            </p>
+          </div>
+
+          <div className="bg-[#3e63dd] rounded-[16px] p-8 flex flex-col justify-between min-h-[260px] shadow-xl relative overflow-hidden">
+            <div className="absolute -right-4 -bottom-4 text-[100px] font-black text-white/10 leading-none select-none">
+              Stripe
+            </div>
+            <h3 className="text-[28px] text-white font-bold mb-4 relative z-10">Stripe</h3>
+            <p className="text-white text-[18px] font-bold mt-auto leading-snug relative z-10 pr-4">
+              Your payments are protected and securely handled by Stripe.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <section className="px-6 md:px-16 py-14">
+        <div className="max-w-6xl mx-auto rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-6 md:p-8 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)]">
+          <div className="mb-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Creator Journey</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Start Learning In 4 Steps</h2>
+          </div>
+
+          {/* STEP 1 */}
+          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-6 shadow-lg">
+            <h3 className="text-2xl font-bold">Step 1.</h3>
+            <p className="text-lg font-semibold">Create your free account</p>
+            <p className="text-white/80">Sign up in minutes</p>
+          </div>
+
+          {/* STEP 2 */}
+          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
+            <h3 className="text-2xl font-bold">Step 2.</h3>
+            <p className="text-lg font-semibold">What do you need help with?</p>
+            <p className="text-white/80">
+              Browse through Helpers to find exactly who you need.
+            </p>
+          </div>
+
+          {/* ACTION CARDS */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
+            {[
+              { label: "Cooking" },
+              { label: "Fitness", href: "/fitness" },
+              { label: "Education" },
+              { label: "Gaming" },
+              { label: "Sports" },
+              { label: "Business" },
+              { label: "Health" },
+              { label: "Art" },
+            ].map((item, i) => {
+              const tileClasses = "bg-gradient-to-b from-secondary to-white text-primary text-lg md:text-xl font-semibold rounded-2xl p-8 text-center shadow-sm border border-primary/10 hover:-translate-y-1 hover:shadow-lg transition block";
+
+              if (item.href) {
+                return (
+                  <Link key={i} href={item.href} className={tileClasses}>
+                    {item.label}
+                  </Link>
+                );
+              }
+
+              return (
+                <div key={i} className={tileClasses}>
+                  {item.label}
+                </div>
+              );
+            })}
+          </div>
+          {/* PROFILE PREVIEW CARD */}
+          {/* <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">
     <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
       <img
         src="/helper-categpry.jpg"
@@ -203,54 +433,54 @@ const Page = () => {
       <span>Helper Name</span>
     </div>
   </div> */}
-  {exploreCategoriesCard}
-  
-  {/* STEP 3 */}
-  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
-    <h3 className="text-2xl font-bold">Step 3.</h3>
-    <p className="text-lg font-semibold">Chat with them.</p>
-    <p className="text-white/80">
-      Chat with your Helper to see if they are the right fit for you.
-    </p>
-  </div>
+          {exploreCategoriesCard}
 
-  {/* IMAGES SECTION */}
-  <div className="grid md:grid-cols-2 gap-6 mb-12">
-    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-      <img
-        src="/help2.jpeg"
-        alt="Picture of a person"
-        className="object-cover w-full h-full"
-      />
-    </div>
+          {/* STEP 3 */}
+          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
+            <h3 className="text-2xl font-bold">Step 3.</h3>
+            <p className="text-lg font-semibold">Chat with them.</p>
+            <p className="text-white/80">
+              Chat with your Helper to see if they are the right fit for you.
+            </p>
+          </div>
 
-    <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-      <img
-        src="/image2.png"
-        alt="Screenshot from web/app"
-        className="object-cover w-full h-full"
-      />
-    </div>
-  </div>
+          {/* IMAGES SECTION */}
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+            <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+              <img
+                src="/help2.jpeg"
+                alt="Picture of a person"
+                className="object-cover w-full h-full"
+              />
+            </div>
 
-  {/* STEP 4 */}
-  <div className="bg-primary text-white rounded-2xl p-6 md:p-7 shadow-lg">
-    <h3 className="text-2xl font-bold">Step 4.</h3>
-    <p className="text-lg font-semibold">Hire them.</p>
-    <p className="text-white/80">
-      Chat with your Helper to see if they are the right fit for you.
-    </p>
-  </div>
-  </div>
+            <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
+              <img
+                src="/image2.png"
+                alt="Screenshot from web/app"
+                className="object-cover w-full h-full"
+              />
+            </div>
+          </div>
 
-</section>
-<div>
+          {/* STEP 4 */}
+          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 shadow-lg">
+            <h3 className="text-2xl font-bold">Step 4.</h3>
+            <p className="text-lg font-semibold">Hire them.</p>
+            <p className="text-white/80">
+              Chat with your Helper to see if they are the right fit for you.
+            </p>
+          </div>
+        </div>
+
+      </section>
+      <div>
         <div className="px-6 md:px-16 mb-3">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">For Learners</p>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-1">Student Steps</h2>
         </div>
-    
-        
+
+
         <section className="px-6 md:px-16 py-14 bg-gradient-to-b from-white via-emerald-50/30 to-cyan-50/40">
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="grid lg:grid-cols-2 gap-6 items-stretch">
@@ -352,7 +582,7 @@ const Page = () => {
 
           </div>
         </section>
-        </div>
+      </div>
 
       <section className="py-20 px-6 text-center max-w-5xl mx-auto">
         <motion.h2
@@ -505,104 +735,102 @@ const Page = () => {
           ))}
         </div>
       </section>
-        <div className="space-y-6 p-6">
-          {faqSections.map((section) => (
-            <article key={section.id} className="rounded-2xl border border-[#45ba61] bg-white p-5 shadow-sm sm:p-6">
-              <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-[#45ba61] pb-4">
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#265A32]">
-                    {section.badge}
-                  </p>
-                  <h3 className="text-xl font-semibold tracking-tight text-slate-900">
-                    {section.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-slate-600">{section.description}</p>
-                </div>
-                <span className="rounded-full bg-[#45ba61] px-3 py-1 text-xs font-medium text-white">
-                  {section.items.length} questions
-                </span>
+      <div className="space-y-6 p-6">
+        {faqSections.map((section) => (
+          <article key={section.id} className="rounded-2xl border border-[#45ba61] bg-white p-5 shadow-sm sm:p-6">
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-[#45ba61] pb-4">
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#265A32]">
+                  {section.badge}
+                </p>
+                <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+                  {section.title}
+                </h3>
+                <p className="mt-1 text-sm text-slate-600">{section.description}</p>
               </div>
+              <span className="rounded-full bg-[#45ba61] px-3 py-1 text-xs font-medium text-white">
+                {section.items.length} questions
+              </span>
+            </div>
 
-              <div className="space-y-3">
-                {section.items.map((faq, idx) => {
-                  const itemKey = `${section.id}-${idx}`;
-                  const isOpen = openFaqKey === itemKey;
+            <div className="space-y-3">
+              {section.items.map((faq, idx) => {
+                const itemKey = `${section.id}-${idx}`;
+                const isOpen = openFaqKey === itemKey;
 
-                  return (
-                    <div
-                      key={itemKey}
-                      className={`rounded-xl border px-4 py-3 transition-colors sm:px-5 ${
-                        isOpen
-                          ? "border-[#45ba61] bg-cyan-50/60"
-                          : "border-[#45ba61] bg-white hover:border-[#45ba61] hover:bg-cyan-50/30"
+                return (
+                  <div
+                    key={itemKey}
+                    className={`rounded-xl border px-4 py-3 transition-colors sm:px-5 ${isOpen
+                      ? "border-[#45ba61] bg-cyan-50/60"
+                      : "border-[#45ba61] bg-white hover:border-[#45ba61] hover:bg-cyan-50/30"
                       }`}
+                  >
+                    <button
+                      className="flex w-full items-center justify-between gap-4 text-left"
+                      onClick={() => setOpenFaqKey(isOpen ? null : itemKey)}
+                      aria-expanded={isOpen}
                     >
-                      <button
-                        className="flex w-full items-center justify-between gap-4 text-left"
-                        onClick={() => setOpenFaqKey(isOpen ? null : itemKey)}
-                        aria-expanded={isOpen}
-                      >
-                        <span className={`text-sm font-medium sm:text-base ${isOpen ? "text-[#265A32]" : "text-slate-800"}`}>
-                          {faq.question}
-                        </span>
-                        <span
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
-                            isOpen ? "bg-cyan-100 text-[#265A32]" : "bg-[#45ba61] text-white"
+                      <span className={`text-sm font-medium sm:text-base ${isOpen ? "text-[#265A32]" : "text-slate-800"}`}>
+                        {faq.question}
+                      </span>
+                      <span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${isOpen ? "bg-cyan-100 text-[#265A32]" : "bg-[#45ba61] text-white"
                           }`}
-                        >
-                          {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                        </span>
-                      </button>
+                      >
+                        {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </span>
+                    </button>
 
-                      {isOpen && (
-                        <div className="mt-3 border-t border-[#45ba61]/70 pt-3 text-sm leading-6 text-slate-700 whitespace-pre-line">
-                          {faq.answer || <span className="italic text-slate-400">Answer coming soon...</span>}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </article>
-          ))}
-        </div>
+                    {isOpen && (
+                      <div className="mt-3 border-t border-[#45ba61]/70 pt-3 text-sm leading-6 text-slate-700 whitespace-pre-line">
+                        {faq.answer || <span className="italic text-slate-400">Answer coming soon...</span>}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </article>
+        ))}
+      </div>
       {!user && (
-  <>
-      <section className="py-20 px-6 text-center bg-gradient-to-r from-primary to-primary/80 text-white">
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          variants={fadeUp}
-          className="text-3xl md:text-5xl font-bold mb-6"
-        >
-          Start Learning Today 🎓
-        </motion.h2>
-        <motion.p
-          initial="hidden"
-          whileInView="visible"
-          variants={fadeUp}
-          custom={0.3}
-          className="text-lg text-gray-100 mb-10 max-w-3xl mx-auto"
-        >
-          Your next skill, mentor, or breakthrough is just a session away.
-          Weteachs makes it easy, affordable, and fun to learn anything, anywhere.
-        </motion.p>
-        <motion.button
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.95 }}
-  size="lg"
-  onClick={() => {
-    setMenuOpen(false);
-    window.open("/auth/signup", "_blank"); 
-  }}
-  className="bg-white text-primary font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
->
-  Sign Up & Find Your Expert
-</motion.button>
+        <>
+          <section className="py-20 px-6 text-center bg-gradient-to-r from-primary to-primary/80 text-white">
+            <motion.h2
+              initial="hidden"
+              whileInView="visible"
+              variants={fadeUp}
+              className="text-3xl md:text-5xl font-bold mb-6"
+            >
+              Start Learning Today 🎓
+            </motion.h2>
+            <motion.p
+              initial="hidden"
+              whileInView="visible"
+              variants={fadeUp}
+              custom={0.3}
+              className="text-lg text-gray-100 mb-10 max-w-3xl mx-auto"
+            >
+              Your next skill, mentor, or breakthrough is just a session away.
+              Weteachs makes it easy, affordable, and fun to learn anything, anywhere.
+            </motion.p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              size="lg"
+              onClick={() => {
+                setMenuOpen(false);
+                window.open("/auth/signup", "_blank");
+              }}
+              className="bg-white text-primary font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              Sign Up & Find Your Expert
+            </motion.button>
 
-      </section>
+          </section>
         </>
-)}
+      )}
     </div>
   );
 };
