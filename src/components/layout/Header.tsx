@@ -83,16 +83,26 @@ const Header = () => {
 
     <>
       <header className="sticky top-0 z-50 w-full bg-white shadow-[0_1px_6px_rgba(0,0,0,0.18)]">
-        <div className="flex h-[68px] items-center border-b border-gray-200 px-5 lg:px-6">
-          <Link href="/" className="mr-8 flex shrink-0 items-center">
-            <span className="text-[30px] font-black leading-none tracking-normal text-primary [text-shadow:0_1px_1px_rgba(0,0,0,0.2)]">
-              WeTeachs
-            </span>
-          </Link>
+        <div className="flex h-[68px] items-center justify-between border-b border-gray-200 px-4 lg:px-6">
+          {/* Left side: Hamburger (mobile only) + Logo */}
+          <div className="flex items-center gap-3 lg:gap-8">
+            <button
+              className="p-1 text-primary hover:bg-gray-100 lg:hidden"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X size={32} strokeWidth={1.5} /> : <Menu size={32} strokeWidth={1.5} />}
+            </button>
+            <Link href="/" className="flex shrink-0 items-center">
+              <span className="text-[26px] lg:text-[30px] font-medium tracking-normal text-primary">
+                Weteachs
+              </span>
+            </Link>
+          </div>
 
+          {/* Middle: Search Form (Desktop only) */}
           <form
             action="/categories"
-            className="hidden h-[36px] w-[350px] shrink-0 items-stretch overflow-hidden rounded-[3px] border border-gray-300 bg-white shadow-[inset_0_1px_3px_rgba(0,0,0,0.08)] md:flex"
+            className="hidden h-[36px] w-[350px] shrink-0 items-stretch overflow-hidden rounded-[3px] border border-gray-300 bg-white shadow-[inset_0_1px_3px_rgba(0,0,0,0.08)] lg:flex mx-4"
           >
             <input
               name="q"
@@ -109,7 +119,8 @@ const Header = () => {
             </button>
           </form>
 
-          <nav className="ml-auto hidden items-center gap-7 lg:flex">
+          {/* Desktop Nav */}
+          <nav className="hidden items-center gap-7 lg:flex">
             {mainNavigationItems.map((item) => {
               const active = pathname === item.href;
               return (
@@ -117,9 +128,7 @@ const Header = () => {
                   key={item.href}
                   href={item.href}
                   className={`text-center text-[14px] font-extrabold leading-tight text-black transition-colors hover:text-primary ${
-                    active
-                      ? "text-primary"
-                      : ""
+                    active ? "text-primary" : ""
                   }`}
                 >
                   <span className="block whitespace-nowrap">{item.label}</span>
@@ -128,7 +137,24 @@ const Header = () => {
             })}
           </nav>
 
-          <div className="ml-5 hidden items-center gap-4 md:flex">
+          {/* Right side: Mobile "Sign up" */}
+          <div className="flex items-center lg:hidden">
+            {!user ? (
+              <Link href="/auth/signup" className="text-[22px] font-medium text-primary">
+                Sign up
+              </Link>
+            ) : (
+              <button
+                onClick={() => router.push("/notifications")}
+                className="flex p-2 items-center justify-center rounded-full text-primary hover:bg-gray-100"
+              >
+                <Bell size={26} strokeWidth={1.5} />
+              </button>
+            )}
+          </div>
+
+          {/* Desktop Actions */}
+          <div className="ml-5 hidden items-center gap-4 lg:flex">
             <Link
               href="/chat"
               aria-label="Open chat"
@@ -137,72 +163,56 @@ const Header = () => {
               <MessageSquare size={22} strokeWidth={1.4} />
             </Link>
             {user && (
-            
-                     <button
-                    onClick={() => router.push("/notifications")}
-                    className="flex h-[31px] w-[31px] items-center justify-center rounded-[3px] text-primary hover:bg-gray-100"
-                  >
-                   <Bell className="h-5 w-5 text-primary" />
-                  </button>
-                
+              <button
+                onClick={() => router.push("/notifications")}
+                className="flex h-[31px] w-[31px] items-center justify-center rounded-[3px] text-primary hover:bg-gray-100"
+              >
+                <Bell className="h-5 w-5 text-primary" />
+              </button>
             )}
-       {user ? (
-  <>
-    <DropdownMenu>
-   <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-primary text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
-  <User size={16} />
-  <span>{user?.email?.split("@")[0] || "User"}</span>
-</DropdownMenuTrigger>
-
-
-      <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem
-          onClick={() => handleNavigate("/profile")}
-          className="cursor-pointer"
-        >
-          My Profile
-        </DropdownMenuItem>
-         <DropdownMenuItem
-          onClick={() => router.push(`/stripe?userId=${encodeURIComponent(storedId || "")}`)}
-          className="cursor-pointer"
-        >
-Payments
-        </DropdownMenuItem>
-        {/* <DropdownMenuItem
-          onClick={() => handleNavigate("/edit-profile")}
-          className="cursor-pointer"
-        >
-          Edit Profile
-        </DropdownMenuItem> */}
-        
-      </DropdownMenuContent>
-    </DropdownMenu>
-    <Button variant="ghost" size="sm" className="flex items-center gap-2 bg-primary text-sm text-white hover:bg-secondary hover:text-primary" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
-  </>
-) : (
-  <>
-    <button
-      onClick={() => (window.location.href = "/auth/login")}
-      className="whitespace-nowrap text-[14px] font-extrabold text-black hover:text-primary"
-    >
-      Sign In
-    </button>
-    <button
-      onClick={() => (window.location.href = "/auth/signup")}
-      className="h-[34px] rounded-[8px] border-2 border-primary px-2 text-[24px] font-black leading-none text-primary shadow-[0_0_0_1px_rgba(34,84,47,0.12)] hover:bg-primary hover:text-white"
-    >
-      Join
-    </button>
-  </>
-)}
+            {user ? (
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full text-primary text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
+                    <User size={16} />
+                    <span>{user?.email?.split("@")[0] || "User"}</span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44">
+                    <DropdownMenuItem
+                      onClick={() => handleNavigate("/profile")}
+                      className="cursor-pointer"
+                    >
+                      My Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push(`/stripe?userId=${encodeURIComponent(storedId || "")}`)}
+                      className="cursor-pointer"
+                    >
+                      Payments
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 bg-primary text-sm text-white hover:bg-secondary hover:text-primary" onClick={() => setShowConfirm(true)} disabled={loading}>
+                  <LogOut size={15} /> {loading ? "..." : "Logout"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => (window.location.href = "/auth/login")}
+                  className="whitespace-nowrap text-[14px] font-extrabold text-black hover:text-primary"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => (window.location.href = "/auth/signup")}
+                  className="h-[34px] rounded-[8px] border-2 border-primary px-2 text-[24px] font-black leading-none text-primary shadow-[0_0_0_1px_rgba(34,84,47,0.12)] hover:bg-primary hover:text-white"
+                >
+                  Join
+                </button>
+              </>
+            )}
           </div>
-
-          <button
-            className="ml-auto rounded-md p-2 text-gray-700 hover:bg-gray-100 lg:hidden"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
         </div>
 
         <nav className="hidden h-[34px] items-center justify-around border-b border-gray-200 bg-white px-8 md:flex">
