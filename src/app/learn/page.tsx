@@ -258,38 +258,38 @@ const Page = () => {
           <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
             {loadingCategories
               ? Array.from({ length: 7 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-[154px] animate-pulse rounded-[7px] bg-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
-                  />
-                ))
+                <div
+                  key={index}
+                  className="h-[154px] animate-pulse rounded-[7px] bg-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
+                />
+              ))
               : categories.map((category) => {
-                  const title =
-                    category.title || category.category_name || "Category";
-                  const teacherName = category.teacher_name || "Name";
+                const title =
+                  category.title || category.category_name || "Category";
+                const teacherName = category.teacher_name || "Name";
 
-                  return (
-                    <a
-                      key={category.id}
-                      href={`/categories?categoryId=${encodeURIComponent(category.id)}`}
-                      className="group overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
-                    >
-                      <div className="flex h-[78px] flex-col justify-between px-3 py-2">
-                        <span className="line-clamp-1 text-left text-lg font-normal leading-none text-white">
-                          {title}
-                        </span>
-                        <span className="line-clamp-1 self-end text-[8px] font-semibold text-white/80">
-                          {teacherName}
-                        </span>
-                      </div>
-                      <img
-                        src={category.category_image_url || "/sample.png"}
-                        alt={title}
-                        className="h-[76px] w-full object-cover"
-                      />
-                    </a>
-                  );
-                })}
+                return (
+                  <a
+                    key={category.id}
+                    href={`/categories?categoryId=${encodeURIComponent(category.id)}`}
+                    className="group overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
+                  >
+                    <div className="flex h-[78px] flex-col justify-between px-3 py-2">
+                      <span className="line-clamp-1 text-left text-lg font-normal leading-none text-white">
+                        {title}
+                      </span>
+                      <span className="line-clamp-1 self-end text-[8px] font-semibold text-white/80">
+                        {teacherName}
+                      </span>
+                    </div>
+                    <img
+                      src={category.category_image_url || "/sample.png"}
+                      alt={title}
+                      className="h-[76px] w-full object-cover"
+                    />
+                  </a>
+                );
+              })}
           </div>
 
           <div className="flex justify-end mt-2">
@@ -299,33 +299,21 @@ const Page = () => {
           </div>
 
           {/* Text Area */}
-          <div className="mt-16 flex flex-col md:flex-row gap-8 md:gap-16 items-start">
-            <h3 className="text-[26px] md:text-[32px] font-black text-black shrink-0">“Experts”</h3>
-            <div className="flex-1">
-              <p className="text-[19px] md:text-[22px] text-[#5c7a6b] mb-6 font-medium">
-                Helpers are real people with experience in specific areas.
-              </p>
-              <div className="grid sm:grid-cols-2 gap-8 text-[17px] font-bold text-black mb-8">
-                <div>
-                  <ul className="space-y-3 list-disc list-outside ml-5 text-[#5c7a6b] font-medium">
-                    <li>Fitness coaches</li>
-                    <li>Students and Graduates</li>
-                    <li>Hobbyists and Specialists</li>
-                  </ul>
-                </div>
-                <div>
-                  <ul className="space-y-3 list-disc list-outside ml-5 text-black">
-                    <li>Industry professionals</li>
-                    <li>Experienced freelancers</li>
-                    <li>Skilled specialists and creators</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="space-y-1 text-[18px] text-[#5c7a6b] font-medium">
-                <p>People who've already solved the problem you have.</p>
-                <p>No bots. No generic responses.</p>
-                <p>Just real people helping you move forward.</p>
-              </div>
+          <div className="mt-16">
+            <p className="text-[19px] md:text-[22px] text-[#5c7a6b] mb-6 font-medium">
+              Experts are real people with experience in specific areas.
+            </p>
+            <div className="mb-8">
+              <ul className="space-y-3 list-disc list-outside ml-5 text-[#5c7a6b] font-bold text-[17px]">
+                <li>Industry professionals</li>
+                <li>Experienced freelancers</li>
+                <li>Skilled specialists and creators</li>
+              </ul>
+            </div>
+            <div className="space-y-1 text-[18px] text-[#5c7a6b] font-medium">
+              <p>People who've already solved the problem you have.</p>
+              <p>No bots. No generic responses.</p>
+              <p>Just real people helping you move forward.</p>
             </div>
           </div>
         </section>
@@ -356,134 +344,17 @@ const Page = () => {
         </section>
       </div>
 
-      <section className="px-6 md:px-16 py-14">
-        <div className="max-w-6xl mx-auto rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-6 md:p-8 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.45)]">
-          <div className="mb-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Creator Journey</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Start Learning In 4 Steps</h2>
-          </div>
 
-          {/* STEP 1 */}
-          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-6 shadow-lg">
-            <h3 className="text-2xl font-bold">Step 1.</h3>
-            <p className="text-lg font-semibold">Create your free account</p>
-            <p className="text-white/80">Sign up in minutes</p>
-          </div>
-
-          {/* STEP 2 */}
-          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
-            <h3 className="text-2xl font-bold">Step 2.</h3>
-            <p className="text-lg font-semibold">What do you need help with?</p>
-            <p className="text-white/80">
-              Browse through Helpers to find exactly who you need.
-            </p>
-          </div>
-
-          {/* ACTION CARDS */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-12">
-            {[
-              { label: "Cooking" },
-              { label: "Fitness", href: "/fitness" },
-              { label: "Education" },
-              { label: "Gaming" },
-              { label: "Sports" },
-              { label: "Business" },
-              { label: "Health" },
-              { label: "Art" },
-            ].map((item, i) => {
-              const tileClasses = "bg-gradient-to-b from-secondary to-white text-primary text-lg md:text-xl font-semibold rounded-2xl p-8 text-center shadow-sm border border-primary/10 hover:-translate-y-1 hover:shadow-lg transition block";
-
-              if (item.href) {
-                return (
-                  <Link key={i} href={item.href} className={tileClasses}>
-                    {item.label}
-                  </Link>
-                );
-              }
-
-              return (
-                <div key={i} className={tileClasses}>
-                  {item.label}
-                </div>
-              );
-            })}
-          </div>
-          {/* PROFILE PREVIEW CARD */}
-          {/* <div className="bg-white rounded-2xl mx-auto w-full max-w-xl shadow-lg border border-slate-200 p-6 mb-12">
-    <div className="rounded-lg mb-6 overflow-hidden flex items-center justify-center bg-green-200 ">
-      <img
-        src="/helper-categpry.jpg"
-        alt="Helper Category"
-        className="object-cover w-full h-full "
-      />
-      
-    </div>
-
-    <h4 className="text-xl font-bold text-green-700">
-      Topic (Math)
-    </h4>
-    <p className="text-gray-600">Category (Education)</p>
-    <p className="text-gray-600 mb-4">
-      Description (I can help you with algebra)
-    </p>
-
-    <div className="flex justify-between text-sm text-gray-700">
-      <span>$3 / 15min</span>
-      <span>Expertise Level (Advanced)</span>
-      <span>Helper Name</span>
-    </div>
-  </div> */}
-          {exploreCategoriesCard}
-
-          {/* STEP 3 */}
-          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 mb-8 shadow-lg">
-            <h3 className="text-2xl font-bold">Step 3.</h3>
-            <p className="text-lg font-semibold">Chat with them.</p>
-            <p className="text-white/80">
-              Chat with your Helper to see if they are the right fit for you.
-            </p>
-          </div>
-
-          {/* IMAGES SECTION */}
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-            <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-              <img
-                src="/help2.jpeg"
-                alt="Picture of a person"
-                className="object-cover w-full h-full"
-              />
-            </div>
-
-            <div className=" rounded-xl overflow-hidden flex items-center justify-center bg-green-200">
-              <img
-                src="/image2.png"
-                alt="Screenshot from web/app"
-                className="object-cover w-full h-full"
-              />
-            </div>
-          </div>
-
-          {/* STEP 4 */}
-          <div className="bg-primary text-white rounded-2xl p-6 md:p-7 shadow-lg">
-            <h3 className="text-2xl font-bold">Step 4.</h3>
-            <p className="text-lg font-semibold">Hire them.</p>
-            <p className="text-white/80">
-              Chat with your Helper to see if they are the right fit for you.
-            </p>
-          </div>
-        </div>
-
-      </section>
       <div>
-        <div className="px-6 md:px-16 mb-3">
+        {/* <div className="px-6 md:px-16 mb-3">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">For Learners</p>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-1">Student Steps</h2>
-        </div>
+        </div> */}
 
 
-        <section className="px-6 md:px-16 py-14 bg-gradient-to-b from-white via-emerald-50/30 to-cyan-50/40">
+        <section className="px-6 md:px-16 py-1 bg-gradient-to-b from-white via-emerald-50/30 to-cyan-50/40">
           <div className="max-w-6xl mx-auto space-y-8">
-            <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+            {/* <div className="grid lg:grid-cols-2 gap-6 items-stretch">
               <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-3xl">
                 <CardContent className="p-8">
                   <p className="text-sm font-semibold text-primary mb-3">For Students</p>
@@ -501,9 +372,9 @@ const Page = () => {
               <div className="rounded-3xl overflow-hidden shadow-xl border border-emerald-100 bg-white">
                 <img src="/learn10.png" alt="Student asking for expert guidance" className="w-full h-full object-cover min-h-[320px]" />
               </div>
-            </div>
+            </div> */}
 
-            <div className="grid lg:grid-cols-2 gap-6">
+            {/* <div className="grid lg:grid-cols-2 gap-6">
               <Card className="rounded-2xl shadow-lg border-emerald-100">
                 <CardContent className="p-7">
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">What Can You Ask?</h3>
@@ -534,9 +405,9 @@ const Page = () => {
                   </ul>
                 </CardContent>
               </Card>
-            </div>
+            </div> */}
 
-            <div className="grid lg:grid-cols-5 gap-6">
+            {/* <div className="grid lg:grid-cols-5 gap-6">
               <Card className="lg:col-span-3 rounded-2xl shadow-lg border-green-100">
                 <CardContent className="p-7">
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">Who Are the Helpers?</h3>
@@ -555,26 +426,59 @@ const Page = () => {
               <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-lg border border-green-100 bg-white">
                 <img src="/learn11.png" alt="Helper providing one-on-one support" className="w-full h-full object-cover min-h-[280px]" />
               </div>
+            </div> */}
+
+            {/* Why Use Weteachs - green card left, images right */}
+            <div className="grid lg:grid-cols-2 gap-6 items-center">
+              <div className="bg-primary text-white rounded-2xl p-8 shadow-lg">
+                <h3 className="text-2xl font-bold mb-4">Why Use Weteachs?</h3>
+                <ul className="space-y-3 text-white/95 text-[16px]">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 w-2 h-2 rounded-full bg-white flex-shrink-0"></span>
+                    Get answers faster
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 w-2 h-2 rounded-full bg-white flex-shrink-0"></span>
+                    Learn from real people
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 w-2 h-2 rounded-full bg-white flex-shrink-0"></span>
+                    Skip the trial and error
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 w-2 h-2 rounded-full bg-white flex-shrink-0"></span>
+                    Get help specific to YOU
+                  </li>
+                </ul>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 h-[280px]">
+                <div className="rounded-xl overflow-hidden shadow-md">
+                  <img src="/help2.jpeg" alt="Expert helping a student" className="w-full h-full object-cover" />
+                </div>
+                <div className="rounded-xl overflow-hidden shadow-md">
+                  <img src="/image2.png" alt="Person using Weteachs on phone" className="w-full h-full object-cover" />
+                </div>
+              </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="rounded-2xl shadow-lg border-amber-100 bg-gradient-to-br from-amber-50 to-white">
-                <CardContent className="p-7">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">How Much Does It Cost?</h3>
-                  <p className="text-gray-700">Each helper sets their own price.</p>
-                  <p className="text-gray-700">Many questions start at just a few dollars.</p>
-                  <p className="text-gray-700">You only pay for what you need no subscriptions required.</p>
-                </CardContent>
-              </Card>
+            {/* Why Not Google / YouTube - illustration left, text right */}
+            <div className="grid lg:grid-cols-2 gap-6 items-center">
+              <div className="rounded-2xl overflow-hidden shadow-lg h-[280px]">
+                <img src="/learn10.png" alt="Weteachs illustration" className="w-full h-full object-cover" />
+              </div>
 
-              <Card className="rounded-2xl shadow-lg border-primary/20 bg-primary text-white">
+              <Card className="rounded-2xl shadow-lg border-cyan-100 bg-gradient-to-br from-cyan-50 to-white">
                 <CardContent className="p-7">
-                  <h3 className="text-2xl font-bold mb-3">Why Use Weteachs?</h3>
-                  <ul className="list-disc list-inside space-y-2 text-white/95">
-                    <li>Get answers faster</li>
-                    <li>Learn from real people</li>
-                    <li>Skip the trial and error</li>
-                    <li>Get help specific to YOU</li>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Why Not Just Use Google or YouTube?</h3>
+                  <p className="text-gray-700 mb-3">
+                    Because they give you general answers, Weteachs gives you personalized answers.
+                  </p>
+                  <p className="text-gray-700 mb-2">Instead of watching multiple videos or reading articles, you can:</p>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>Ask your exact situation</li>
+                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>Get a direct response</li>
+                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>Save time and confusion</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -584,7 +488,7 @@ const Page = () => {
         </section>
       </div>
 
-      <section className="py-20 px-6 text-center max-w-5xl mx-auto">
+      {/* <section className="py-20 px-6 text-center max-w-5xl mx-auto">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -650,8 +554,9 @@ const Page = () => {
             </motion.div>
           ))}
         </div>
-      </section>
-      <section className="py-20 px-6 bg-white border-t border-gray-100 text-center">
+      </section> */}
+
+      {/* <section className="py-20 px-6 bg-white border-t border-gray-100 text-center">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -694,7 +599,8 @@ const Page = () => {
           ))}
         </div>
       </section>
-      <section className="py-20 px-6 text-center bg-gradient-to-b from-gray-50 to-white">
+       */}
+      {/* <section className="py-20 px-6 text-center bg-gradient-to-b from-gray-50 to-white">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -735,7 +641,8 @@ const Page = () => {
           ))}
         </div>
       </section>
-      <div className="space-y-6 p-6">
+       */}
+      <div className="space-y-6 p-6 pt-40">
         {faqSections.map((section) => (
           <article key={section.id} className="rounded-2xl border border-[#45ba61] bg-white p-5 shadow-sm sm:p-6">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-[#45ba61] pb-4">
