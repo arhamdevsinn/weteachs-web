@@ -52,26 +52,30 @@ const MobileHowItWorks = () => {
       </h2>
 
       {/* Tab Toggle */}
-      <div className="mb-5 flex rounded-[10px] border border-gray-300 overflow-hidden">
-        <button
-          onClick={() => setActiveTab("hiring")}
-          className={`flex-1 py-2.5 text-[14px] font-semibold transition-colors ${activeTab === "hiring"
-            ? "bg-white text-black border-2 border-black rounded-[10px] shadow"
-            : "bg-white text-gray-500"
-            }`}
-        >
-          For Hiring
-        </button>
-        <button
-          onClick={() => setActiveTab("earning")}
-          className={`flex-1 py-2.5 text-[14px] font-semibold transition-colors ${activeTab === "earning"
-            ? "bg-white text-black border-2 border-black rounded-[10px] shadow"
-            : "bg-white text-gray-500"
-            }`}
-        >
-          For Earning
-        </button>
+      <div className="flex justify-center">
+        <div className="mb-5 flex w-fit rounded-[10px] border border-gray-300 overflow-hidden">
+          <button
+            onClick={() => setActiveTab("hiring")}
+            className={`px-4 py-2.5 text-[14px] font-semibold transition-colors ${activeTab === "hiring"
+              ? "bg-white text-black border-2 border-black rounded-[10px] shadow"
+              : "bg-white text-gray-500"
+              }`}
+          >
+            For Hiring
+          </button>
+
+          <button
+            onClick={() => setActiveTab("earning")}
+            className={`px-4 py-2.5 text-[14px] font-semibold transition-colors ${activeTab === "earning"
+              ? "bg-white text-black border-2 border-black rounded-[10px] shadow"
+              : "bg-white text-gray-500"
+              }`}
+          >
+            For Earning
+          </button>
+        </div>
       </div>
+
 
       {/* Scrollable Cards Row */}
       <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-2 scrollbar-none snap-x snap-mandatory">
