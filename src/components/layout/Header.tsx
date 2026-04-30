@@ -31,7 +31,7 @@ import {
   DropdownMenuItem,
 } from "@/src/components/ui/dropdown-menu";
 import { Button } from "@/src/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Header = () => {
   const router = useRouter();
@@ -228,101 +228,159 @@ const Header = () => {
           ))}
         </nav>
 
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="border-t border-gray-100 bg-white px-6 py-4 shadow-lg lg:hidden"
-          >
-            <form action="/categories" className="mb-4 flex h-10 overflow-hidden rounded border border-gray-300">
-              <input
-                name="q"
-                aria-label="Search"
-                placeholder="What do you need help with?"
-                className="min-w-0 flex-1 px-3 text-sm font-semibold outline-none"
-              />
-              <button type="submit" className="w-11 bg-primary" aria-label="Search experts" />
-            </form>
-
-            {[...mainNavigationItems, ...categoryItems].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
+        <AnimatePresence>
+          {menuOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 onClick={() => setMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-sm font-medium transition ${pathname === item.href
-                    ? "bg-blue-100 text-primary"
-                    : "text-gray-700 hover:bg-blue-50 hover:text-primary"
-                  }`}
+                className="fixed inset-0 z-[100] bg-black/60 lg:hidden"
+              />
+
+              {/* Slide-in Drawer */}
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed top-0 left-0 bottom-0 z-[101] flex w-[85%] max-w-[360px] flex-col bg-white shadow-2xl lg:hidden"
               >
-                {item.label}
-              </Link>
-            ))}
+                {/* Drawer Header */}
+                <div className="flex items-center justify-between border-b border-gray-100 px-5 py-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#22542F] text-[15px] font-black tracking-tighter text-white">
+                      WT
+                    </div>
+                    <span className="text-[26px] font-black text-[#22542F]">
+                      WeTeachs
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="flex h-10 w-10 items-center justify-center rounded-[10px] border-2 border-gray-200 text-gray-500 hover:bg-gray-50"
+                  >
+                    <X size={24} strokeWidth={2.5} />
+                  </button>
+                </div>
 
-            <hr className="my-3 border-gray-200" />
+                {/* Drawer Links */}
+                <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-3">
+                  <Link
+                    href="/"
+                    onClick={() => setMenuOpen(false)}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
+                      pathname === "/" || pathname === ""
+                        ? "bg-[#E6F0FD] text-[#22542F]"
+                        : "text-[#333333] hover:bg-gray-50"
+                    }`}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/teach"
+                    onClick={() => setMenuOpen(false)}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
+                      pathname === "/teach"
+                        ? "bg-[#E6F0FD] text-[#22542F]"
+                        : "text-[#333333] hover:bg-gray-50"
+                    }`}
+                  >
+                    Helper
+                  </Link>
+                  <Link
+                    href="/categories"
+                    onClick={() => setMenuOpen(false)}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
+                      pathname.startsWith("/categories")
+                        ? "bg-[#E6F0FD] text-[#22542F]"
+                        : "text-[#333333] hover:bg-gray-50"
+                    }`}
+                  >
+                    Clients
+                  </Link>
+                  <Link
+                    href="/learn"
+                    onClick={() => setMenuOpen(false)}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
+                      pathname === "/learn"
+                        ? "bg-[#E6F0FD] text-[#22542F]"
+                        : "text-[#333333] hover:bg-gray-50"
+                    }`}
+                  >
+                    Learn
+                  </Link>
+                  <Link
+                    href="/explore"
+                    onClick={() => setMenuOpen(false)}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
+                      pathname === "/explore"
+                        ? "bg-[#E6F0FD] text-[#22542F]"
+                        : "text-[#333333] hover:bg-gray-50"
+                    }`}
+                  >
+                    Explore
+                  </Link>
+                </div>
 
-            {user ? (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild className="flex items-center gap-2 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer">
-
-                    <User size={16} />
-                    <span className="text-sm">{user?.email || "Account"}</span>
-                  </DropdownMenuTrigger>
-
-                  <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuItem
-                      onClick={() => handleNavigate("/profile")}
-                      className="cursor-pointer"
-                    >
-                      My Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleNavigate("/edit-profile")}
-                      className="cursor-pointer"
-                    >
-                      Edit Profile
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-3 w-full text-primary hover:bg-secondary"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    setShowConfirm(true);
-                  }}
-                >
-                  <LogOut size={15} className="mr-1" /> Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    window.location.href = "/auth/login";
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                >
-                  <LogIn size={15} className="mr-1" /> Login
-                </Button>
-                <Button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    window.location.href = "/auth/signup";
-                  }}
-                  size="sm"
-                  className="w-full bg-gradient-to-r from-primary to-indigo-500 text-white"
-                >
-                  <UserPlus size={15} className="mr-1" /> Sign up
-                </Button>
-              </>
-            )}
-          </motion.div>
-        )}
+                {/* Drawer Footer Actions */}
+                <div className="border-t border-gray-100 p-5">
+                  {user ? (
+                    <div className="flex flex-col gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-gray-200 py-6 text-[16px] font-bold text-black"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          handleNavigate("/profile");
+                        }}
+                      >
+                        <User size={20} />
+                        My Profile
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 py-6 text-[16px] font-bold text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setShowConfirm(true);
+                        }}
+                      >
+                        <LogOut size={20} />
+                        Logout
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          window.location.href = "/auth/login";
+                        }}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-gray-200 py-3.5 text-[17px] font-bold text-black transition hover:bg-gray-50"
+                      >
+                        <LogIn size={20} strokeWidth={2.5} />
+                        Login
+                      </button>
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          window.location.href = "/auth/signup";
+                        }}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#5B6BF9] py-3.5 text-[17px] font-bold text-white transition hover:opacity-90"
+                      >
+                        <UserPlus size={20} strokeWidth={2.5} />
+                        Sign up
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* 🧩 Logout Confirmation Dialog */}
