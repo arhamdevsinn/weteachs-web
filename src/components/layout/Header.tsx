@@ -65,9 +65,9 @@ const Header = () => {
   };
 
   const mainNavigationItems = [
-    { href: "/categories", label: "Find Experts",  },
-    { href: "/teach", label: "Become an Expert",  },
-    { href: "/about", label: "How it works", },
+    { href: "/categories", label: "Find Experts" },
+    { href: "/teach", label: "Become an Expert" },
+    { href: "/about", label: "How it works" },
   ];
 
   const categoryItems = [
@@ -123,9 +123,6 @@ const Header = () => {
                   }`}
                 >
                   <span className="block whitespace-nowrap">{item.label}</span>
-                  <span className="block whitespace-nowrap text-[14px] font-extrabold text-red-500">
-                    {item.helper}
-                  </span>
                 </Link>
               );
             })}
@@ -180,7 +177,7 @@ Payments
         
       </DropdownMenuContent>
     </DropdownMenu>
-    <Button variant="ghost" size="sm" className="flex items-center gap-2 bg-primary text-sm text-white hover:bg-red-50 hover:text-red-600" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
+    <Button variant="ghost" size="sm" className="flex items-center gap-2 bg-primary text-sm text-white hover:bg-secondary hover:text-primary" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
   </>
 ) : (
   <>
@@ -248,9 +245,6 @@ Payments
                 }`}
               >
                 {item.label}
-                {"helper" in item && (
-                  <span className="ml-1 text-xs font-bold text-red-500">{item.helper}</span>
-                )}
               </Link>
             ))}
 
@@ -283,7 +277,7 @@ Payments
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="mt-3 w-full text-red-600 hover:bg-red-50"
+                  className="mt-3 w-full text-primary hover:bg-secondary"
                   onClick={() => {
                     setMenuOpen(false);
                     setShowConfirm(true);

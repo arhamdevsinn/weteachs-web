@@ -26,29 +26,14 @@
 //   );
 // }
 "use client"
-import HeroSection from "@/src/components/home/HeroSection";
-import TestimonialsSection from "@/src/components/home/TestimonialsSection";
 import FeaturesSection from "../components/home/FeaturesSection";
-import { RecentUsersSection } from "@/src/components/home/RecentUsersSection";
-import { RecentCategoriesSection } from "@/src/components/home/RecentCategoriesSection";
-import Helpers from "../components/home/Helpers";
-import Clients from "../components/home/Clients";
-import { Button } from "../components/ui/button";
 import Hero from "../components/home/Hero";
 
 export default function Page() {
   return (
     <main>
-      {/* <HeroSection /> */}
-  <Hero/>
-      {/* <RecentUsersSection /> */}
-      <Clients />
-      <Helpers />
-        <RecentCategoriesSection />
+      <Hero />
       <FeaturesSection />
-
-    
-      <TestimonialsSection />
     </main>
   );
 }

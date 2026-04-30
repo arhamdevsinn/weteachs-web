@@ -1,153 +1,187 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/src/components/ui/button";
-import { motion } from "framer-motion";
 
-const features = [
+const clientCards = [
   {
-    id: 1,
-    title: "Earn as an Helper",
-    description:
-      "Earn by chatting with people who need your skills. Set your own rates, times, and topics-it's that simple.",
-    image: "/expert.png",
-    buttonText: "Learn More",
-    accent: "from-primary to-primary",
-    reverse: false,
-    onClick: () =>
-      window.open("/teach", "_blank", "noopener,noreferrer"),
+    image: "/chat.png",
+    title: "Start with a free chat",
+    text: "Talk to an expert, ask questions, and see if it's the right fit-no commitment.",
   },
   {
-    id: 2,
-    title: "Learn as a Client",
-    description:
-      "Imagine talking to Al-but it's a real person.Get help tailored exactly to what you need, quickly and stress-free.",
-    image: "/student.png",
-    buttonText: "Learn More",
-    accent: "from-primary to-primary",
-    reverse: false,
-    onClick: () =>
-      window.open("/learn", "_blank", "noopener,noreferrer"),
+    image: "/verify.png",
+    title: "Your payment stays protected",
+    text: "Only pay when you're ready. Your payment is protected every step of the way.",
   },
   {
-    id: 3,
-    title: "For Content Creators",
-    description:
-      "Unify all your online presence — YouTube, TikTok, Instagram — into a professional digital portfolio to grow and engage your audience seamlessly.",
-    image: "/creator.png",
-    buttonText: "Create Now",
-    accent: "from-primary to-primary",
-    reverse: false,
-    onClick: () =>
-      window.open("/how-to-weteachs", "_blank", "noopener,noreferrer"),
+    image: "/real.png",
+    title: "Work with trusted experts",
+    text: "Every expert is vetted so you can confidently choose the right person for your needs.",
+    cta: "Ask Experts",
   },
 ];
 
-const FeaturesSection = () => {
+const helperCards = [
+  {
+    image: "/dollar-sign.png",
+    title: "Turn your skills into income",
+    text: "Get discovered by clients and start earning on your terms.",
+  },
+  {
+    image: "/clock.png",
+    title: "You set the rules",
+    text: "Offer services however you want-hourly, fixed, or custom.",
+  },
+  {
+    image: "/chat.png",
+    title: "Connect with clients instantly",
+    text: "Chat in real time, answer questions, and build trust before starting the work.",
+    cta: "Start earning",
+  },
+];
+
+function FeatureBand({
+  image,
+  kicker,
+  audience,
+  action,
+  description,
+  href,
+}: {
+  image: string;
+  kicker: string;
+  audience: string;
+  action: string;
+  description: string;
+  href: string;
+}) {
   return (
-    <section className="relative overflow-hidden bg-white">
-      {/* Header Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="text-center pt-20 pb-10"
-      >
-        <h2 className="text-sm md:text-base uppercase tracking-[0.25em] text-primary font-semibold">
-          Turn Knowledge Into Income
-        </h2>
-        <h1 className="mt-4 text-4xl md:text-5xl font-extrabold text-gray-900">
-          Empower Your Growth —{" "}
-          <span className="bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
-            Learn & Earn
-          </span>
-        </h1>
-      </motion.div>
+    <section className="mx-auto max-w-[1120px] bg-secondary px-6 py-8 sm:px-12">
+      <div className="grid items-center gap-8 md:grid-cols-[0.85fr_0.9fr_1.15fr]">
+        <div className="flex justify-center">
+          <Image
+            src={image}
+            alt=""
+            width={190}
+            height={150}
+            className="h-[150px] w-[190px] rounded-[4px] object-cover shadow-[0_12px_22px_rgba(0,0,0,0.22)]"
+          />
+        </div>
+        <div className="text-center md:text-left">
+          <h3 className="text-[22px] font-black leading-tight text-black sm:text-[26px]">
+            {kicker}
+          </h3>
+          <p className="mx-auto mt-3 max-w-[280px] text-[10px] font-semibold leading-tight text-gray-700 md:mx-0">
+            {description}
+          </p>
 
-      {/* Features */}
-      {features.map((feature, index) => (
-        <div
-          key={feature.id}
-          className={`relative py-20 md:py-28 bg-secondary  ${
-            index !== features.length - 1 ? "border-b border-gray-700" : ""
-          }`}
-        >
-          {/* Floating Glow */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <motion.div
-              animate={{ y: [0, 20, 0], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-              className="absolute left-1/3 top-1/3 w-[350px] h-[350px] bg-green-300/20 rounded-full blur-3xl"
-            />
-          </div>
-
-          <div
-            className={`container mx-auto px-6 lg:px-16 grid md:grid-cols-2 gap-16 items-center ${
-              feature.reverse ? "md:flex-row-reverse" : ""
-            }`}
-          >
-            {/* IMAGE SIDE */}
-            <motion.div
-              initial={{ opacity: 0, x: feature.reverse ? 100 : -100 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className={`relative flex justify-center ${
-                feature.reverse ? "order-2 md:order-1" : ""
-              }`}
+          <div className="flex items-center gap-4 justify-center md:justify-start">
+            <a
+              href={href}
+                className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-black text-white transition hover:bg-green-900"
             >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-                className="relative"
-              >
-                <Image  priority={true}
-                  src={feature.image}
-                  alt={feature.title}
-                  width={400}
-                  height={400}
-                  className="rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-white/50"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400/10 to-green-300/10 rounded-[2rem] blur-xl" />
-              </motion.div>
-            </motion.div>
-
-            {/* TEXT SIDE */}
-            <motion.div
-              initial={{ opacity: 0, x: feature.reverse ? -100 : 100 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-              className={`space-y-6 ${
-                feature.reverse ? "order-1 md:order-2" : ""
-              }`}
-            >
-              <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-900">
-                {feature.title.split(" ").slice(0, -1).join(" ")}{" "}
-                <span
-                  className={`bg-gradient-to-r ${feature.accent} bg-clip-text text-transparent`}
-                >
-                  {feature.title.split(" ").slice(-1)}
+              Learn More
+            </a>
+            <div className="text-center md:text-left">
+              {/* <h2 className="text-[28px] font-black leading-tight text-black sm:text-[34px]">
+            {audience}
+          </h2> */}
+              <p className="mt-6 flex items-center justify-center gap-2 text-[30px] font-normal leading-none text-normal sm:text-[24px] md:justify-start">
+                {action}
+                <span className="flex size-8 items-center justify-center rounded-[4px] bg-[#6fbd58] text-[24px] leading-none text-white">
+                  ✓
                 </span>
-              </h2>
-
-              <p className="text-gray-700 text-lg leading-relaxed max-w-lg">
-                {feature.description}
               </p>
-
-              <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
-                <Button
-                  onClick={feature.onClick}
-                  className="rounded-full px-10 py-6 text-lg font-semibold bg-primary text-white shadow-lg hover:shadow-emerald-300/50 transition-all"
-                >
-                  {feature.buttonText}
-                </Button>
-              </motion.div>
-            </motion.div>
+            </div>
           </div>
         </div>
-      ))}
+
+      </div>
+    </section>
+  );
+}
+
+function InfoCard({
+  image,
+  title,
+  text,
+  cta,
+}: {
+  image: string;
+  title: string;
+  text: string;
+  cta?: string;
+}) {
+  return (
+    <article className="flex min-h-[360px] flex-col items-center justify-between rounded-[6px] border border-gray-700 bg-white px-5 pb-3 pt-8 text-center shadow-[14px_14px_20px_rgba(0,0,0,0.25)]">
+      <div>
+        <Image
+          src={image}
+          alt=""
+          width={220}
+          height={170}
+          className="mx-auto h-[170px] w-[220px] object-contain"
+        />
+        <h3 className="mt-4 text-base font-black leading-tight text-black">
+          {title}
+        </h3>
+        <p className="mx-auto mt-1 max-w-[260px] text-[15px] leading-tight text-gray-800">
+          {text}
+        </p>
+      </div>
+      {cta && (
+        <a
+          href={cta === "Ask Experts" ? "/categories" : "/teach"}
+          className="mt-5 flex h-[54px] w-full items-center justify-center rounded-[6px] bg-primary text-[27px] font-black leading-none text-white transition hover:bg-green-900"
+        >
+          {cta}
+        </a>
+      )}
+    </article>
+  );
+}
+
+const FeaturesSection = () => {
+  return (
+    <section className="bg-white pb-12">
+      <div className="mx-auto mb-7 max-w-[900px] border-t border-gray-200 pt-5 text-center">
+        <p className="text-[8px] font-black uppercase tracking-[0.35em] text-gray-700">
+          Turn Knowledge Into Income
+        </p>
+        <h2 className="mt-2 text-lg font-black text-black">
+          Empower Your Growth - Learn & Earn
+        </h2>
+      </div>
+
+      <FeatureBand
+        image="/student.png"
+        kicker="Learn as a Client"
+        audience="For Hiring"
+        action="Start Here"
+        description="Imagine talking to AI-but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
+        href="/learn"
+      />
+
+      <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
+        {clientCards.map((card) => (
+          <InfoCard key={card.title} {...card} />
+        ))}
+      </div>
+
+      <FeatureBand
+        image="/expert.png"
+        kicker="Earn as an Helper"
+        audience="For Earning"
+        action="Find Out How"
+        description="Earn by chatting with people who need your skills. Set your own rates, times, and topics-it's that simple."
+        href="/teach"
+      />
+
+      <div className="mx-auto grid max-w-[1120px] gap-12 px-6 pt-10 md:grid-cols-3">
+        {helperCards.map((card) => (
+          <InfoCard key={card.title} {...card} />
+        ))}
+      </div>
     </section>
   );
 };
