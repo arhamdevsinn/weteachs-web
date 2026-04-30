@@ -1,23 +1,30 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import {
+  getRecentCategories,
+  RecentCategory,
+} from "@/src/lib/api/recentCategories";
 
 const Hero = () => {
-  const quickCategories = [
-    "Arts",
-    "Education",
-    "Category",
-    "Category",
-    "Category",
-    "Category",
-    "Category",
-  ];
+  const [categories, setCategories] = useState<RecentCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
-  const examples = [
-    { title: "Arts", image: "/sample.png" },
-    { title: "Education", image: "/sample1.png" },
-    { title: "Family", image: "/sample2.png" },
-  ];
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const latestCategories = await getRecentCategories(7);
+        setCategories(latestCategories);
+      } catch (error) {
+        console.error("Error loading latest categories:", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   return (
     <section className="bg-white px-4 pb-8 pt-10 sm:px-6 lg:pt-14">
@@ -46,27 +53,40 @@ const Hero = () => {
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
-            {quickCategories.map((category, index) => (
-              <a
-                key={`${category}-${index}`}
-                href={`/categories?category=${encodeURIComponent(category.toLowerCase())}`}
-                className="group overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
-              >
-                <div className="flex h-[78px] flex-col justify-between px-3 py-2">
-                  <span className="text-left text-lg font-normal leading-none text-white">
-                    {category}
-                  </span>
-                  <span className="self-end text-[8px] font-semibold text-white/80">
-                    Name
-                  </span>
-                </div>
-                <img
-                  src={category === "Education" ? "/sample1.png" : "/sample.png"}
-                  alt=""
-                  className="h-[76px] w-full object-cover"
-                />
-              </a>
-            ))}
+            {loadingCategories
+              ? Array.from({ length: 7 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-[154px] animate-pulse rounded-[7px] bg-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
+                  />
+                ))
+              : categories.map((category) => {
+                  const title =
+                    category.title || category.category_name || "Category";
+                  const teacherName = category.teacher_name || "Name";
+
+                  return (
+                    <a
+                      key={category.id}
+                      href={`/categories?categoryId=${encodeURIComponent(category.id)}`}
+                      className="group overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
+                    >
+                      <div className="flex h-[78px] flex-col justify-between px-3 py-2">
+                        <span className="line-clamp-1 text-left text-lg font-normal leading-none text-white">
+                          {title}
+                        </span>
+                        <span className="line-clamp-1 self-end text-[8px] font-semibold text-white/80">
+                          {teacherName}
+                        </span>
+                      </div>
+                      <img
+                        src={category.category_image_url || "/sample.png"}
+                        alt={title}
+                        className="h-[76px] w-full object-cover"
+                      />
+                    </a>
+                  );
+                })}
           </div>
 
           <div className="mt-8 flex items-center justify-end gap-8">

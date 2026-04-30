@@ -219,6 +219,7 @@ const CategoriesCard = () => {
   const [open, setOpen] = useState(false);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [modalImageError, setModalImageError] = useState(false);
+  const initialCategoryOpenedRef = useRef(false);
 
   // Check if user is authenticated
   const isAuthenticated = () => {
@@ -257,6 +258,20 @@ const CategoriesCard = () => {
     setShowSignupPrompt(false);
     setSelectedCategory(null);
   };
+
+  useEffect(() => {
+    const categoryId = searchParams.get("categoryId");
+    if (!categoryId || loading || initialCategoryOpenedRef.current) return;
+
+    const source =
+      allCategories && allCategories.length > 0 ? allCategories : categories || [];
+    const matchedCategory = source.find((cat) => cat.id === categoryId);
+
+    if (matchedCategory) {
+      initialCategoryOpenedRef.current = true;
+      openCategoryModal(matchedCategory);
+    }
+  }, [allCategories, categories, loading, searchParams]);
 
   // Redirect to profile page once data is fetched successfully
   // React.useEffect(() => {

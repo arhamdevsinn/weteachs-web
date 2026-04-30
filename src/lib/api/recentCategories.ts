@@ -13,6 +13,7 @@ import {
 export interface RecentCategory {
   id: string;
   title: string;
+  category_name?: string;
   category_image_url?: string;
   description?: string;
   teacher_name?: string;
@@ -21,7 +22,14 @@ export interface RecentCategory {
   teacher_ref?: string;
 }
 
+const recentCategoriesCache = new Map<number, RecentCategory[]>();
+
 export const getRecentCategories = async (limitCount: number = 8): Promise<RecentCategory[]> => {
+  const cachedCategories = recentCategoriesCache.get(limitCount);
+  if (cachedCategories) {
+    return cachedCategories;
+  }
+
   try {
     const categoriesCollection = collection(db, "Categories");
     const q = query(
@@ -88,7 +96,8 @@ export const getRecentCategories = async (limitCount: number = 8): Promise<Recen
 
       categories.push({
         id: docSnap.id,
-        category_name: categoryData.category_name || "Unknown Category",
+        title: categoryData.title || categoryData.category_name || "Category",
+        category_name: categoryData.category_name || categoryData.title || "Category",
         category_image_url: categoryData.image || "/sample.png",
         description: categoryData.description || "",
         teacher_name: teacherName,
@@ -98,6 +107,7 @@ export const getRecentCategories = async (limitCount: number = 8): Promise<Recen
       });
     }
 
+    recentCategoriesCache.set(limitCount, categories);
     return categories;
   } catch (error) {
     console.error("Error fetching recent categories:", error);
