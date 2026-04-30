@@ -9,6 +9,8 @@ import { useAuth } from "@/src/hooks/useAuth";
 import Link from "next/link";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
+import MobileLearnPage from "@/src/components/learn/MobileLearnPage";
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -163,7 +165,25 @@ const Page = () => {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // ── Mobile view ──
+  if (isMobile) {
+    return (
+      <MobileLearnPage
+        categories={categories}
+        loadingCategories={loadingCategories}
+        user={user}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-800">
