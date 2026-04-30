@@ -193,7 +193,7 @@ const Page = () => {
         <div className="relative aspect-[1.45/1] w-full overflow-hidden rounded-[8px] bg-gray-200 shadow-[0_0_0_1px_rgba(0,0,0,0.16)] sm:aspect-[1.75/1] lg:aspect-[1.91/1]">
           <picture>
             <source media="(min-width: 768px)" srcSet="/learn_image.png" />
-            <source media="(min-width: 480px)" srcSet="/hi2.png" />
+            <source media="(min-width: 480px)" srcSet="/learn_image.png" />
             <img
               src="/learn_image.png"
               alt="A person smiling while talking with an expert on a laptop"
@@ -293,7 +293,7 @@ const Page = () => {
           </div>
 
           <div className="flex justify-end mt-2">
-            <Link href="/explore" className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-6 py-2.5 rounded-full font-bold text-[16px] hover:bg-[#112a16] transition shadow-md">
+            <Link href="/categories" className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-6 py-2.5 rounded-full font-bold text-[16px] hover:bg-[#112a16] transition shadow-md">
               Ask Now <ArrowRight size={20} strokeWidth={2.5} />
             </Link>
           </div>
