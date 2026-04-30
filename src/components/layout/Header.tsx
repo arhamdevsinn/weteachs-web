@@ -12,11 +12,10 @@ import {
   LogIn,
   UserPlus,
   User,
-  GraduationCap,
   Bell,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +32,6 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { Button } from "@/src/components/ui/button";
 import { motion } from "framer-motion";
-import ChatIcon from "../ChatIcon";
 
 const Header = () => {
    const router = useRouter();
@@ -51,15 +49,6 @@ const Header = () => {
         null
       : null;
 
-  const mockNotifications = [
-    { id: 1, title: "New hire request", body: "Azan accepted your chat request." },
-    { id: 2, title: "Payment pending", body: "Complete payment to confirm session." },
-    { id: 3, title: "Schedule update", body: "Session moved to 3:30 PM." },
-    { id: 4, title: "Reminder", body: "Start chat 5 minutes before time." },
-    { id: 5, title: "Profile view", body: "An expert viewed your profile." },
-    { id: 6, title: "Receipt ready", body: "Download your latest receipt." },
-  ];
-
   const handleNavigate = (path: string) => {
     router.push(path);
   };
@@ -75,77 +64,88 @@ const Header = () => {
     }
   };
 
-  const navigationItems = [
-    { href: "/", label: "Home" },
-    { href: "/teach", label: "Helper" },
-    { href: "/learn", label: "Clients" },
-    { href: "/about", label: "Learn" },
-    { href: "/categories", label: "Explore" },
-    // { href: "/fitness", label: "Fitness" },
-    // ...(user ? [{ href: "/community", label: "Community" }] : []),
-    // ...(user ? [{ href: "/categories", label: "Explore" }] : []),
-    // ...(user ? [{ href: "/profile", label: "Profile" }] : []),
+  const mainNavigationItems = [
+    { href: "/categories", label: "Find Experts",  },
+    { href: "/teach", label: "Become an Expert",  },
+    { href: "/about", label: "How it works", },
+  ];
+
+  const categoryItems = [
+    { href: "/categories?category=education", label: "Education" },
+    { href: "/fitness", label: "Fitness" },
+    { href: "/categories?category=business", label: "Business" },
+    { href: "/categories?category=art", label: "Art" },
+    { href: "/categories?category=technology", label: "Technology" },
+    { href: "/categories?category=finance", label: "Finance" },
   ];
 
   return (
 
     <>
-      {/* 🌈 Modern Glass Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-white/60 backdrop-blur-xl shadow-[0_1px_10px_rgba(0,0,0,0.05)] transition-all">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between h-16">
-
-          {/* Left: Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <motion.div
-              whileHover={{ rotate: 10, scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              
-              <Image  priority={true}
-                src="/logo.png"
-                alt="logo"
-                width={36}
-                height={36}
-                className="rounded-lg shadow-sm"
-              />
-            </motion.div>
-            <h1 className="text-2xl font-bold bg-primary text-transparent bg-clip-text">
+      <header className="sticky top-0 z-50 w-full bg-white shadow-[0_1px_6px_rgba(0,0,0,0.18)]">
+        <div className="flex h-[68px] items-center border-b border-gray-200 px-5 lg:px-6">
+          <Link href="/" className="mr-8 flex shrink-0 items-center">
+            <span className="text-[30px] font-black leading-none tracking-normal text-primary [text-shadow:0_1px_1px_rgba(0,0,0,0.2)]">
               WeTeachs
-            </h1>
+            </span>
           </Link>
 
-          {/* Middle: Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            {navigationItems.map((item) => {
+          <form
+            action="/categories"
+            className="hidden h-[36px] w-[350px] shrink-0 items-stretch overflow-hidden rounded-[3px] border border-gray-300 bg-white shadow-[inset_0_1px_3px_rgba(0,0,0,0.08)] md:flex"
+          >
+            <input
+              name="q"
+              aria-label="Search"
+              placeholder="What do you need help with?"
+              className="min-w-0 flex-1 px-3 text-[13px] font-semibold text-gray-800 outline-none placeholder:text-gray-800"
+            />
+            <button
+              type="submit"
+              aria-label="Search experts"
+              className="flex w-[40px] items-center justify-center bg-primary text-white"
+            >
+              <span className="sr-only">Search</span>
+            </button>
+          </form>
+
+          <nav className="ml-auto hidden items-center gap-7 lg:flex">
+            {mainNavigationItems.map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative text-sm font-medium transition-all ${
+                  className={`text-center text-[14px] font-extrabold leading-tight text-black transition-colors hover:text-primary ${
                     active
-                      ? "text-primary after:absolute after:left-0 after:bottom-[-6px] after:w-full after:h-[2px] after:bg-primary"
-                      : "text-black hover:text-primary hover:after:absolute hover:after:left-0 hover:after:bottom-[-6px] hover:after:w-full hover:after:h-[2px] hover:after:bg-primaary"
+                      ? "text-primary"
+                      : ""
                   }`}
                 >
-                  {item.label}
+                  <span className="block whitespace-nowrap">{item.label}</span>
+                  <span className="block whitespace-nowrap text-[14px] font-extrabold text-red-500">
+                    {item.helper}
+                  </span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right: Auth / User */}
-          <div className="hidden md:flex items-center gap-3">
-                   <Link href="/chat" aria-label="Open chat" className="flex items-center justify-center rounded-full p-2 hover:bg-blue-100 transition focus:outline-none focus:ring-2 focus:ring-primary">
-              <ChatIcon className="w-6 h-6 text-primary" />
+          <div className="ml-5 hidden items-center gap-4 md:flex">
+            <Link
+              href="/chat"
+              aria-label="Open chat"
+              className="flex h-[31px] w-[31px] items-center justify-center rounded-[3px] border border-gray-200 text-gray-400 transition hover:border-primary hover:text-primary"
+            >
+              <MessageSquare size={22} strokeWidth={1.4} />
             </Link>
             {user && (
             
                      <button
                     onClick={() => router.push("/notifications")}
-                    className="w-full px-3 py-2 text-sm font-semibold text-primary hover:bg-blue-50"
+                    className="flex h-[31px] w-[31px] items-center justify-center rounded-[3px] text-primary hover:bg-gray-100"
                   >
-                   <Bell className="w-6 h-6 text-primary" />
+                   <Bell className="h-5 w-5 text-primary" />
                   </button>
                 
             )}
@@ -180,48 +180,63 @@ Payments
         
       </DropdownMenuContent>
     </DropdownMenu>
-    <Button variant="ghost" size="sm" className="text-sm flex items-center bg-primary text-white gap-2 hover:bg-red-50 hover:text-red-600" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
+    <Button variant="ghost" size="sm" className="flex items-center gap-2 bg-primary text-sm text-white hover:bg-red-50 hover:text-red-600" onClick={() => setShowConfirm(true)} disabled={loading} > <LogOut size={15} /> {loading ? "..." : "Logout"} </Button>
   </>
 ) : (
   <>
-    <Button
-      variant="ghost"
-      size="sm"
+    <button
       onClick={() => (window.location.href = "/auth/login")}
-      className="flex items-center gap-2 hover:text-primary"
+      className="whitespace-nowrap text-[14px] font-extrabold text-black hover:text-primary"
     >
-      <LogIn size={15} />
-      Login
-    </Button>
-    <Button
-      size="sm"
+      Sign In
+    </button>
+    <button
       onClick={() => (window.location.href = "/auth/signup")}
-      className="flex items-center gap-2 bg-primary text-white hover:opacity-90"
+      className="h-[34px] rounded-[8px] border-2 border-primary px-2 text-[24px] font-black leading-none text-primary shadow-[0_0_0_1px_rgba(34,84,47,0.12)] hover:bg-primary hover:text-white"
     >
-      <UserPlus size={15} />
-      Sign up
-    </Button>
+      Join
+    </button>
   </>
 )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+            className="ml-auto rounded-md p-2 text-gray-700 hover:bg-gray-100 lg:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
 
-        {/* 📱 Mobile Navigation */}
+        <nav className="hidden h-[34px] items-center justify-around border-b border-gray-200 bg-white px-8 md:flex">
+          {categoryItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-[15px] font-extrabold text-gray-600 transition hover:text-primary"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-white/90 backdrop-blur-xl border-t border-gray-100 shadow-lg py-4 px-6 space-y-2"
+            className="border-t border-gray-100 bg-white px-6 py-4 shadow-lg lg:hidden"
           >
-            {navigationItems.map((item) => (
+            <form action="/categories" className="mb-4 flex h-10 overflow-hidden rounded border border-gray-300">
+              <input
+                name="q"
+                aria-label="Search"
+                placeholder="What do you need help with?"
+                className="min-w-0 flex-1 px-3 text-sm font-semibold outline-none"
+              />
+              <button type="submit" className="w-11 bg-primary" aria-label="Search experts" />
+            </form>
+
+            {[...mainNavigationItems, ...categoryItems].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -233,6 +248,9 @@ Payments
                 }`}
               >
                 {item.label}
+                {"helper" in item && (
+                  <span className="ml-1 text-xs font-bold text-red-500">{item.helper}</span>
+                )}
               </Link>
             ))}
 

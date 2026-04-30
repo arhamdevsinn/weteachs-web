@@ -9,7 +9,7 @@ const Hero = () => {
       <div className="absolute inset-0 w-full h-full">
         {/* md and up */}
         <img
-          src="/hi.jpeg"
+          src="/home_image.png"
           alt="Hero Background"
           className="hidden md:block w-full h-full object-cover"
         />
