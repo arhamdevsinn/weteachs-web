@@ -1,41 +1,33 @@
-// 'use client';
-
-// import { useEffect } from 'react';
-// import { useRouter } from 'next/navigation';
-// import { useAuth } from '@/src/hooks/useAuth';
-// import UserProfile from '../components/auth/UserProfile';
-
-// export default function HomePage() {
-//   const { user, loading } = useAuth();
-//   const router = useRouter();
-
-//   useEffect(() => {
-//     if (!loading && !user) {
-//       router.push('/auth/login');
-//     }
-//   }, [loading, user, router]);
-
-//   if (loading) {
-//     return <div>Loading...</div>;
-//   }
-
-//   return (
-//     <div>
-//       {user && <UserProfile />}
-//     </div>
-//   );
-// }
 "use client"
 import FeaturesSection from "../components/home/FeaturesSection";
 import Hero from "../components/home/Hero";
 import HomeBottomSection from "../components/home/HomeBottomSection";
 
+// Mobile Components
+import MobileHero from "../components/home/mobile/MobileHero";
+import MobileCategoriesSection from "../components/home/mobile/MobileCategoriesSection";
+import MobileHowItWorks from "../components/home/mobile/MobileHowItWorks";
+import MobileFeatureBands from "../components/home/mobile/MobileFeatureBands";
+import MobileTestimonials from "../components/home/mobile/MobileTestimonials";
+
 export default function Page() {
   return (
     <main>
-      <Hero />
-      <FeaturesSection />
-      <HomeBottomSection />
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <Hero />
+        <FeaturesSection />
+        <HomeBottomSection />
+      </div>
+
+      {/* Mobile View */}
+      <div className="block md:hidden bg-[#f9fafb]">
+        <MobileHero />
+        <MobileCategoriesSection />
+        <MobileHowItWorks />
+        <MobileFeatureBands />
+        <MobileTestimonials />
+      </div>
     </main>
   );
 }
