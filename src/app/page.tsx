@@ -28,12 +28,14 @@
 "use client"
 import FeaturesSection from "../components/home/FeaturesSection";
 import Hero from "../components/home/Hero";
+import HomeBottomSection from "../components/home/HomeBottomSection";
 
 export default function Page() {
   return (
     <main>
       <Hero />
       <FeaturesSection />
+      <HomeBottomSection />
     </main>
   );
 }
