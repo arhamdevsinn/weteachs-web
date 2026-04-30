@@ -34,7 +34,7 @@ import { Button } from "@/src/components/ui/button";
 import { motion } from "framer-motion";
 
 const Header = () => {
-   const router = useRouter();
+  const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -44,9 +44,9 @@ const Header = () => {
   const storedId =
     typeof window !== "undefined"
       ? localStorage.getItem("user_id") ||
-        localStorage.getItem("userId") ||
-        user?.uid ||
-        null
+      localStorage.getItem("userId") ||
+      user?.uid ||
+      null
       : null;
 
   const handleNavigate = (path: string) => {
@@ -127,9 +127,8 @@ const Header = () => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-center text-[14px] font-extrabold leading-tight text-black transition-colors hover:text-primary ${
-                    active ? "text-primary" : ""
-                  }`}
+                  className={`text-center text-[14px] font-extrabold leading-tight text-black transition-colors hover:text-primary ${active ? "text-primary" : ""
+                    }`}
                 >
                   <span className="block whitespace-nowrap">{item.label}</span>
                 </Link>
@@ -143,14 +142,16 @@ const Header = () => {
               <Link href="/auth/signup" className="text-[22px] font-medium text-primary">
                 Sign up
               </Link>
-            ) : (
-              <button
-                onClick={() => router.push("/notifications")}
-                className="flex p-2 items-center justify-center rounded-full text-primary hover:bg-gray-100"
-              >
-                <Bell size={26} strokeWidth={1.5} />
-              </button>
-            )}
+            ) : <div></div>
+              // (
+              //   <button
+              //     onClick={() => router.push("/notifications")}
+              //     className="flex p-2 items-center justify-center rounded-full text-primary hover:bg-gray-100"
+              //   >
+              //     <Bell size={26} strokeWidth={1.5} />
+              //   </button>
+              // )
+            }
           </div>
 
           {/* Desktop Actions */}
@@ -248,11 +249,10 @@ const Header = () => {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-sm font-medium transition ${
-                  pathname === item.href
+                className={`block px-3 py-2 rounded-md text-sm font-medium transition ${pathname === item.href
                     ? "bg-blue-100 text-primary"
                     : "text-gray-700 hover:bg-blue-50 hover:text-primary"
-                }`}
+                  }`}
               >
                 {item.label}
               </Link>
@@ -262,28 +262,28 @@ const Header = () => {
 
             {user ? (
               <>
-               <DropdownMenu>
-      <DropdownMenuTrigger asChild className="flex items-center gap-2 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer">
-       
-          <User size={16} />
-          <span className="text-sm">{user?.email || "Account"}</span>
-      </DropdownMenuTrigger>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild className="flex items-center gap-2 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer">
 
-      <DropdownMenuContent align="end" className="w-40">
-        <DropdownMenuItem
-          onClick={() => handleNavigate("/profile")}
-          className="cursor-pointer"
-        >
-          My Profile
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => handleNavigate("/edit-profile")}
-          className="cursor-pointer"
-        >
-          Edit Profile
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+                    <User size={16} />
+                    <span className="text-sm">{user?.email || "Account"}</span>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem
+                      onClick={() => handleNavigate("/profile")}
+                      className="cursor-pointer"
+                    >
+                      My Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleNavigate("/edit-profile")}
+                      className="cursor-pointer"
+                    >
+                      Edit Profile
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button
                   variant="ghost"
                   size="sm"

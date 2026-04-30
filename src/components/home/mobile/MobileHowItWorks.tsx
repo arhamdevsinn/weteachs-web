@@ -74,25 +74,27 @@ const MobileHowItWorks = () => {
       </div>
 
       {/* Scrollable Cards Row */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
+      <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-2 scrollbar-none snap-x snap-mandatory">
         {cards.map((card) => (
           <article
             key={card.title}
-            className="flex w-[220px] shrink-0 snap-start flex-col rounded-[8px] border border-gray-300 bg-white pb-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+            className="flex w-[240px] shrink-0 snap-center flex-col rounded-[12px] border border-gray-100 bg-white pb-5 shadow-[0_6px_18px_rgba(0,0,0,0.15)] transition-transform active:scale-[0.98]"
           >
-            <div className="relative h-[150px] w-full overflow-hidden rounded-t-[8px] bg-gray-50">
-              <Image
-                src={card.image}
-                alt={card.title}
-                fill
-                className="object-contain p-4"
-              />
+            <div className="relative h-[160px] w-full overflow-hidden rounded-t-[12px] bg-gray-50/50 flex items-center justify-center p-6">
+              <div className="relative w-full h-full">
+                <Image
+                  src={card.image}
+                  alt={card.title}
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
-            <div className="px-3 pt-3">
-              <h3 className="text-[13px] font-black leading-tight text-black">
+            <div className="px-4 pt-4 text-center">
+              <h3 className="text-[14px] font-black leading-tight text-black">
                 {card.title}
               </h3>
-              <p className="mt-1 text-[11px] leading-snug text-gray-600">
+              <p className="mx-auto mt-2 max-w-[200px] text-[12px] leading-snug text-gray-600">
                 {card.text}
               </p>
             </div>
