@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-
+import Image from "next/image";
 import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AuthService } from "@/src/lib/firebase/auth";
@@ -93,8 +93,36 @@ const Header = () => {
     <>
       <header className="sticky top-0 z-50 w-full bg-white shadow-[0_1px_6px_rgba(0,0,0,0.18)]">
         <div className="flex h-[68px] items-center justify-between border-b border-gray-200 px-4 lg:px-6">
-          {/* Left side: Hamburger (mobile only) + Logo */}
-          <div className="flex items-center gap-3 lg:gap-8">
+          {/* Left side: Hamburger (mobile) + Logo */}
+          <div className="flex items-center gap-4">
+            <button
+              className="p-1 text-primary hover:bg-gray-100 lg:hidden transition-colors rounded-lg"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={28} strokeWidth={2} /> : <Menu size={28} strokeWidth={2} />}
+            </button>
+
+            <Link href="/" className="flex items-center gap-2 group transition-transform active:scale-95">
+              <motion.div
+                whileHover={{ rotate: 10, scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                className="relative h-8 w-8 lg:h-9 lg:w-9 shrink-0"
+              >
+                <Image
+                  src="/logo.png"
+                  alt="WeTeachs Logo"
+                  fill
+                  className="object-contain rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                  priority
+                />
+              </motion.div>
+              <h1 className="text-xl lg:text-2xl font-bold bg-primary text-transparent bg-clip-text">
+                WeTeachs
+              </h1>
+            </Link>
+          </div>
+          {/* <div className="flex items-center gap-3 lg:gap-8">
             <button
               className="p-1 text-primary hover:bg-gray-100 lg:hidden"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -106,19 +134,39 @@ const Header = () => {
                 Weteachs
               </span>
             </Link>
-          </div>
+          </div> */}
 
           {/* Middle: Search Form (Desktop only) */}
           <form
             onSubmit={handleSubmit}
-            className="hidden lg:flex items-center w-[460px] mx-4 px-3 py-2 rounded-2xl 
-             bg-white/80 backdrop-blur-md border border-gray-200 
-             shadow-[0_4px_20px_rgba(0,0,0,0.08)] 
-             focus-within:ring-2 focus-within:ring-primary/40 
-             transition-all duration-300 hover:shadow-[0_6px_25px_rgba(0,0,0,0.12)]"
+            className="hidden lg:flex items-center w-[420px] mx-4 px-2 py-1 rounded-xl 
+             bg-white border border-gray-200 
+             shadow-[0_2px_12px_rgba(0,0,0,0.06)] 
+             focus-within:ring-2 focus-within:ring-primary/20 
+             transition-all duration-300"
           >
             {/* Search Icon */}
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gray-100 text-gray-500">
+
+
+            {/* Input */}
+            <input
+              name="q"
+              aria-label="Search"
+              placeholder="What do you need help with?"
+              className="flex-1 bg-transparent px-3 py-1 text-[13px] text-gray-700 
+               placeholder:text-gray-400 outline-none"
+            />
+
+            {/* Divider */}
+            <div className="h-6 w-px bg-gray-200"></div>
+
+            {/* Button */}
+            <button
+              type="submit"
+              className="ml-2 px-3 py-1.5 rounded-lg bg-primary text-white text-[13px] font-semibold
+               shadow-sm hover:bg-primary/90 hover:shadow-md 
+               active:scale-95 transition-all duration-200"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -133,28 +181,6 @@ const Header = () => {
                   d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-            </div>
-
-            {/* Input */}
-            <input
-              name="q"
-              aria-label="Search"
-              placeholder="Search for services, experts, skills..."
-              className="flex-1 bg-transparent px-4 py-2 text-[14px] text-gray-700 
-               placeholder:text-gray-400 outline-none"
-            />
-
-            {/* Divider */}
-            <div className="h-6 w-px bg-gray-200"></div>
-
-            {/* Button */}
-            <button
-              type="submit"
-              className="ml-3 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold
-               shadow-md hover:bg-primary/90 hover:shadow-lg 
-               active:scale-95 transition-all duration-200"
-            >
-              Search
             </button>
           </form>
 
