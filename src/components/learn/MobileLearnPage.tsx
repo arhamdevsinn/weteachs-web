@@ -3,16 +3,17 @@
 
 import React, { useState, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { RecentCategory } from "@/src/lib/api/recentCategories";
 
 /* ─────────────────── static data ─────────────────── */
 
 const categoryPills = [
-  { label: "Education", href: "/categories?category=education" },
+  { label: "Education", href: "/categories/education" },
   { label: "Fitness", href: "/fitness" },
-  { label: "Foods", href: "/categories?category=foods" },
-  { label: "Arts", href: "/categories?category=art" },
+  { label: "Foods", href: "/categories/foods" },
+  { label: "Arts", href: "/categories/arts" },
 ];
 
 const howItWorksSteps = [
@@ -87,6 +88,16 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
   const [openFaqKey, setOpenFaqKey] = useState<string | null>(null);
   const [howStep, setHowStep] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const q = formData.get("q") as string;
+    if (q) {
+      router.push(`/categories/${encodeURIComponent(q.trim().toLowerCase())}`);
+    }
+  };
 
   const scrollCards = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -109,7 +120,7 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
         {/* Search + pills at bottom */}
         {/* <div className="absolute bottom-4 left-0 w-full px-4 flex flex-col gap-2">
           <form
-            action="/categories"
+            onSubmit={handleSubmit}
             className="flex h-[38px] w-full items-center overflow-hidden rounded-[6px] bg-white shadow-lg border border-gray-200"
           >
             <input
@@ -141,7 +152,7 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
         <div className="absolute bottom-5 left-0 w-full px-4 flex flex-col gap-2">
           {/* Search Bar */}
           <form
-            action="/categories"
+            onSubmit={handleSubmit}
             className="flex h-[36px] w-[300px] items-center overflow-hidden rounded-[6px] bg-white shadow-lg"
           >
             <input

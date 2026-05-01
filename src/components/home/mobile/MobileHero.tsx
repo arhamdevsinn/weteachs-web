@@ -2,15 +2,27 @@
 import React from "react";
 import { Search, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const categoryPills = [
-  { label: "Education", href: "/categories?category=education" },
+  { label: "Education", href: "/categories/education" },
   { label: "Fitness", href: "/fitness" },
-  { label: "Foods", href: "/categories?category=foods" },
-  { label: "Arts", href: "/categories?category=art" },
+  { label: "Foods", href: "/categories/foods" },
+  { label: "Arts", href: "/categories/arts" },
 ];
 
 const MobileHero = () => {
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const q = formData.get("q") as string;
+    if (q) {
+      router.push(`/categories/${encodeURIComponent(q.trim().toLowerCase())}`);
+    }
+  };
+
   return (
     <section className="relative w-full h-[340px] sm:h-[400px]">
       {/* Full-width Hero Image */}
@@ -28,7 +40,7 @@ const MobileHero = () => {
       <div className="absolute bottom-5 left-0 w-full px-4 flex flex-col gap-2">
         {/* Search Bar */}
         <form
-          action="/categories"
+          onSubmit={handleSubmit}
           className="flex h-[36px] w-[300px] items-center overflow-hidden rounded-[6px] bg-white shadow-lg"
         >
           <input

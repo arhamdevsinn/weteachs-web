@@ -91,7 +91,7 @@ const CategoryCard = ({ cat, index, openCategoryModal }) => {
   );
 };
 
-const CategoriesCard = () => {
+const CategoriesCard = ({ filterCategory }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -495,6 +495,48 @@ const CategoriesCard = () => {
                 return hay.includes(q);
               })
             : rawSource;
+
+          // If a specific category is requested via prop or query param
+          const activeCategoryFilter = filterCategory || searchParams.get("category");
+
+          if (activeCategoryFilter) {
+            const filteredSource = rawSource.filter((cat) => {
+              const q = activeCategoryFilter.toLowerCase();
+              const title = (cat.title || "").toLowerCase();
+              const topic = (cat.topic || "").toLowerCase();
+              return title === q || topic === q || title.startsWith(q) || q.startsWith(title);
+            });
+
+            return (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-3xl font-extrabold text-gray-900 capitalize">
+                    {activeCategoryFilter} Experts
+                  </h2>
+                  <span className="text-gray-500 font-medium">
+                    {filteredSource.length} results
+                  </span>
+                </div>
+                {filteredSource.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {filteredSource.map((cat, index) => (
+                      <CategoryCard key={cat.id} cat={cat} index={index} openCategoryModal={openCategoryModal} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <p className="text-xl text-gray-500 font-medium">No experts found in this category yet.</p>
+                    <button 
+                      onClick={() => router.push('/categories')}
+                      className="mt-4 text-primary font-bold hover:underline"
+                    >
+                      Browse all categories
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          }
 
           // If search is active, show filtered results in grid
           if (searchQuery && source.length > 0) {

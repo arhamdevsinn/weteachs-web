@@ -64,6 +64,15 @@ const Header = () => {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const q = formData.get("q") as string;
+    if (q) {
+      router.push(`/categories/${encodeURIComponent(q.trim().toLowerCase())}`);
+    }
+  };
+
   const mainNavigationItems = [
     { href: "/categories", label: "Find Experts" },
     { href: "/teach", label: "Become an Expert" },
@@ -71,12 +80,12 @@ const Header = () => {
   ];
 
   const categoryItems = [
-    { href: "/categories?category=education", label: "Education" },
-    { href: "/fitness", label: "Fitness" },
-    { href: "/categories?category=business", label: "Business" },
-    { href: "/categories?category=art", label: "Art" },
-    { href: "/categories?category=technology", label: "Technology" },
-    { href: "/categories?category=finance", label: "Finance" },
+    { href: "/categories/education", label: "Education" },
+    { href: "/categories/fitness", label: "Fitness" },
+    { href: "/categories/business", label: "Business" },
+    { href: "/categories/art", label: "Art" },
+    { href: "/categories/technology", label: "Technology" },
+    { href: "/categories/finance", label: "Finance" },
   ];
 
   return (
@@ -101,7 +110,7 @@ const Header = () => {
 
           {/* Middle: Search Form (Desktop only) */}
           <form
-            action="/categories"
+            onSubmit={handleSubmit}
             className="hidden h-[36px] w-[350px] shrink-0 items-stretch overflow-hidden rounded-[3px] border border-gray-300 bg-white shadow-[inset_0_1px_3px_rgba(0,0,0,0.08)] lg:flex mx-4"
           >
             <input
