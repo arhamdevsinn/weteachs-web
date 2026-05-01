@@ -105,14 +105,7 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
         {/* Text overlay */}
-        <div className="absolute inset-0 flex flex-col justify-center px-5 pt-2">
-          <h1 className="text-[28px] font-black text-white leading-tight drop-shadow-lg max-w-[260px]">
-            Ask anything.<br />Get answers from<br />trusted experts.
-          </h1>
-          <p className="text-white/90 text-[13px] font-medium mt-2 drop-shadow max-w-[240px]">
-            Chat with real people, get advice fast, and only pay what's worth it.
-          </p>
-        </div>
+
         {/* Search + pills at bottom */}
         <div className="absolute bottom-4 left-0 w-full px-4 flex flex-col gap-2">
           <form
@@ -218,36 +211,36 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2">
           {loadingCategories
             ? Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="flex-shrink-0 w-[130px] h-[154px] rounded-[7px] bg-gray-200 animate-pulse shadow"
-                />
-              ))
+              <div
+                key={i}
+                className="flex-shrink-0 w-[130px] h-[154px] rounded-[7px] bg-gray-200 animate-pulse shadow"
+              />
+            ))
             : categories.map((category) => {
-                const title = category.title || category.category_name || "Category";
-                const teacherName = category.teacher_name || "Name";
-                return (
-                  <a
-                    key={category.id}
-                    href={`/categories?categoryId=${encodeURIComponent(category.id)}`}
-                    className="flex-shrink-0 w-[130px] overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
-                  >
-                    <div className="flex h-[70px] flex-col justify-between px-2.5 py-2">
-                      <span className="line-clamp-2 text-left text-[14px] font-normal leading-tight text-white">
-                        {title}
-                      </span>
-                      <span className="line-clamp-1 self-end text-[8px] font-semibold text-white/80">
-                        {teacherName}
-                      </span>
-                    </div>
-                    <img
-                      src={category.category_image_url || "/sample.png"}
-                      alt={title}
-                      className="h-[70px] w-full object-cover"
-                    />
-                  </a>
-                );
-              })}
+              const title = category.title || category.category_name || "Category";
+              const teacherName = category.teacher_name || "Name";
+              return (
+                <a
+                  key={category.id}
+                  href={`/categories?categoryId=${encodeURIComponent(category.id)}`}
+                  className="flex-shrink-0 w-[130px] overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
+                >
+                  <div className="flex h-[70px] flex-col justify-between px-2.5 py-2">
+                    <span className="line-clamp-2 text-left text-[14px] font-normal leading-tight text-white">
+                      {title}
+                    </span>
+                    <span className="line-clamp-1 self-end text-[8px] font-semibold text-white/80">
+                      {teacherName}
+                    </span>
+                  </div>
+                  <img
+                    src={category.category_image_url || "/sample.png"}
+                    alt={title}
+                    className="h-[70px] w-full object-cover"
+                  />
+                </a>
+              );
+            })}
         </div>
 
         {/* Ask Now button */}
@@ -335,11 +328,10 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
               return (
                 <div
                   key={key}
-                  className={`rounded-xl border px-4 py-3 transition-colors ${
-                    isOpen
+                  className={`rounded-xl border px-4 py-3 transition-colors ${isOpen
                       ? "border-[#45ba61] bg-cyan-50/60"
                       : "border-[#45ba61] bg-white hover:bg-cyan-50/30"
-                  }`}
+                    }`}
                 >
                   <button
                     className="flex w-full items-center justify-between gap-3 text-left"
@@ -350,9 +342,8 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
                       {faq.question}
                     </span>
                     <span
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${
-                        isOpen ? "bg-cyan-100 text-[#265A32]" : "bg-[#45ba61] text-white"
-                      }`}
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${isOpen ? "bg-cyan-100 text-[#265A32]" : "bg-[#45ba61] text-white"
+                        }`}
                     >
                       {isOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                     </span>

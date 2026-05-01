@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BookOpen, Clock, DollarSign, Star, Users, Video } from "lucide-react";
 import TestimonialsSection from "./TestimonialsSection";
+import { useAuth } from "@/src/hooks/useAuth";
 
 const uniqueItems = [
   {
@@ -38,6 +39,7 @@ const uniqueItems = [
 ];
 
 const HomeBottomSection = () => {
+  const { user } = useAuth();
   return (
     <section className="bg-white pb-24">
       <div className="mx-auto max-w-[920px] px-6 py-16 text-center">
@@ -71,20 +73,22 @@ const HomeBottomSection = () => {
       </div>
 
       <TestimonialsSection />
-
-      <div className="mx-auto mt-24 max-w-[760px] px-6">
-        <div className="rounded-[12px] bg-primary px-6 py-8 text-center text-white">
-          <h2 className="text-[30px] font-normal leading-tight sm:text-[30px]">
-            Hire the top knowledgeable Experts
-          </h2>
-          <Link
-            href="/auth/signup"
-            className="mt-7 inline-flex rounded-[10px] bg-white px-12 py-2 text-[30px] font-normal leading-none text-primary transition hover:bg-secondary"
-          >
-            Join Now
-          </Link>
-        </div>
-      </div>
+      {
+        user ? <div></div> :
+          <div className="mx-auto mt-24 max-w-[760px] px-6">
+            <div className="rounded-[12px] bg-primary px-6 py-8 text-center text-white">
+              <h2 className="text-[30px] font-normal leading-tight sm:text-[30px]">
+                Hire the top knowledgeable Experts
+              </h2>
+              <Link
+                href="/auth/signup"
+                className="mt-7 inline-flex rounded-[10px] bg-white px-12 py-2 text-[30px] font-normal leading-none text-primary transition hover:bg-secondary"
+              >
+                Join Now
+              </Link>
+            </div>
+          </div>
+      }
     </section>
   );
 };
