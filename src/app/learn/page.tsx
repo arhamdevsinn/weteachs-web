@@ -117,6 +117,7 @@ const Page = () => {
   const [categories, setCategories] = useState<RecentCategory[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -246,11 +247,13 @@ const Page = () => {
               </div>
             ))}
           </div>
-          <div className="mt-8 flex items-center justify-start max-w-[900px] mx-auto">
-            <Link href="/auth/signup" className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-6 py-2.5 rounded-full font-bold text-[17px] hover:bg-[#112a16] transition shadow-md">
-              Get Started <ArrowRight size={20} strokeWidth={2.5} />
-            </Link>
-          </div>
+          {user ? null : (
+            <div className="mt-8 flex items-center justify-start max-w-[900px] mx-auto">
+              <Link href="/auth/signup" className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-6 py-2.5 rounded-full font-bold text-[17px] hover:bg-[#112a16] transition shadow-md">
+                Get Started <ArrowRight size={20} strokeWidth={2.5} />
+              </Link>
+            </div>
+          )}
         </section>
 
         {/* What Can You Ask? */}

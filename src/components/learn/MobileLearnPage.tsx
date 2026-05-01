@@ -104,10 +104,10 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
           alt="Learn with Weteachs"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
-        {/* Text overlay */}
+
 
         {/* Search + pills at bottom */}
-        <div className="absolute bottom-4 left-0 w-full px-4 flex flex-col gap-2">
+        {/* <div className="absolute bottom-4 left-0 w-full px-4 flex flex-col gap-2">
           <form
             action="/categories"
             className="flex h-[38px] w-full items-center overflow-hidden rounded-[6px] bg-white shadow-lg border border-gray-200"
@@ -133,6 +133,42 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
               >
                 {pill.label}
                 <ChevronRight size={12} strokeWidth={3} className="text-white" />
+              </Link>
+            ))}
+          </div>
+        </div> */}
+        {/* Bottom Overlay - Search and Pills */}
+        <div className="absolute bottom-5 left-0 w-full px-4 flex flex-col gap-2">
+          {/* Search Bar */}
+          <form
+            action="/categories"
+            className="flex h-[36px] w-[300px] items-center overflow-hidden rounded-[6px] bg-white shadow-lg"
+          >
+            <input
+              name="q"
+              aria-label="Search"
+              placeholder="Search"
+              className="min-w-0 flex-1 px-3 text-[14px] text-gray-800 outline-none placeholder:text-gray-800"
+            />
+            <button
+              type="submit"
+              aria-label="Search"
+              className="flex h-full w-[36px] items-center justify-center text-black hover:bg-gray-50"
+            >
+              <Search size={18} strokeWidth={1.5} />
+            </button>
+          </form>
+
+          {/* Category Pills */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-none">
+            {categoryPills.map((pill) => (
+              <Link
+                key={pill.label}
+                href={pill.href}
+                className="flex shrink-0 items-center gap-1.5 rounded-[3px] border-[1.5px] border-white bg-transparent px-1 py-0.5 text-[8px]  text-white transition hover:bg-white/20"
+              >
+                {pill.label}
+                <ChevronRight size={16} strokeWidth={3} className="text-white" />
               </Link>
             ))}
           </div>
@@ -164,34 +200,37 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
         </div>
 
         {/* Get Started + arrows */}
-        <div className="flex items-center justify-between mt-4">
-          <Link
-            href="/auth/signup"
-            className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-5 py-2 rounded-full font-bold text-[14px] shadow-md"
-          >
-            Get Started <ArrowRight size={17} strokeWidth={2.5} />
-          </Link>
-          <div className="flex gap-2">
-            <button
-              onClick={() => scrollCards("left")}
-              className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              onClick={() => scrollCards("right")}
-              className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        </div>
+        {
+          user ? null :
+            <div className="flex items-center justify-between mt-4">
+              <Link
+                href="/auth/signup"
+                className="inline-flex items-center gap-2 bg-[#1B4323] text-white px-5 py-2 rounded-full font-bold text-[14px] shadow-md"
+              >
+                Get Started <ArrowRight size={17} strokeWidth={2.5} />
+              </Link>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => scrollCards("left")}
+                  className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  onClick={() => scrollCards("right")}
+                  className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            </div>
+        }
       </section>
 
       {/* ── What Can You Ask? ── (scrollable on mobile) */}
       <section className="bg-white pt-4 pb-6">
         <h2 className="text-[22px] font-black text-black mb-4 px-4">What Can You Ask?</h2>
-        <div className="max-h-[340px] overflow-y-auto px-4 flex flex-col gap-2 scrollbar-none">
+        <div className="px-4 flex flex-col gap-2 ">
           {questions.map((q, i) => (
             <div
               key={i}
@@ -329,8 +368,8 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
                 <div
                   key={key}
                   className={`rounded-xl border px-4 py-3 transition-colors ${isOpen
-                      ? "border-[#45ba61] bg-cyan-50/60"
-                      : "border-[#45ba61] bg-white hover:bg-cyan-50/30"
+                    ? "border-[#45ba61] bg-cyan-50/60"
+                    : "border-[#45ba61] bg-white hover:bg-cyan-50/30"
                     }`}
                 >
                   <button
