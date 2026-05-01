@@ -111,20 +111,50 @@ const Header = () => {
           {/* Middle: Search Form (Desktop only) */}
           <form
             onSubmit={handleSubmit}
-            className="hidden h-[36px] w-[350px] shrink-0 items-stretch overflow-hidden rounded-[3px] border border-gray-300 bg-white shadow-[inset_0_1px_3px_rgba(0,0,0,0.08)] lg:flex mx-4"
+            className="hidden lg:flex items-center w-[460px] mx-4 px-3 py-2 rounded-2xl 
+             bg-white/80 backdrop-blur-md border border-gray-200 
+             shadow-[0_4px_20px_rgba(0,0,0,0.08)] 
+             focus-within:ring-2 focus-within:ring-primary/40 
+             transition-all duration-300 hover:shadow-[0_6px_25px_rgba(0,0,0,0.12)]"
           >
+            {/* Search Icon */}
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gray-100 text-gray-500">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+
+            {/* Input */}
             <input
               name="q"
               aria-label="Search"
-              placeholder="What do you need help with?"
-              className="min-w-0 flex-1 px-3 text-[13px] font-semibold text-gray-800 outline-none placeholder:text-gray-800"
+              placeholder="Search for services, experts, skills..."
+              className="flex-1 bg-transparent px-4 py-2 text-[14px] text-gray-700 
+               placeholder:text-gray-400 outline-none"
             />
+
+            {/* Divider */}
+            <div className="h-6 w-px bg-gray-200"></div>
+
+            {/* Button */}
             <button
               type="submit"
-              aria-label="Search experts"
-              className="flex w-[40px] items-center justify-center bg-primary text-white"
+              className="ml-3 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold
+               shadow-md hover:bg-primary/90 hover:shadow-lg 
+               active:scale-95 transition-all duration-200"
             >
-              <span className="sr-only">Search</span>
+              Search
             </button>
           </form>
 
@@ -225,16 +255,32 @@ const Header = () => {
           </div>
         </div>
 
-        <nav className="hidden h-[34px] items-center justify-around border-b border-gray-200 bg-white px-8 md:flex">
-          {categoryItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-[15px] font-extrabold text-gray-600 transition hover:text-primary"
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* Category Navigation Bar */}
+        <nav className="hidden h-[48px] items-center justify-center gap-2 border-b border-gray-100 bg-white px-8 md:flex">
+          {categoryItems.map((item) => {
+            // Check if current category is active
+            const isActive = pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`relative px-4 py-1.5 text-[14px] font-semibold transition-all duration-200 ease-in-out hover:text-primary whitespace-nowrap ${isActive
+                  ? "text-primary"
+                  : "text-gray-500 hover:bg-gray-50 rounded-full"
+                  }`}
+              >
+                {item.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-[-13px] left-2 right-2 h-[2.5px] bg-primary rounded-full shadow-[0_-1px_4px_rgba(34,84,47,0.2)]"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <AnimatePresence>
