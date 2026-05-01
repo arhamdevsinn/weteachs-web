@@ -163,7 +163,7 @@ export default function FitnessPage() {
                   href={card.href}
                   className="mt-6 text-3xl font-black tracking-tight text-red-600 hover:text-red-700"
                 >
-                    <Button className="bg-primary text-white w-full">{card.cta}</Button>
+                  <Button className="bg-primary text-white w-full">{card.cta}</Button>
                 </Link>
               </article>
             ))}
@@ -328,7 +328,7 @@ export default function FitnessPage() {
       <section className="px-5 pb-16 md:px-10 lg:px-16">
         <div className="mx-auto max-w-4xl">
           <h2 className="text-6xl font-black text-center">Get help your way</h2>
-{/* 
+          {/* 
           <div className="mt-8 flex flex-col items-center justify-between gap-5 border-x-4 border-slate-900 px-5 py-6 md:flex-row">
             <Link href="/download" className="text-5xl font-black tracking-tight">
               Download App -&gt;
@@ -341,35 +341,35 @@ export default function FitnessPage() {
               </div>
             </div>
           </div> */}
-<div className="mt-8 flex flex-col items-center justify-center gap-5  px-5 py-6 md:flex-row">
-  <a
-    href="https://play.google.com/store/apps/details?id=com.weteachappneww.app"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <Image  priority={true}
-      src="/play-store.png"
-      width={110}
-      height={50}
-      alt="Play Store"
-      className="hover:scale-105 transition-transform"
-    />
-  </a>
+          <div className="mt-8 flex flex-col items-center justify-center gap-5  px-5 py-6 md:flex-row">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.weteachappneww.app"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image priority={true}
+                src="/play-store.png"
+                width={110}
+                height={50}
+                alt="Play Store"
+                className="hover:scale-105 transition-transform"
+              />
+            </a>
 
-  <a
-    href="https://apps.apple.com/us/app/weteachs/id6502515880"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <Image  priority={true}
-      src="/app-store.png"
-      width={110}
-      height={50}
-      alt="App Store"
-      className="hover:scale-105 transition-transform"
-    />
-  </a>
-</div>
+            <a
+              href="https://apps.apple.com/us/app/weteachs/id6502515880"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image priority={true}
+                src="/app-store.png"
+                width={110}
+                height={50}
+                alt="App Store"
+                className="hover:scale-105 transition-transform"
+              />
+            </a>
+          </div>
 
           <p className="mt-5 flex items-center justify-center gap-2 text-sm font-semibold text-slate-500">
             <CircleHelp className="h-4 w-4" />

@@ -103,7 +103,7 @@ const Header = () => {
               {menuOpen ? <X size={28} strokeWidth={2} /> : <Menu size={28} strokeWidth={2} />}
             </button>
 
-            <Link href="/" className="flex items-center gap-2 group transition-transform active:scale-95">
+            <Link href="/education" className="flex items-center gap-2 group transition-transform active:scale-95">
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -291,11 +291,10 @@ const Header = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative px-5 py-2 text-[14px] font-bold tracking-tight transition-all duration-300 ease-in-out whitespace-nowrap rounded-full ${
-                  isActive 
-                    ? "text-primary bg-primary/5" 
-                    : "text-slate-600 hover:text-primary hover:bg-gray-50"
-                }`}
+                className={`relative px-5 py-2 text-[14px] font-bold tracking-tight transition-all duration-300 ease-in-out whitespace-nowrap rounded-full ${isActive
+                  ? "text-primary bg-primary/5"
+                  : "text-slate-600 hover:text-primary hover:bg-gray-50"
+                  }`}
               >
                 {item.label}
                 {isActive && (
