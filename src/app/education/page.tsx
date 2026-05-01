@@ -230,9 +230,12 @@ const EducationPage = () => {
                   <ShieldCheck className="text-primary" />
                   <span>Beginner Friendly</span>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <p className="text-2xl font-black text-gray-900">“clear explanations”</p>
-                  <p className="text-2xl font-black text-gray-900">“Learn at your own pace”</p>
+                <div className="flex items-center gap-3 text-lg font-bold text-gray-800">
+                  <ShieldCheck className="text-primary" />
+                  <span>Clear explanations</span>
+                </div><div className="flex items-center gap-3 text-lg font-bold text-gray-800">
+                  <ShieldCheck className="text-primary" />
+                  <span>Learn at your own pace</span>
                 </div>
               </div>
 
