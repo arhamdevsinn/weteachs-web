@@ -266,13 +266,13 @@ const Header = () => {
               <>
                 <button
                   onClick={() => (window.location.href = "/auth/login")}
-                  className="whitespace-nowrap text-[14px] font-extrabold text-black hover:text-primary"
+                  className="whitespace-nowrap text-[14px] font-bold text-gray-700 hover:text-primary transition-colors"
                 >
                   Sign In
                 </button>
                 <button
                   onClick={() => (window.location.href = "/auth/signup")}
-                  className="h-[34px] rounded-[8px] border-2 border-primary px-2 text-[24px] font-black leading-none text-primary shadow-[0_0_0_1px_rgba(34,84,47,0.12)] hover:bg-primary hover:text-white"
+                  className="h-[36px] rounded-lg border border-primary px-5 text-[14px] font-bold text-primary hover:bg-primary hover:text-white transition-all duration-200 active:scale-95 shadow-sm"
                 >
                   Join
                 </button>
@@ -282,7 +282,7 @@ const Header = () => {
         </div>
 
         {/* Category Navigation Bar */}
-        <nav className="hidden h-[48px] items-center justify-center gap-2 border-b border-gray-100 bg-white px-8 md:flex">
+        <nav className="hidden h-[52px] items-center justify-center gap-3 border-b border-gray-100 bg-white px-8 md:flex">
           {categoryItems.map((item) => {
             // Check if current category is active
             const isActive = pathname === item.href;
@@ -291,16 +291,17 @@ const Header = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative px-4 py-1.5 text-[14px] font-semibold transition-all duration-200 ease-in-out hover:text-primary whitespace-nowrap ${isActive
-                  ? "text-primary"
-                  : "text-gray-500 hover:bg-gray-50 rounded-full"
-                  }`}
+                className={`relative px-5 py-2 text-[14px] font-bold tracking-tight transition-all duration-300 ease-in-out whitespace-nowrap rounded-full ${
+                  isActive 
+                    ? "text-primary bg-primary/5" 
+                    : "text-slate-600 hover:text-primary hover:bg-gray-50"
+                }`}
               >
                 {item.label}
                 {isActive && (
                   <motion.div
-                    layoutId="activeTab"
-                    className="absolute bottom-[-13px] left-2 right-2 h-[2.5px] bg-primary rounded-full shadow-[0_-1px_4px_rgba(34,84,47,0.2)]"
+                    layoutId="activeTabIndicator"
+                    className="absolute bottom-0 left-4 right-4 h-[2.5px] bg-primary rounded-t-full shadow-[0_-1px_4px_rgba(34,84,47,0.2)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
