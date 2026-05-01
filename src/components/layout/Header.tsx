@@ -271,55 +271,50 @@ const Header = () => {
                   <Link
                     href="/"
                     onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
-                      pathname === "/" || pathname === ""
-                        ? "bg-[#E6F0FD] text-[#22542F]"
-                        : "text-[#333333] hover:bg-gray-50"
-                    }`}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/" || pathname === ""
+                      ? "bg-[#E8ECE4] text-[#22542F]"
+                      : "text-[#333333] hover:bg-gray-50"
+                      }`}
                   >
                     Home
                   </Link>
                   <Link
-                    href="/teach"
+                    href="/about"
                     onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
-                      pathname === "/teach"
-                        ? "bg-[#E6F0FD] text-[#22542F]"
-                        : "text-[#333333] hover:bg-gray-50"
-                    }`}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/about"
+                      ? "bg-[#E8ECE4] text-[#22542F]"
+                      : "text-[#333333] hover:bg-gray-50"
+                      }`}
                   >
                     Helper
                   </Link>
                   <Link
-                    href="/categories"
+                    href="/learn"
                     onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
-                      pathname.startsWith("/categories")
-                        ? "bg-[#E6F0FD] text-[#22542F]"
-                        : "text-[#333333] hover:bg-gray-50"
-                    }`}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname.startsWith("/learn")
+                      ? "bg-[#E8ECE4] text-[#22542F]"
+                      : "text-[#333333] hover:bg-gray-50"
+                      }`}
                   >
                     Clients
                   </Link>
                   <Link
-                    href="/learn"
+                    href="/teach"
                     onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
-                      pathname === "/learn"
-                        ? "bg-[#E6F0FD] text-[#22542F]"
-                        : "text-[#333333] hover:bg-gray-50"
-                    }`}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/teach"
+                      ? "bg-[#E8ECE4] text-[#22542F]"
+                      : "text-[#333333] hover:bg-gray-50"
+                      }`}
                   >
                     Learn
                   </Link>
                   <Link
-                    href="/explore"
+                    href="/categories"
                     onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${
-                      pathname === "/explore"
-                        ? "bg-[#E6F0FD] text-[#22542F]"
-                        : "text-[#333333] hover:bg-gray-50"
-                    }`}
+                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/categories"
+                      ? "bg-[#E8ECE4] text-[#22542F]"
+                      : "text-[#333333] hover:bg-gray-50"
+                      }`}
                   >
                     Explore
                   </Link>
