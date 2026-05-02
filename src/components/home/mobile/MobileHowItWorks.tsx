@@ -56,31 +56,38 @@ const MobileHowItWorks = () => {
       </h2>
 
       {/* Tabs */}
-      <div className="mx-auto mb-10 flex max-w-[320px] rounded-[10px] border-2 border-black bg-white p-1">
+      <div className="mx-auto mb-10 flex max-w-[320px] rounded-[10px] border-2 border-primary bg-white p-1">
         <button
           onClick={() => setActiveTab("hiring")}
-          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${activeTab === "hiring" ? "bg-black text-white" : "bg-transparent text-gray-700"
-            }`}
+          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${
+            activeTab === "hiring" ? "bg-primary text-white" : "bg-transparent text-gray-700"
+          }`}
         >
           For Hiring
         </button>
         <button
           onClick={() => setActiveTab("earning")}
-          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${activeTab === "earning" ? "bg-black text-white" : "bg-transparent text-gray-700"
-            }`}
+          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${
+            activeTab === "earning" ? "bg-primary text-white" : "bg-transparent text-gray-700"
+          }`}
         >
           For Earning
         </button>
       </div>
 
       {/* Scrollable Cards Row */}
-      <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-2 scrollbar-none snap-x snap-mandatory">
-        {cards.map((card) => (
+      <div className="flex gap-5 overflow-x-auto pb-10 pt-4 px-4 scrollbar-none snap-x snap-mandatory">
+        {cards.map((card, index) => (
           <article
             key={card.title}
-            className="flex w-[260px] shrink-0 snap-center flex-col rounded-[16px] border border-gray-100 bg-white pb-6 shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-transform active:scale-[0.98]"
+            className="flex w-[280px] shrink-0 snap-center flex-col rounded-[24px] border border-gray-100 bg-white pb-8 shadow-[0_15px_40px_rgba(0,0,0,0.08)] transition-all active:scale-[0.98]"
           >
-            <div className="relative h-[180px] w-full overflow-hidden rounded-t-[16px] bg-gray-50/50 flex items-center justify-center p-8">
+            <div className="relative h-[200px] w-full overflow-hidden rounded-t-[24px] bg-[#f8fafc] flex items-center justify-center p-10">
+              {/* Step Badge */}
+              <div className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full bg-black text-[12px] font-black text-white shadow-md">
+                {index + 1}
+              </div>
+              
               <div className="relative w-full h-full">
                 <Image
                   src={card.image}
@@ -90,18 +97,19 @@ const MobileHowItWorks = () => {
                 />
               </div>
             </div>
-            <div className="flex flex-1 flex-col px-5 pt-5 text-center">
-              <h3 className="text-[15px] font-black leading-tight text-black">
+            
+            <div className="flex flex-1 flex-col px-6 pt-6 text-center">
+              <h3 className="text-[17px] font-black leading-tight text-black">
                 {card.title}
               </h3>
-              <p className="mx-auto mt-2 mb-6 max-w-[220px] text-[13px] font-bold leading-tight text-gray-500">
+              <p className="mx-auto mt-3 mb-8 max-w-[220px] text-[14px] font-medium leading-relaxed text-gray-500">
                 {card.text}
               </p>
-
+              
               {card.cta && (
                 <Link
                   href={card.ctaHref}
-                  className="mt-auto flex w-full items-center justify-center rounded-[8px] bg-[#22542F] py-3.5 text-[16px] font-black text-white shadow-lg transition active:scale-95"
+                  className="mt-auto flex w-full items-center justify-center rounded-[12px] bg-[#22542F] py-4 text-[17px] font-black text-white shadow-[0_10px_20px_rgba(34,84,47,0.2)] transition active:scale-95"
                 >
                   {card.cta}
                 </Link>
