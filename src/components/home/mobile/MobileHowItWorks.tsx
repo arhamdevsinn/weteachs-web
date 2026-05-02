@@ -1,8 +1,5 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
-
-type Tab = "hiring" | "earning";
 
 const hiringCards = [
   {
@@ -22,64 +19,17 @@ const hiringCards = [
   },
 ];
 
-const earningCards = [
-  {
-    image: "/dollar-sign.png",
-    title: "Turn your skills into income",
-    text: "Get discovered by clients and start earning on your own terms.",
-  },
-  {
-    image: "/clock.png",
-    title: "You set the rules",
-    text: "Offer services however you want — hourly, fixed, or custom.",
-  },
-  {
-    image: "/chat.png",
-    title: "Connect with clients instantly",
-    text: "Chat in real time, answer questions, and build trust before starting the work.",
-  },
-];
-
 const MobileHowItWorks = () => {
-  const [activeTab, setActiveTab] = useState<Tab>("hiring");
-  const cards = activeTab === "hiring" ? hiringCards : earningCards;
-
   return (
     <section className="bg-white px-4 pb-8 pt-6">
       {/* Title */}
-      <h2 className="mb-5 text-center text-[26px] font-black text-black">
+      <h2 className="mb-8 text-center text-[26px] font-black text-black">
         How it works
       </h2>
 
-      {/* Tab Toggle */}
-      <div className="flex justify-center">
-        <div className="mb-5 flex w-fit rounded-[10px] border border-gray-300 overflow-hidden">
-          <button
-            onClick={() => setActiveTab("hiring")}
-            className={`px-4 py-2.5 text-[14px] font-semibold transition-colors ${activeTab === "hiring"
-              ? "bg-white text-black border-2 border-black rounded-[10px] shadow"
-              : "bg-white text-gray-500"
-              }`}
-          >
-            For Hiring
-          </button>
-
-          <button
-            onClick={() => setActiveTab("earning")}
-            className={`px-4 py-2.5 text-[14px] font-semibold transition-colors ${activeTab === "earning"
-              ? "bg-white text-black border-2 border-black rounded-[10px] shadow"
-              : "bg-white text-gray-500"
-              }`}
-          >
-            For Earning
-          </button>
-        </div>
-      </div>
-
-
       {/* Scrollable Cards Row */}
       <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-2 scrollbar-none snap-x snap-mandatory">
-        {cards.map((card) => (
+        {hiringCards.map((card) => (
           <article
             key={card.title}
             className="flex w-[240px] shrink-0 snap-center flex-col rounded-[12px] border border-gray-100 bg-white pb-5 shadow-[0_6px_18px_rgba(0,0,0,0.15)] transition-transform active:scale-[0.98]"

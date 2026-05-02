@@ -72,8 +72,8 @@ const MoreIcon = () => (
 const categories = [
   { label: "Fitness", Icon: FitnessIcon, href: "/fitness" },
   { label: "Business", Icon: BusinessIcon, href: "/categories/business" },
-  { label: "Education", Icon: EducationIcon, href: "/categories/education" },
-  { label: "Art", Icon: ArtIcon, href: "/categories/art" },
+  { label: "Education", Icon: EducationIcon, href: "/education" },
+  { label: "Art", Icon: ArtIcon, href: "/art" },
   { label: "Foods", Icon: FoodsIcon, href: "/categories/foods" },
   { label: "Health", Icon: HealthIcon, href: "/categories/health" },
   { label: "Family", Icon: FamilyIcon, href: "/categories/family" },

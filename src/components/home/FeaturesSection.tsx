@@ -136,12 +136,12 @@ function InfoCard({
 const FeaturesSection = () => {
   return (
     <section className="bg-white pb-12">
-      <div className="mx-auto mb-7 max-w-[900px] border-t border-gray-200 pt-5 text-center">
-        <p className="text-[8px] font-black uppercase tracking-[0.35em] text-gray-700">
-          Turn Knowledge Into Income
+      <div className="mx-auto mb-7 max-w-[900px] border-t border-gray-200 pt-10 text-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">
+          How it works
         </p>
-        <h2 className="mt-2 text-lg font-black text-black">
-          Empower Your Growth - Learn & Earn
+        <h2 className="mt-2 text-4xl font-black text-black">
+          Connect with real Experts
         </h2>
       </div>
 
@@ -156,21 +156,6 @@ const FeaturesSection = () => {
 
       <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
         {clientCards.map((card) => (
-          <InfoCard key={card.title} {...card} />
-        ))}
-      </div>
-
-      <FeatureBand
-        image="/expert.png"
-        kicker="For Earning"
-        audience="For Earning"
-        action="Find Out How"
-        description="Earn by chatting with people who need your skills. Set your own rates, times, and topics-it's that simple."
-        href="/teach"
-      />
-
-      <div className="mx-auto grid max-w-[1120px] gap-12 px-6 pt-10 md:grid-cols-3">
-        {helperCards.map((card) => (
           <InfoCard key={card.title} {...card} />
         ))}
       </div>

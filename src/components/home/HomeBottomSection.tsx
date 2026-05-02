@@ -74,39 +74,20 @@ const HomeBottomSection = () => {
 
       <TestimonialsSection />
       {user ? null : (
-        <div className="mx-auto mt-24 max-w-[1120px] px-6">
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Hiring CTA */}
-            <div className="flex flex-col items-center justify-between rounded-[16px] bg-primary px-8 py-12 text-center text-white shadow-xl transition-transform hover:scale-[1.02]">
-              <h2 className="text-[32px] font-black leading-tight">
-                Hire the top knowledgeable Experts
-              </h2>
-              <p className="mt-4 max-w-[300px] text-[18px] font-medium text-white/90">
-                Get the help you need, directly from real people.
-              </p>
-              <Link
-                href="/learn"
-                className="mt-10 inline-flex rounded-[12px] bg-white px-12 py-4 text-[22px] font-black leading-none text-primary transition hover:bg-secondary"
-              >
-                Start Learning
-              </Link>
-            </div>
-
-            {/* Earning CTA */}
-            <div className="flex flex-col items-center justify-between rounded-[16px] bg-secondary px-8 py-12 text-center text-primary shadow-xl border border-primary/10 transition-transform hover:scale-[1.02]">
-              <h2 className="text-[32px] font-black leading-tight">
-                Turn your skills into income
-              </h2>
-              <p className="mt-4 max-w-[300px] text-[18px] font-medium text-primary/80">
-                Start sharing your expertise and earn on your own terms.
-              </p>
-              <Link
-                href="/teach"
-                className="mt-10 inline-flex rounded-[12px] bg-primary px-12 py-4 text-[22px] font-black leading-none text-white transition hover:bg-green-900"
-              >
-                Start Earning
-              </Link>
-            </div>
+        <div className="mx-auto mt-24 max-w-[760px] px-6">
+          <div className="flex flex-col items-center justify-between rounded-[16px] bg-primary px-8 py-12 text-center text-white shadow-xl transition-transform hover:scale-[1.02]">
+            <h2 className="text-[32px] font-black leading-tight sm:text-[40px]">
+              Hire the top knowledgeable Experts
+            </h2>
+            <p className="mt-4 max-w-[450px] text-[18px] font-medium text-white/90">
+              Get the help you need, directly from real people.
+            </p>
+            <Link
+              href="/learn"
+              className="mt-10 inline-flex rounded-[12px] bg-white px-12 py-4 text-[22px] font-black leading-none text-primary transition hover:bg-secondary"
+            >
+              Start Learning
+            </Link>
           </div>
         </div>
       )}
