@@ -6,8 +6,11 @@ import HomeBottomSection from "../components/home/HomeBottomSection";
 // Mobile Components
 import MobileHero from "../components/home/mobile/MobileHero";
 import MobileCategoriesSection from "../components/home/mobile/MobileCategoriesSection";
-import MobileHowItWorks from "../components/home/mobile/MobileHowItWorks";
+import MobileExamplesSection from "../components/home/mobile/MobileExamplesSection";
 import MobileFeatureBands from "../components/home/mobile/MobileFeatureBands";
+import MobileHowItWorks from "../components/home/mobile/MobileHowItWorks";
+import MobileHelperBand from "../components/home/mobile/MobileHelperBand";
+import MobileEarningSteps from "../components/home/mobile/MobileEarningSteps";
 import MobileTestimonials from "../components/home/mobile/MobileTestimonials";
 import MobileBottomCTA from "../components/home/mobile/MobileBottomCTA";
 
@@ -25,8 +28,11 @@ export default function Page() {
       <div className="block md:hidden bg-[#f9fafb]">
         <MobileHero />
         <MobileCategoriesSection />
+
         <MobileHowItWorks />
         <MobileFeatureBands />
+        <MobileHelperBand />
+        {/* <MobileEarningSteps /> */}
         <MobileTestimonials />
         <MobileBottomCTA />
       </div>

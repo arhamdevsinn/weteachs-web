@@ -37,35 +37,25 @@ const ArtIcon = () => (
   </svg>
 );
 
-const FoodsIcon = () => (
+const FinanceIcon = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22542F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
-    <path d="M7 2v20" />
-    <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+    <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    <path d="M16 3l4 4-4 4" />
   </svg>
 );
 
-const HealthIcon = () => (
+const TechnologyIcon = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22542F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-  </svg>
-);
-
-const FamilyIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22542F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+    <circle cx="12" cy="10" r="3" />
   </svg>
 );
 
 const MoreIcon = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22542F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="2" width="9" height="9" rx="2" />
-    <rect x="13" y="2" width="9" height="9" rx="2" />
-    <rect x="2" y="13" width="9" height="9" rx="2" />
-    <rect x="13" y="13" width="9" height="9" rx="2" />
+    <path d="M12 2l3.5 6h-7L12 2zM12 22l-3.5-6h7L12 22zM2 12l6-3.5v7L2 12zM22 12l-6 3.5v-7L22 12z" />
   </svg>
 );
 
@@ -74,35 +64,42 @@ const categories = [
   { label: "Business", Icon: BusinessIcon, href: "/business" },
   { label: "Education", Icon: EducationIcon, href: "/education" },
   { label: "Art", Icon: ArtIcon, href: "/art" },
-  { label: "Foods", Icon: FoodsIcon, href: "/categories/foods" },
-  { label: "Health", Icon: HealthIcon, href: "/categories/health" },
-  { label: "Family", Icon: FamilyIcon, href: "/categories/family" },
-  { label: "More!", Icon: MoreIcon, href: "/categories" },
+  { label: "Finance", Icon: FinanceIcon, href: "/finance" },
+  { label: "Technology", Icon: TechnologyIcon, href: "/technology" },
 ];
 
 const MobileCategoriesSection = () => {
   return (
-    <section className="bg-white px-2 pb-8 pt-5">
-      <h2 className="mb-6 text-center text-[19px] font-bold text-black">
+    <section className="bg-white px-2 pb-12 pt-8">
+      <h2 className="mb-8 text-center text-[22px] font-black text-black">
         Real Ways People Get Help
       </h2>
 
-      <div className="mx-auto max-w-[340px] px-2">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+      <div className="mx-auto max-w-[360px] px-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4">
           {categories.map(({ label, Icon, href }) => (
             <Link
               key={label}
               href={href}
-              className="flex items-center justify-between rounded-[8px] border border-gray-100 bg-white px-3 py-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.12)] transition-transform active:scale-95 hover:border-primary hover:shadow-[0_6px_14px_rgba(0,0,0,0.15)]"
+              className="flex items-center justify-between rounded-[12px] border border-gray-100 bg-white px-4 py-3.5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] transition-transform active:scale-95"
             >
-              <span className="text-[14px] font-bold text-black">{label}</span>
-              <div className="scale-90"><Icon /></div>
+              <span className="text-[16px] font-black text-black">{label}</span>
+              <div className="scale-110"><Icon /></div>
             </Link>
           ))}
         </div>
+        
+        <div className="mt-6 flex justify-center">
+          <Link
+            href="/categories"
+            className="flex w-[160px] items-center justify-between rounded-[12px] border border-gray-100 bg-white px-5 py-3.5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] transition-transform active:scale-95"
+          >
+            <span className="text-[16px] font-black text-black">More!</span>
+            <div className="scale-110"><MoreIcon /></div>
+          </Link>
+        </div>
       </div>
     </section>
-
   );
 };
 
