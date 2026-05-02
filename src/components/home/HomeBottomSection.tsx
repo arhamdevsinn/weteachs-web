@@ -79,14 +79,12 @@ const HomeBottomSection = () => {
             <h2 className="text-[32px] font-black leading-tight sm:text-[40px]">
               Hire the top knowledgeable Experts
             </h2>
-            <p className="mt-4 max-w-[450px] text-[18px] font-medium text-white/90">
-              Get the help you need, directly from real people.
-            </p>
+
             <Link
-              href="/learn"
+              href="/auth/signup"
               className="mt-10 inline-flex rounded-[12px] bg-white px-12 py-4 text-[22px] font-black leading-none text-primary transition hover:bg-secondary"
             >
-              Start Learning
+              Join Now
             </Link>
           </div>
         </div>

@@ -123,8 +123,8 @@ function InfoCard({
       </div>
       {cta && (
         <a
-          href={cta === "Ask Experts" ? "/categories" : "/teach"}
-          className="mt-5 flex h-[54px] w-full items-center justify-center rounded-[6px] bg-primary text-[27px] font-black leading-none text-white transition hover:bg-green-900"
+          href={cta === "Ask Experts" ? "/categories" : "/auth/signup"}
+          className="mt-5 flex h-[48px] px-8 items-center justify-center rounded-[6px] bg-primary text-lg font-black leading-none text-white transition hover:bg-green-900"
         >
           {cta}
         </a>
@@ -135,8 +135,8 @@ function InfoCard({
 
 const FeaturesSection = () => {
   return (
-    <section className="bg-white pb-12">
-      <div className="mx-auto mb-7 max-w-[900px] border-t border-gray-200 pt-10 text-center">
+    <section className="bg-white pb-24">
+      <div className="mx-auto mb-7 max-w-[900px] border-t border-gray-200 pt-16 text-center">
         <p className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">
           How it works
         </p>
@@ -145,19 +145,38 @@ const FeaturesSection = () => {
         </h2>
       </div>
 
+      {/* Hiring Section */}
       <FeatureBand
-        image="/student.png"
+        image="/learn_image.png"
         kicker="For Hiring"
         audience="For Hiring"
         action="Start Here"
-        description="Imagine talking to AI-but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
-        href="/learn"
+        description="Imagine talking to AI—but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
+        href="/auth/signup"
       />
 
       <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
         {clientCards.map((card) => (
           <InfoCard key={card.title} {...card} />
         ))}
+      </div>
+
+      {/* Earning Section */}
+      <div className="mt-12">
+        <FeatureBand
+          image="/helper-categpry.jpg"
+          kicker="For Earning"
+          audience="For Earning"
+          action="Find Out How"
+          description="Earn by chatting with people who need your skills. Set your own rates, times, and topics. It's that simple."
+          href="/auth/signup"
+        />
+
+        <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
+          {helperCards.map((card) => (
+            <InfoCard key={card.title} {...card} />
+          ))}
+        </div>
       </div>
     </section>
   );
