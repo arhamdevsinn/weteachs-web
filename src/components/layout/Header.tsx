@@ -103,7 +103,7 @@ const Header = () => {
               {menuOpen ? <X size={28} strokeWidth={2} /> : <Menu size={28} strokeWidth={2} />}
             </button>
 
-            <Link href="/technology" className="flex items-center gap-2 group transition-transform active:scale-95">
+            <Link href="/" className="flex items-center gap-2 group transition-transform active:scale-95">
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}

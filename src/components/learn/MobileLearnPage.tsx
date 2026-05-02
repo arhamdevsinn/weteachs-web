@@ -111,7 +111,7 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
       {/* ── Hero ── */}
       <section className="relative w-full h-[340px]">
         <img
-          src="/learn_image.png"
+          src="/client_image_mobile.png"
           alt="Learn with Weteachs"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />

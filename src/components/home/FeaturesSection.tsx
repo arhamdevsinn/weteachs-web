@@ -75,24 +75,16 @@ function FeatureBand({
             {description}
           </p>
 
-          <div className="flex items-center gap-4 justify-center md:justify-start">
+          <div className="mt-6 flex justify-center md:justify-start">
             <a
               href={href}
-                className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-black text-white transition hover:bg-green-900"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-[15px] font-black text-white transition hover:bg-green-900 shadow-[0_4px_10px_rgba(0,0,0,0.15)]"
             >
-              Learn More
+              {action}
+              <span className="flex size-5 items-center justify-center rounded-[3px] bg-[#6fbd58] text-[14px] leading-none text-white">
+                ✓
+              </span>
             </a>
-            <div className="text-center md:text-left">
-              {/* <h2 className="text-[28px] font-black leading-tight text-black sm:text-[34px]">
-            {audience}
-          </h2> */}
-              <p className="mt-6 flex items-center justify-center gap-2 text-[30px] font-normal leading-none text-normal sm:text-[24px] md:justify-start">
-                {action}
-                <span className="flex size-8 items-center justify-center rounded-[4px] bg-[#6fbd58] text-[24px] leading-none text-white">
-                  ✓
-                </span>
-              </p>
-            </div>
           </div>
         </div>
 
@@ -155,7 +147,7 @@ const FeaturesSection = () => {
 
       <FeatureBand
         image="/student.png"
-        kicker="Learn as a Client"
+        kicker="For Hiring"
         audience="For Hiring"
         action="Start Here"
         description="Imagine talking to AI-but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
@@ -170,7 +162,7 @@ const FeaturesSection = () => {
 
       <FeatureBand
         image="/expert.png"
-        kicker="Earn as an Helper"
+        kicker="For Earning"
         audience="For Earning"
         action="Find Out How"
         description="Earn by chatting with people who need your skills. Set your own rates, times, and topics-it's that simple."

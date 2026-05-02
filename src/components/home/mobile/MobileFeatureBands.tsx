@@ -28,17 +28,19 @@ const MobileFeatureBands = () => {
         </div>
         <div className="flex flex-col gap-1">
           <h3 className="text-[14px] font-black leading-tight text-black">
-            Learn as a{" "}
-            <span className="text-primary">Client</span>
+            For Hiring
           </h3>
           <p className="text-[10px] leading-snug text-gray-700">
             Imagine talking to AI—but it's a real person. Get help tailored exactly to what you need quickly and stress-free.
           </p>
           <Link
             href="/learn"
-            className="mt-1 w-fit rounded-full bg-primary px-4 py-1.5 text-[10px] font-black text-white transition hover:bg-green-900"
+            className="mt-1 flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-[10px] font-black text-white transition hover:bg-green-900 shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
           >
-            Learn More
+            Start Here
+            <span className="flex size-3.5 items-center justify-center rounded-[2px] bg-[#6fbd58] text-[9px] leading-none text-white">
+              ✓
+            </span>
           </Link>
         </div>
       </div>
@@ -55,17 +57,19 @@ const MobileFeatureBands = () => {
         </div>
         <div className="flex flex-col gap-1">
           <h3 className="text-[14px] font-black leading-tight text-black">
-            Earn as an{" "}
-            <span className="text-primary">Helper</span>
+            For Earning
           </h3>
           <p className="text-[10px] leading-snug text-gray-700">
             Earn by chatting with people who need your skills. Set your own rates, times, and topics—it's that simple.
           </p>
           <Link
             href="/teach"
-            className="mt-1 w-fit rounded-full bg-primary px-4 py-1.5 text-[10px] font-black text-white transition hover:bg-green-900"
+            className="mt-1 flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-[10px] font-black text-white transition hover:bg-green-900 shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
           >
-            Learn More
+            Find Out How
+            <span className="flex size-3.5 items-center justify-center rounded-[2px] bg-[#6fbd58] text-[9px] leading-none text-white">
+              ✓
+            </span>
           </Link>
         </div>
       </div>

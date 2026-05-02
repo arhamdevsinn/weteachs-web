@@ -9,6 +9,7 @@ import MobileCategoriesSection from "../components/home/mobile/MobileCategoriesS
 import MobileHowItWorks from "../components/home/mobile/MobileHowItWorks";
 import MobileFeatureBands from "../components/home/mobile/MobileFeatureBands";
 import MobileTestimonials from "../components/home/mobile/MobileTestimonials";
+import MobileBottomCTA from "../components/home/mobile/MobileBottomCTA";
 
 export default function Page() {
   return (
@@ -27,6 +28,7 @@ export default function Page() {
         <MobileHowItWorks />
         <MobileFeatureBands />
         <MobileTestimonials />
+        <MobileBottomCTA />
       </div>
     </main>
   );
