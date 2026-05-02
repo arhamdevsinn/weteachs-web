@@ -71,7 +71,7 @@ const MoreIcon = () => (
 
 const categories = [
   { label: "Fitness", Icon: FitnessIcon, href: "/fitness" },
-  { label: "Business", Icon: BusinessIcon, href: "/categories/business" },
+  { label: "Business", Icon: BusinessIcon, href: "/business" },
   { label: "Education", Icon: EducationIcon, href: "/education" },
   { label: "Art", Icon: ArtIcon, href: "/art" },
   { label: "Foods", Icon: FoodsIcon, href: "/categories/foods" },

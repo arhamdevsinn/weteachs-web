@@ -126,10 +126,10 @@ const EducationPage = () => {
               <p className="text-gray-500 text-sm font-medium">{box.desc}</p>
               {i === 2 && (
                 <div className="mt-6 w-full">
-                  <Link href="/clients" className="inline-block bg-primary text-white px-8 py-3 rounded-full font-black text-base hover:bg-primary/90 transition shadow-md">
+                  <Link href="/learn" className="inline-block bg-primary text-white px-8 py-3 rounded-full font-black text-base hover:bg-primary/90 transition shadow-md">
                     learn step-by-step
                   </Link>
-                  <p className="text-xs text-gray-400 mt-2 italic font-medium">Clients page</p>
+
                 </div>
               )}
             </div>
@@ -220,9 +220,9 @@ const EducationPage = () => {
                   <span>No Commitment</span>
                   <ArrowRight size={16} />
                 </div>
-                <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                {/* <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
                   <div className="h-full bg-primary w-[30%]" />
-                </div>
+                </div> */}
               </div>
 
               <div className="space-y-6 mb-12">
@@ -240,7 +240,7 @@ const EducationPage = () => {
               </div>
 
               <div className="mt-auto">
-                <Link href="/signup" className="block w-full bg-[#1B4323] text-white py-4 rounded-xl font-black text-xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-xl text-center">
+                <Link href="/about" className="block w-full bg-[#1B4323] text-white py-4 rounded-xl font-black text-xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-xl text-center">
                   Get help now
                 </Link>
                 <div className="flex justify-center items-center mt-3 px-2">
@@ -331,11 +331,10 @@ const EducationPage = () => {
                 </h3>
                 <Link
                   href="/auth/signup"
-                  className="inline-block bg-white text-[#1B4323] px-12 py-5 rounded-[12px] font-black text-2xl md:text-3xl hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl relative z-10"
+                  className="inline-block bg-white text-[#1B4323] px-10 py-4 rounded-[12px] font-black text-xl md:text-2xl hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl relative z-10"
                 >
                   Join Now
                 </Link>
-                <p className="text-xs text-white/40 mt-6 italic font-medium uppercase tracking-tighter">(Sign up page)</p>
               </div>
             </div>
           </section>

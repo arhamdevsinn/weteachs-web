@@ -17,7 +17,7 @@ const fadeUp = {
   }),
 };
 
-const ArtPage = () => {
+const BusinessPage = () => {
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -34,11 +34,10 @@ const ArtPage = () => {
       <section className="relative px-4 pt-10 pb-16 md:pt-14 md:pb-24 max-w-[1180px] mx-auto">
         <div className="relative aspect-[1.45/1] md:aspect-[1.91/1] w-full overflow-hidden rounded-2xl bg-gray-100 shadow-xl">
           <img
-            src={isMobile ? "/art page mobile.png" : "/art page.png"}
-            alt="Art Expert Guidance"
+            src={isMobile ? "/business page mobile.png" : "/business page.png"}
+            alt="Business Expert Guidance"
             className="h-full w-full object-cover"
           />
-
         </div>
       </section>
 
@@ -50,25 +49,25 @@ const ArtPage = () => {
         <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
           {[
             {
-              image: "/art 2.png",
-              title: "Search for Your Style",
-              text: "Find artists and experts who understand the medium you want to master.",
+              image: "/business 2.png",
+              title: "Find the Right Expert",
+              text: "Search for professionals with experience in your area or challenge.",
             },
             {
               image: "/chat.png",
-              title: "Start a Chat ⭐",
-              text: "Ask questions, share your work, and get clear feedback—no commitment.",
+              title: "Start a Conversation ⭐",
+              text: "Ask questions, get insights, and see if they're the right fit—no commitment.",
             },
             {
-              image: "/art 1.png",
-              title: "Create and Improve",
-              text: "Work 1-on-1 with an artist to understand techniques and build your portfolio.",
-              cta: "Find an Artist",
-              ctaHref: "/categories"
+              image: "/business 1.png",
+              title: "Take Action with Confidence",
+              text: "Use expert advice to make smarter decisions and move forward.",
+              cta: "Get Business Advice",
+              ctaHref: "/explore"
             }
           ].map((item, i) => (
-
             <InfoCard
+              key={i}
               image={item.image}
               title={item.title}
               text={item.text}
@@ -85,15 +84,15 @@ const ArtPage = () => {
         <div className="max-w-[1100px] mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <h2 className="text-[32px] md:text-[44px] font-black text-black leading-tight">
-              Everything You Need<br />to Create Better
+              Everything You Need<br />to Move Your Business Forward
             </h2>
             <ul className="space-y-5">
               {[
-                "Personalized feedback on your work",
-                "Step-by-step guidance on techniques",
-                "Help developing your style and ideas",
-                "Support from real working artists",
-                "Flexible sessions that fit your schedule"
+                "Advice on strategy, growth, and execution",
+                "Marketing and customer acquisition insights",
+                "Help validating ideas and business plans",
+                "Feedback on products, pricing, and positioning",
+                "Guidance from experienced professionals"
               ].map((text, i) => (
                 <li key={i} className="flex items-center gap-4 text-lg font-bold text-[#3D4B41]">
                   <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
@@ -105,8 +104,8 @@ const ArtPage = () => {
           <div className="relative group">
             <div className="absolute -inset-4 bg-primary/5 rounded-[32px] blur-2xl group-hover:bg-primary/10 transition-all" />
             <img
-              src="/Art page 2.jpg"
-              alt="Art context"
+              src="/Business page 2.jpg"
+              alt="Business context"
               className="relative rounded-3xl shadow-2xl border-4 border-white object-cover w-full h-[400px]"
             />
           </div>
@@ -118,17 +117,17 @@ const ArtPage = () => {
         <h2 className="text-[28px] md:text-[36px] font-black text-black mb-12">Why try out Weteachs?</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { title: "1 on 1 Creative Support", desc: "Get personalized feedback focused on your specific techniques and vision." },
-            { title: "Find the Right Artist for You", desc: "Browse different mediums and styles to match how you create best." },
-            { title: "No Pressure, Just Creativity", desc: "Start with a chat and continue only if it helps your art." }
+            { title: "1-on-1 Business Advice", desc: "Get direct insights tailored to your specific situation." },
+            { title: "Find Experts Across Industries", desc: "Connect with people who've solved similar challenges." },
+            { title: "No Long-Term Commitment", desc: "Start with a conversation and continue only if it's valuable." }
           ].map((box, i) => (
             <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center min-h-[180px]">
               <h4 className="font-black text-[17px] mb-3">{box.title}</h4>
               <p className="text-gray-500 text-sm font-medium">{box.desc}</p>
               {i === 2 && (
                 <div className="mt-6 w-full">
-                  <Link href="/learn" className="inline-block bg-primary text-white px-8 py-3 rounded-full font-black text-base hover:bg-primary/90 transition shadow-md">
-                    learn more
+                  <Link href="/auth/signup" className="inline-block bg-primary text-white px-8 py-3 rounded-full font-black text-base hover:bg-primary/90 transition shadow-md">
+                    Find an Expert
                   </Link>
                 </div>
               )}
@@ -140,9 +139,9 @@ const ArtPage = () => {
       {/* ── Section 5: Banner ── */}
       <section className="bg-primary text-white py-16 px-6 text-center">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-[32px] md:text-[44px] font-black mb-6">Talk to the Right Artist for Your Masterpiece</h2>
+          <h2 className="text-[32px] md:text-[44px] font-black mb-6">Talk to the Right Person Before You Make Your Next Move</h2>
           <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed">
-            Affordable sessions, quick feedback, and a wide range of mediums—designed for creators at any level.
+            Affordable sessions, real-world experience, and fast access to insights—so you can act with clarity.
           </p>
         </div>
       </section>
@@ -151,18 +150,18 @@ const ArtPage = () => {
       <section className="py-24 px-6 bg-white">
         <div className="max-w-[1100px] mx-auto grid md:grid-cols-2 gap-16 items-center">
           <div className="order-2 md:order-1">
-            <img src="/Art page 1.jpg" alt="Person creating art" className="rounded-[40px] shadow-2xl w-full h-[450px] object-cover" />
+            <img src="/Business page 1.jpg" alt="Business consultation" className="rounded-[40px] shadow-2xl w-full h-[450px] object-cover" />
           </div>
           <div className="order-1 md:order-2 space-y-8">
             <h2 className="text-[36px] md:text-[52px] font-black text-black leading-tight">What are people asking?</h2>
             <div className="space-y-4">
               {[
-                "“Can you show me how to blend these colors?”",
-                "“Can you review my portfolio and suggest improvements?”",
-                "“I don't understand perspective—can you break it down?”",
-                "“Can you help me master digital painting?”",
-                "“What's the best technique for shading here?”",
-                "“How do I start with oil paints as a beginner?”"
+                "“Is this a good business idea?”",
+                "“How do I get my first customers?”",
+                "“Can you review my marketing strategy?”",
+                "“How should I price my product?”",
+                "“Why isn't my business growing?”",
+                "“How do I improve my sales?”"
               ].map((q, i) => (
                 <p key={i} className="text-lg md:text-2xl font-bold text-gray-700 leading-tight italic">
                   {q}
@@ -191,13 +190,13 @@ const ArtPage = () => {
               </div>
 
               <div className="space-y-6 mt-auto">
-                <h4 className="text-xl font-black text-black">Artists & Mentors</h4>
+                <h4 className="text-xl font-black text-black">Real professionals</h4>
                 <ul className="space-y-4">
                   {[
-                    "No long-term commitment",
-                    "Pay only for the help you need",
-                    "Real artists and technical experts",
-                    "Start small and continue anytime"
+                    "Pay per session—no retainers",
+                    "Get quick answers or deeper guidance",
+                    "Work with experts on your terms",
+                    "No long-term contracts"
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-base font-bold text-gray-700">
                       <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white">
@@ -221,7 +220,6 @@ const ArtPage = () => {
                   <span>No Commitment</span>
                   <ArrowRight size={16} />
                 </div>
-
               </div>
 
               <div className="space-y-6 mb-12">
@@ -231,32 +229,34 @@ const ArtPage = () => {
                 </div>
                 <div className="flex items-center gap-3 text-lg font-bold text-gray-800">
                   <ShieldCheck className="text-primary" />
-                  <span>Explore different styles and perspectives</span>
-                </div><div className="flex items-center gap-3 text-lg font-bold text-gray-800">
+                  <span>Real insights</span>
+                </div>
+                <div className="flex items-center gap-3 text-lg font-bold text-gray-800">
                   <ShieldCheck className="text-primary" />
-                  <span>Real Artists</span>
+                  <span>Real Coaches</span>
                 </div>
               </div>
 
               <div className="mt-auto">
-                <Link href="/auth/signup" className="block w-full bg-[#1B4323] text-white py-4 rounded-xl font-black text-xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-xl text-center">
-                  Start Creating
+                <Link href="/about" className="block w-full bg-[#1B4323] text-white py-4 rounded-xl font-black text-xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-xl text-center">
+                  Get help now
                 </Link>
                 <div className="flex justify-center items-center mt-3 px-2">
-                  <p className="text-[10px] text-gray-400  tracking-tighter italic justify-center items-center">Create your account and pick the creative support that matches your vision</p>
+                  <p className="text-[10px] text-gray-400  tracking-tighter italic justify-center items-center text-center">Create your account and pick the support that matches your business</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
       {/* ── Section 8: Quote Section ── */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-[800px] mx-auto text-center space-y-8">
           <div className="space-y-4">
-            <h3 className="text-3xl md:text-5xl font-black text-black leading-tight">An Artist in Your Corner</h3>
+            <h3 className="text-3xl md:text-5xl font-black text-black leading-tight">An Expert in Your Corner</h3>
             <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-[600px] mx-auto">
-              Get feedback, direction, and creative support—whenever inspiration strikes.
+              Get insight, feedback, and direction—whenever you need it.
             </p>
           </div>
 
@@ -267,9 +267,9 @@ const ArtPage = () => {
       <section className="bg-[#1B4323] text-white py-16 px-6">
         <div className="max-w-[1000px] mx-auto space-y-0 divide-y divide-white/10">
           {[
-            { title: "What do you want to create?", desc: "Find an artist who can guide your technique." },
-            { title: "Chat with them", desc: "Ask questions and see if their style fits your vision." },
-            { title: "Work together", desc: "Flexible sessions. Real guidance. Your creativity, leveled up." }
+            { title: "What do you need help with?", desc: "Find an expert who understands your challenge." },
+            { title: "Start a conversation", desc: "Ask questions and get real insight." },
+            { title: "Move forward with confidence", desc: "Make decisions backed by experience." }
           ].map((item, i) => (
             <div key={i} className="py-10 first:pt-0 last:pb-0">
               <h4 className="text-2xl md:text-3xl font-black mb-3">{item.title}</h4>
@@ -278,36 +278,32 @@ const ArtPage = () => {
           ))}
         </div>
       </section>
-      {/* ── Section 9: FAQ Section ── */}
-      <section className="py-24 px-6 bg-[#FDFDFD]">
-        <div className="max-w-[900px] mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-xs font-black uppercase tracking-widest text-primary mb-4 block">Support</span>
-            <h2 className="text-[40px] md:text-[54px] font-black text-black leading-tight">Frequently Asked Questions</h2>
-            <p className="text-gray-500 font-bold mt-2">Clear answers to help you start with confidence.</p>
-          </div>
 
-          <div className="space-y-4">
+      {/* ── Section 10: FAQ Section ── */}
+      <section className="py-24 px-6 bg-[#FDFDFD]">
+        <div className="max-w-[900px] mx-auto text-center">
+          <h2 className="text-[40px] md:text-[54px] font-black text-black leading-tight mb-16">Frequently Asked Questions</h2>
+          <div className="space-y-4 text-left">
             {[
               {
-                q: "Can I get feedback on my artwork?",
-                a: "Yes, you can share your work and get honest, constructive feedback from experienced artists."
+                q: "What kind of business advice can I get?",
+                a: "You can get help with strategy, marketing, sales, pricing, and growth."
               },
               {
-                q: "What types of art can I get help with?",
-                a: "You can find experts in illustration, painting, digital art, design, crafts, and more."
+                q: "Is this only for established businesses?",
+                a: "No, you can get help whether you're starting out or scaling."
               },
               {
-                q: "Are these professional artists?",
-                a: "Our experts include working artists, designers, and skilled creatives with real experience."
+                q: "Can I validate a business idea?",
+                a: "Yes, experts can give feedback and help you evaluate your idea."
               },
               {
-                q: "Do I need to be experienced to use this?",
-                a: "Not at all. Whether you're a beginner or advanced, you can get help at your level."
+                q: "How do I know the advice is reliable?",
+                a: "You can review expert profiles and start with a conversation before committing."
               },
               {
-                q: "Can I learn techniques or just get critiques?",
-                a: "Both. You can ask for technique guidance, style development, or detailed critiques."
+                q: "Can I get ongoing support?",
+                a: "Yes, you can continue working with an expert if it's valuable."
               }
             ].map((faq, i) => (
               <details key={i} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-primary/30 shadow-sm">
@@ -328,30 +324,26 @@ const ArtPage = () => {
         </div>
       </section>
 
-      {/* ── Section 10: Join Now CTA ── */}
-      {
-        user ? null :
-          <section className="pb-24 px-6">
-            <div className="max-w-[1100px] mx-auto text-center">
-              <div className="bg-[#1B4323] rounded-[24px] p-10 md:p-14 shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/10 transition-all duration-700" />
-                <h3 className="text-3xl md:text-5xl font-black text-white mb-10 relative z-10">
-                  Hire the top knowledgeable Experts
-                </h3>
-                <Link
-                  href="/categories"
-                  className="inline-block bg-white text-[#1B4323] px-10 py-4 rounded-[12px] font-black text-xl md:text-2xl hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl relative z-10"
-                >
-                  Get Creative Help
-                </Link>
-
-              </div>
+      {/* ── Section 11: Join CTA ── */}
+      {user ? null : (
+        <section className="pb-24 px-6">
+          <div className="max-w-[1100px] mx-auto text-center">
+            <div className="bg-[#1B4323] rounded-[24px] p-10 md:p-14 shadow-2xl relative overflow-hidden group">
+              <h3 className="text-3xl md:text-5xl font-black text-white mb-10 relative z-10">
+                Hire the top knowledgeable Experts
+              </h3>
+              <Link
+                href="/learn"
+                className="inline-block bg-white text-[#1B4323] px-10 py-4 rounded-[12px] font-black text-xl md:text-2xl hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl relative z-10"
+              >
+                Learn more
+              </Link>
             </div>
-          </section>
-      }
-
+          </div>
+        </section>
+      )}
     </div>
   );
 };
 
-export default ArtPage;
+export default BusinessPage;

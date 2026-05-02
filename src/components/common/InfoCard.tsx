@@ -36,8 +36,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
       </div>
       {cta && (
         <a
-          href={cta === "Ask Experts" ? "/categories" : "/teach"}
-          className="mt-5 flex h-[54px] w-full items-center justify-center rounded-[6px] bg-primary text-[27px] font-black leading-none text-white transition hover:bg-green-900"
+          href={ctaHref ?? (cta === "Ask Experts" ? "/categories" : "/teach")}
+          className="mt-5 flex h-[48px] px-6 items-center justify-center rounded-[8px] bg-primary text-lg font-black leading-none text-white transition hover:bg-green-900"
         >
           {cta}
         </a>

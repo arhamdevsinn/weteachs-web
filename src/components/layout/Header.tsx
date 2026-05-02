@@ -82,10 +82,10 @@ const Header = () => {
   const categoryItems = [
     { href: "/education", label: "Education" },
     { href: "/categories/fitness", label: "Fitness" },
-    { href: "/categories/business", label: "Business" },
+    { href: "/business", label: "Business" },
     { href: "/art", label: "Art" },
-    { href: "/categories/technology", label: "Technology" },
-    { href: "/categories/finance", label: "Finance" },
+    { href: "/technology", label: "Technology" },
+    { href: "/finance", label: "Finance" },
   ];
 
   return (

@@ -29,7 +29,7 @@ const MobileTechnologyPage = ({ user }) => {
           {/* Card 1 */}
           <div className="flex flex-col items-center rounded-[8px] border border-gray-300 bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.12)] p-2 text-center h-full">
             <div className="w-full h-[90px] flex items-center justify-center mb-2">
-              <img src="/tech icon 1.png" alt="Search Problem" className="w-[60px] h-[60px] object-contain" />
+              <img src="/tech 2.png" alt="Search Problem" className="w-[60px] h-[60px] object-contain" />
             </div>
             <h3 className="text-[10px] font-black text-black uppercase leading-tight mb-1">Search Your Problem</h3>
             <p className="text-[8px] text-gray-600 font-bold leading-tight">Find experts who understand your tech stack or issue.</p>
@@ -47,7 +47,7 @@ const MobileTechnologyPage = ({ user }) => {
           {/* Card 3 */}
           <div className="flex flex-col items-center rounded-[8px] border border-gray-300 bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.12)] p-2 text-center h-full">
             <div className="w-full h-[90px] flex items-center justify-center mb-2">
-              <img src="/tech icon 2.png" alt="Fix It" className="w-[60px] h-[60px] object-contain" />
+              <img src="/tech 1.png" alt="Fix It" className="w-[60px] h-[60px] object-contain" />
             </div>
             <h3 className="text-[10px] font-black text-black uppercase leading-tight mb-1">Fix It and Move Forward</h3>
             <p className="text-[8px] text-gray-600 font-bold leading-tight mb-2">Solve issues faster and keep your project on track.</p>
@@ -127,7 +127,7 @@ const MobileTechnologyPage = ({ user }) => {
         <div className="grid grid-cols-2 gap-5 items-center">
           <div>
             <img
-              src="/Technology page 3.jpg"
+              src="/Technology page.jpg"
               alt="Server room"
               className="w-full h-[220px] object-cover rounded-[20px] shadow-xl"
             />
@@ -215,7 +215,21 @@ const MobileTechnologyPage = ({ user }) => {
           </div>
         </div>
       </section>
-
+      {/* ── Footer Info ── */}
+      <section className="bg-[#1B4323] text-white px-6 py-12">
+        <div className="flex flex-col divide-y divide-white/20">
+          {[
+            { title: "Stuck on something?", desc: "Find someone who can help." },
+            { title: "Start a chat", desc: "Explain your issue and get real solutions." },
+            { title: "Build with confidence", desc: "Move forward without roadblocks." },
+          ].map((item, i) => (
+            <div key={i} className="py-8 first:pt-0 last:pb-0">
+              <h4 className="text-[18px] font-black mb-2 uppercase leading-tight tracking-tight">{item.title}</h4>
+              <p className="text-[13px] text-white/80 font-bold leading-snug">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* ── FAQ Section ── */}
       <section className="py-12 px-5 bg-white text-center">
         <h2 className="text-[28px] font-black text-black mb-2 tracking-tight">Frequently Asked Questions</h2>
@@ -248,34 +262,22 @@ const MobileTechnologyPage = ({ user }) => {
       </section>
 
       {/* ── CTA Banner Section ── */}
-      <section className="py-12 px-5 text-center">
-        <h2 className="text-[32px] font-black text-black mb-8 tracking-tight">Get help your way</h2>
-        <div className="bg-[#1B4323] rounded-2xl p-8 shadow-xl">
-          <h3 className="text-[20px] font-black text-white mb-6 leading-tight">Hire the top knowledgeble Experts</h3>
-          <Link href="/signup" className="inline-block bg-white text-[#1B4323] px-12 py-3 rounded-full font-black text-xl shadow-lg hover:bg-gray-100 transition-all">
-            Join Now
-          </Link>
-          <div className="mt-4">
-            {/* <p className="text-[10px] text-white/60 font-bold uppercase tracking-widest">(Sign up page)</p> */}
-          </div>
-        </div>
-      </section>
+      {user ? null :
+        <section className="py-12 px-5 text-center">
+          <h2 className="text-[32px] font-black text-black mb-8 tracking-tight">Get help your way</h2>
+          <div className="bg-[#1B4323] rounded-2xl p-8 shadow-xl">
+            <h3 className="text-[20px] font-black text-white mb-6 leading-tight">Hire the top knowledgeble Experts</h3>
+            <Link href="/signup" className="inline-block bg-white text-[#1B4323] px-12 py-3 rounded-full font-black text-xl shadow-lg hover:bg-gray-100 transition-all">
+              Join Now
+            </Link>
+            <div className="mt-4">
 
-      {/* ── Footer Info ── */}
-      <section className="bg-[#1B4323] text-white px-6 py-12">
-        <div className="flex flex-col divide-y divide-white/20">
-          {[
-            { title: "Stuck on something?", desc: "Find someone who can help." },
-            { title: "Start a chat", desc: "Explain your issue and get real solutions." },
-            { title: "Build with confidence", desc: "Move forward without roadblocks." },
-          ].map((item, i) => (
-            <div key={i} className="py-8 first:pt-0 last:pb-0">
-              <h4 className="text-[18px] font-black mb-2 uppercase leading-tight tracking-tight">{item.title}</h4>
-              <p className="text-[13px] text-white/80 font-bold leading-snug">{item.desc}</p>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      }
+
+
     </div>
   );
 };

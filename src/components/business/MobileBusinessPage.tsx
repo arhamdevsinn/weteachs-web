@@ -5,18 +5,24 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Check, ShieldCheck, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 
-const MobileFinancePage = ({ user }) => {
+const MobileBusinessPage = ({ user }) => {
   const [openFaq, setOpenFaq] = useState(null);
+
   return (
     <div className="min-h-screen bg-white text-[#1A1A1A] font-sans overflow-x-hidden">
       {/* ── Hero ── */}
       <section className="relative w-full">
         <div className="relative w-full h-[300px] overflow-hidden">
           <img
-            src="/Finance mobile page.png"
-            alt="Finance Guidance"
+            src="/business page mobile.png"
+            alt="Business Guidance"
             className="w-full h-full object-cover brightness-50"
           />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 bg-black/20">
+            <h1 className="text-[28px] font-black text-white leading-tight drop-shadow-lg">
+              Your Competitive Edge<br />Is One Conversation Away
+            </h1>
+          </div>
         </div>
       </section>
 
@@ -27,30 +33,30 @@ const MobileFinancePage = ({ user }) => {
           {/* Card 1 */}
           <div className="flex flex-col items-center rounded-[8px] border border-gray-300 bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.12)] p-2 text-center h-full">
             <div className="w-full h-[90px] flex items-center justify-center mb-2">
-              <img src="/finance 2.png" alt="Find Expert" className="w-[60px] h-[60px] object-contain" />
+              <img src="/business 2.png" alt="Find Expert" className="w-[60px] h-[60px] object-contain" />
             </div>
             <h3 className="text-[10px] font-black text-black uppercase leading-tight mb-1">Find the Right Expert</h3>
-            <p className="text-[8px] text-gray-600 font-bold leading-tight">Search for professionals with experience in your area or challenge.</p>
+            <p className="text-[8px] text-gray-600 font-bold leading-tight">Search for professionals with experience in your area.</p>
           </div>
 
           {/* Card 2 */}
           <div className="flex flex-col items-center rounded-[8px] border border-gray-300 bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.12)] p-2 text-center h-full">
             <div className="w-full h-[90px] flex items-center justify-center mb-2">
-              <img src="/chat.png" alt="Conversation" className="w-[60px] h-[60px] object-contain" />
+              <img src="/chat.png" alt="Chat" className="w-[60px] h-[60px] object-contain" />
             </div>
             <h3 className="text-[10px] font-black text-black uppercase leading-tight mb-1">Start a Conversation ⭐</h3>
-            <p className="text-[8px] text-gray-600 font-bold leading-tight">Ask questions, get insights, and see if they're the right fit—no commitment.</p>
+            <p className="text-[8px] text-gray-600 font-bold leading-tight">Ask questions, get insights, and see if they're the right fit.</p>
           </div>
 
           {/* Card 3 */}
           <div className="flex flex-col items-center rounded-[8px] border border-gray-300 bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.12)] p-2 text-center h-full">
             <div className="w-full h-[90px] flex items-center justify-center mb-2">
-              <img src="/finance 1.png" alt="Take Action" className="w-[60px] h-[60px] object-contain" />
+              <img src="/business 1.png" alt="Take Action" className="w-[60px] h-[60px] object-contain" />
             </div>
             <h3 className="text-[10px] font-black text-black uppercase leading-tight mb-1">Take Action with Confidence</h3>
             <p className="text-[8px] text-gray-600 font-bold leading-tight mb-2">Use expert advice to make smarter decisions and move forward.</p>
-            <Link href="/categories" className="block w-full bg-[#265A32] text-white text-[9px] font-black py-2 rounded-[4px] leading-tight mt-auto">
-              Get Finance Advice
+            <Link href="/explore" className="block w-full bg-[#265A32] text-white text-[9px] font-black py-2 rounded-[4px] leading-tight mt-auto">
+              Get Business Advice
             </Link>
           </div>
         </div>
@@ -61,13 +67,13 @@ const MobileFinancePage = ({ user }) => {
         <div className="grid grid-cols-2 gap-5 items-start">
           <div>
             <h2 className="text-[15px] font-black text-black leading-tight mb-4">
-              Everything You Need to Move Your Finance Forward
+              Everything You Need to Move Your Business Forward
             </h2>
             <ul className="space-y-2.5">
               {[
                 "Advice on strategy, growth, and execution",
-                "Market analysis and customer acquisition insights",
-                "Help validating ideas and financial plans",
+                "Marketing and customer acquisition insights",
+                "Help validating ideas and business plans",
                 "Feedback on products, pricing, and positioning",
                 "Guidance from experienced professionals",
               ].map((item, i) => (
@@ -80,8 +86,8 @@ const MobileFinancePage = ({ user }) => {
           </div>
           <div>
             <img
-              src="/Finance page 2.jpg"
-              alt="Finance supplies"
+              src="/Business page 2.jpg"
+              alt="Business context"
               className="w-full h-[180px] object-cover rounded-[16px] shadow-lg border-2 border-white"
             />
           </div>
@@ -93,7 +99,7 @@ const MobileFinancePage = ({ user }) => {
         <h2 className="text-[18px] font-black text-black text-center mb-6 uppercase tracking-tighter">Why try out Weteachs?</h2>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { title: "1-on-1 Finance Advice", desc: "Get direct insights tailored to your specific situation." },
+            { title: "1-on-1 Business Advice", desc: "Get direct insights tailored to your specific situation." },
             { title: "Find Experts Across Industries", desc: "Connect with people who've solved similar challenges." },
             { title: "No Long-Term Commitment", desc: "Start with a conversation and continue only if it's valuable.", cta: true },
           ].map((box, i) => (
@@ -102,7 +108,7 @@ const MobileFinancePage = ({ user }) => {
               <p className="text-[8px] text-gray-500 font-bold leading-tight mb-3">{box.desc}</p>
               {box.cta && (
                 <div className="mt-auto w-full">
-                  <Link href="/categories" className="block w-full bg-[#1B4323] text-white text-[9px] font-black py-2 rounded-[4px]">
+                  <Link href="/signup" className="block w-full bg-[#1B4323] text-white text-[9px] font-black py-2 rounded-[4px]">
                     Find an Expert
                   </Link>
                 </div>
@@ -125,8 +131,8 @@ const MobileFinancePage = ({ user }) => {
         <div className="grid grid-cols-2 gap-5 items-center">
           <div>
             <img
-              src="/Finance page.jpg"
-              alt="Expert working"
+              src="/Business page.jpg"
+              alt="Business consultation"
               className="w-full h-[220px] object-cover rounded-[20px] shadow-xl"
             />
           </div>
@@ -134,12 +140,12 @@ const MobileFinancePage = ({ user }) => {
             <h2 className="text-[16px] font-black text-black mb-4 leading-tight">What are people asking?</h2>
             <div className="space-y-2.5">
               {[
-                "“Is this a good investment idea?”",
-                "“How do I build a budget that works?”",
-                "“Can you review my financial strategy?”",
-                "“How should I save for my future?”",
-                "“Why isn't my money growing?”",
-                "“How do I manage my taxes better?”"
+                "“Is this a good business idea?”",
+                "“How do I get my first customers?”",
+                "“Can you review my marketing strategy?”",
+                "“How should I price my product?”",
+                "“Why isn't my business growing?”",
+                "“How do I improve my sales?”",
               ].map((q, i) => (
                 <p key={i} className="text-[11px] text-gray-700 italic font-bold leading-tight">{q}</p>
               ))}
@@ -179,9 +185,6 @@ const MobileFinancePage = ({ user }) => {
                 </li>
               ))}
             </ul>
-            <Link href="https://stripe.com" className="text-[8px] text-blue-600 font-black mt-4 block hover:underline uppercase tracking-tight opacity-40">
-              Link to Stripe.com
-            </Link>
           </div>
 
           {/* Transformation Card */}
@@ -207,30 +210,16 @@ const MobileFinancePage = ({ user }) => {
               </div>
               <p className="text-[10px] text-gray-500 italic mt-2 leading-tight">Explore different styles and perspectives</p>
             </div>
-            <Link href="/signup" className="block w-full bg-[#1B4323] text-white text-[12px] font-black py-3 rounded-[8px] text-center hover:bg-[#112a16] transition-colors shadow-lg">
+            <Link href="/about" className="block w-full bg-[#1B4323] text-white text-[12px] font-black py-3 rounded-[8px] text-center hover:bg-[#112a16] transition-colors shadow-lg">
               Get help now
             </Link>
             <p className="text-[8px] text-gray-400 text-center mt-3 font-bold leading-tight">
-              Create your account and pick the <span className="text-gray-600 uppercase font-black tracking-tighter">finance</span> support that matches your needs
+              Create your account and pick the <span className="text-gray-600 uppercase font-black tracking-tighter">business</span> support that matches your needs
             </p>
           </div>
         </div>
       </section>
 
-      <section className="bg-[#1B4323] text-white px-6 py-12">
-        <div className="flex flex-col divide-y divide-white/20">
-          {[
-            { title: "What do you want help with?", desc: "Find an expert who understands your challenge." },
-            { title: "Start a conversation", desc: "Ask questions and get real insight." },
-            { title: "Move forward with confidence", desc: "Make decisions backed by experience." },
-          ].map((item, i) => (
-            <div key={i} className="py-8 first:pt-0 last:pb-0">
-              <h4 className="text-[18px] font-black mb-2 uppercase leading-tight tracking-tight">{item.title}</h4>
-              <p className="text-[13px] text-white/80 font-bold leading-snug">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
       {/* ── FAQ Section ── */}
       <section className="py-12 px-5 bg-white text-center">
         <h2 className="text-[28px] font-black text-black mb-2 tracking-tight">Frequently Asked Questions</h2>
@@ -238,9 +227,9 @@ const MobileFinancePage = ({ user }) => {
 
         <div className="space-y-3 text-left">
           {[
-            { q: "What kind of financial advice can I get?", a: "You can get help with budgeting, investing, tax strategies, and financial planning." },
-            { q: "Is this only for wealthy individuals?", a: "Not at all. Experts can help you manage your money at any income level." },
-            { q: "Can I get help with my taxes?", a: "Yes, you can find experts who specialize in tax planning and preparation." },
+            { q: "What kind of business advice can I get?", a: "You can get help with strategy, marketing, sales, pricing, and growth." },
+            { q: "Is this only for established businesses?", a: "No, you can get help whether you're starting out or scaling." },
+            { q: "Can I validate a business idea?", a: "Yes, experts can give feedback and help you evaluate your idea." },
             { q: "How do I know the advice is reliable?", a: "You can review expert profiles and start with a conversation before committing." },
             { q: "Can I get ongoing support?", a: "Yes, you can continue working with an expert if it's valuable." }
           ].map((item, i) => (
@@ -263,23 +252,33 @@ const MobileFinancePage = ({ user }) => {
       </section>
 
       {/* ── CTA Banner Section ── */}
-      {user ? null :
-        <section className="py-12 px-5 text-center">
-          <h2 className="text-[32px] font-black text-black mb-8 tracking-tight">Get help your way</h2>
-          <div className="bg-[#1B4323] rounded-2xl p-8 shadow-xl">
-            <h3 className="text-[20px] font-black text-white mb-6 leading-tight">Hire the top knowledgeble Experts</h3>
-            <Link href="/auth/signup" className="inline-block bg-white text-[#1B4323] px-10 py-3 rounded-full font-black text-lg shadow-lg hover:bg-gray-100 transition-all">
-              Join Now
-            </Link>
-            <div className="mt-4">
+      <section className="py-12 px-5 text-center">
+        <h2 className="text-[32px] font-black text-black mb-8 tracking-tight">Get help your way</h2>
+        <div className="bg-[#1B4323] rounded-2xl p-8 shadow-xl">
+          <h3 className="text-[20px] font-black text-white mb-6 leading-tight">Hire the top knowledgeable Experts</h3>
+          <Link href="/learn" className="inline-block bg-white text-[#1B4323] px-12 py-3 rounded-full font-black text-xl shadow-lg hover:bg-gray-100 transition-all">
+            Learn more
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer Info ── */}
+      <section className="bg-[#1B4323] text-white px-6 py-12">
+        <div className="flex flex-col divide-y divide-white/20">
+          {[
+            { title: "What do you need help with?", desc: "Find an expert who understands your challenge." },
+            { title: "Start a conversation", desc: "Ask questions and get real insight." },
+            { title: "Move forward with confidence", desc: "Make decisions backed by experience." },
+          ].map((item, i) => (
+            <div key={i} className="py-8 first:pt-0 last:pb-0">
+              <h4 className="text-[18px] font-black mb-2 uppercase leading-tight tracking-tight">{item.title}</h4>
+              <p className="text-[13px] text-white/80 font-bold leading-snug">{item.desc}</p>
             </div>
-          </div>
-        </section>
-      }
-
-
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
 
-export default MobileFinancePage;
+export default MobileBusinessPage;

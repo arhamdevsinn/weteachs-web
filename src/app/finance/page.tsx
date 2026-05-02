@@ -42,11 +42,10 @@ const FinancePage = () => {
       <section className="relative px-4 pb-16 md:pb-24 max-w-[1180px] mx-auto">
         <div className="relative aspect-[1.45/1] md:aspect-[1.91/1] w-full overflow-hidden rounded-[32px] bg-gray-100 shadow-2xl border-4 border-white">
           <img
-            src="/Finance page.png"
-            alt="/Finance page.png"
+            src={isMobile ? "/Finance mobile page.png" : "/Finance page.png"}
+            alt="Finance Expert Guidance"
             className="h-full w-full object-cover brightness-[0.7]"
           />
-
         </div>
       </section>
 
@@ -134,10 +133,9 @@ const FinancePage = () => {
               <p className="text-gray-500 text-base font-bold leading-relaxed">{box.desc}</p>
               {i === 2 && (
                 <div className="mt-8 w-full">
-                  <Link href="/signup" className="inline-block bg-[#1B4323] text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-[#112a16] shadow-xl transition-all">
+                  <Link href="/auth/signup" className="inline-block bg-[#1B4323] text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-[#112a16] shadow-xl transition-all">
                     Find an Expert
                   </Link>
-                  <p className="text-xs text-red-600 mt-3 font-bold uppercase tracking-widest">(sign up page)</p>
                 </div>
               )}
             </div>
@@ -164,11 +162,11 @@ const FinancePage = () => {
             <div className="space-y-4">
               {[
                 "“Is this a good investment idea?”",
-                "“How do I get my first customers?”",
+                "“How do I build a budget that works?”",
                 "“Can you review my financial strategy?”",
-                "“How should I price my product?”",
-                "“Why isn't my business growing?”",
-                "“How do I improve my sales?”"
+                "“How should I save for my future?”",
+                "“Why isn't my money growing?”",
+                "“How do I manage my taxes better?”"
               ].map((q, i) => (
                 <p key={i} className="text-xl md:text-2xl font-bold text-gray-700 italic leading-snug">
                   {q}
@@ -243,7 +241,7 @@ const FinancePage = () => {
             </div>
 
             <div className="mt-auto">
-              <Link href="/signup" className="block w-full bg-[#1B4323] text-white py-6 rounded-2xl font-black text-2xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-2xl text-center">
+              <Link href="/about" className="block w-full bg-[#1B4323] text-white py-6 rounded-2xl font-black text-2xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-2xl text-center">
                 Get help now
               </Link>
               <div className="flex justify-center items-center mt-5">
@@ -277,9 +275,9 @@ const FinancePage = () => {
 
           <div className="space-y-6 text-left">
             {[
-              { q: "What kind of business advice can I get?", a: "You can get help with strategy, marketing, sales, pricing, and growth." },
-              { q: "Is this only for established businesses?", a: "No, you can get help whether you're starting out or scaling." },
-              { q: "Can I validate a business idea?", a: "Yes, experts can give feedback and help you evaluate your idea." },
+              { q: "What kind of financial advice can I get?", a: "You can get help with budgeting, investing, tax strategies, and financial planning." },
+              { q: "Is this only for wealthy individuals?", a: "Not at all. Experts can help you manage your money at any income level." },
+              { q: "Can I get help with my taxes?", a: "Yes, you can find experts who specialize in tax planning and preparation." },
               { q: "How do I know the advice is reliable?", a: "You can review expert profiles and start with a conversation before committing." },
               { q: "Can I get ongoing support?", a: "Yes, you can continue working with an expert if it's valuable." }
             ].map((item, i) => (
@@ -308,8 +306,8 @@ const FinancePage = () => {
         <div className="max-w-[1000px] mx-auto bg-[#1B4323] rounded-[40px] p-20 shadow-2xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110" />
           <h3 className="text-[32px] md:text-[48px] font-black text-white mb-10 leading-tight relative z-10">Hire the top knowledgeble Experts</h3>
-          <Link href="/clients" className="relative z-10 inline-block bg-white text-[#1B4323] px-16 py-5 rounded-full font-black text-2xl shadow-2xl hover:bg-gray-100 transform hover:-translate-y-1 transition-all">
-            Learn more
+          <Link href="/auth/signup" className="relative z-10 inline-block bg-white text-[#1B4323] px-10 py-4 rounded-full font-black text-xl shadow-2xl hover:bg-gray-100 transform hover:-translate-y-1 transition-all">
+            Join Now
           </Link>
           <div className="mt-8 relative z-10">
             {/* <p className="text-sm text-white/40 font-bold uppercase tracking-[0.3em]">(Clients page)</p> */}

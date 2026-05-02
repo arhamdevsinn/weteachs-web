@@ -132,7 +132,7 @@ const TechnologyPage = () => {
               <p className="text-gray-500 text-base font-bold leading-relaxed">{box.desc}</p>
               {i === 2 && (
                 <div className="mt-8 w-full">
-                  <Link href="/signup" className="inline-block bg-[#1B4323] text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-[#112a16] shadow-xl transition-all">
+                  <Link href="/categories" className="inline-block bg-[#1B4323] text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-[#112a16] shadow-xl transition-all">
                     Find a Developer
                   </Link>
                 </div>
@@ -240,7 +240,7 @@ const TechnologyPage = () => {
             </div>
 
             <div className="mt-auto">
-              <Link href="/signup" className="block w-full bg-[#1B4323] text-white py-6 rounded-2xl font-black text-2xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-2xl text-center">
+              <Link href="/about" className="block w-full bg-[#1B4323] text-white py-6 rounded-2xl font-black text-2xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-2xl text-center">
                 Get help now
               </Link>
               <div className="flex justify-center items-center mt-5">
@@ -251,7 +251,21 @@ const TechnologyPage = () => {
         </div>
       </section>
 
-
+      {/* ── Section 8: Footer Info Boxes ── */}
+      <section className="bg-[#112a16] text-white py-20 px-6">
+        <div className="max-w-[1000px] mx-auto space-y-0 divide-y divide-white/10">
+          {[
+            { title: "Stuck on something?", desc: "Find someone who can help." },
+            { title: "Start a chat", desc: "Explain your issue and get real solutions." },
+            { title: "Build with confidence", desc: "Move forward without roadblocks." }
+          ].map((item, i) => (
+            <div key={i} className="py-12 first:pt-0 last:pb-0">
+              <h4 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">{item.title}</h4>
+              <p className="text-xl text-white/60 font-medium">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* ── FAQ Section ── */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-[800px] mx-auto text-center">
@@ -286,35 +300,21 @@ const TechnologyPage = () => {
       </section>
 
       {/* ── CTA Banner Section ── */}
-      <section className="py-24 px-6 text-center">
-        <h2 className="text-[44px] md:text-[64px] font-black text-black mb-16 tracking-tighter">Get help your way</h2>
-        <div className="max-w-[1000px] mx-auto bg-[#1B4323] rounded-[40px] p-20 shadow-2xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110" />
-          <h3 className="text-[32px] md:text-[48px] font-black text-white mb-10 leading-tight relative z-10">Hire the top knowledgeble Experts</h3>
-          <Link href="/signup" className="relative z-10 inline-block bg-white text-[#1B4323] px-16 py-5 rounded-full font-black text-2xl shadow-2xl hover:bg-gray-100 transform hover:-translate-y-1 transition-all">
-            Join Now
-          </Link>
-          <div className="mt-8 relative z-10">
-            {/* <p className="text-sm text-white/40 font-bold uppercase tracking-[0.3em]">(Sign up page)</p> */}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Section 8: Footer Info Boxes ── */}
-      <section className="bg-[#112a16] text-white py-20 px-6">
-        <div className="max-w-[1000px] mx-auto space-y-0 divide-y divide-white/10">
-          {[
-            { title: "Stuck on something?", desc: "Find someone who can help." },
-            { title: "Start a chat", desc: "Explain your issue and get real solutions." },
-            { title: "Build with confidence", desc: "Move forward without roadblocks." }
-          ].map((item, i) => (
-            <div key={i} className="py-12 first:pt-0 last:pb-0">
-              <h4 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">{item.title}</h4>
-              <p className="text-xl text-white/60 font-medium">{item.desc}</p>
+      {
+        user ? null :
+          <section className="py-24 px-6 text-center">
+            <h2 className="text-[44px] md:text-[64px] font-black text-black mb-16 tracking-tighter">Get help your way</h2>
+            <div className="max-w-[1000px] mx-auto bg-[#1B4323] rounded-[40px] p-20 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110" />
+              <h3 className="text-[32px] md:text-[48px] font-black text-white mb-10 leading-tight relative z-10">Hire the top knowledgeble Experts</h3>
+              <Link href="/auth/signup" className="relative z-10 inline-block bg-white text-[#1B4323] px-10 py-4 rounded-full font-black text-xl shadow-2xl hover:bg-gray-100 transform hover:-translate-y-1 transition-all">
+                Join Now
+              </Link>
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
+      }
+
+
     </div>
   );
 };
