@@ -43,51 +43,49 @@ const helperCards = [
 function FeatureBand({
   image,
   kicker,
-  audience,
   action,
   description,
   href,
 }: {
   image: string;
   kicker: string;
-  audience: string;
   action: string;
   description: string;
   href: string;
 }) {
   return (
-    <section className="mx-auto max-w-[1120px] bg-secondary px-6 py-8 sm:px-12">
-      <div className="grid items-center gap-8 md:grid-cols-[0.85fr_0.9fr_1.15fr]">
+    <section className="mx-auto mt-16 max-w-[1140px] rounded-[32px] bg-[#EBF3EF] px-10 py-12 shadow-sm border border-primary/5">
+      <div className="grid items-center gap-16 md:grid-cols-[1fr_1.8fr]">
         <div className="flex justify-center">
-          <Image
-            src={image}
-            alt=""
-            width={190}
-            height={150}
-            className="h-[150px] w-[190px] rounded-[4px] object-cover shadow-[0_12px_22px_rgba(0,0,0,0.22)]"
-          />
+          <div className="relative h-[260px] w-full max-w-[340px] overflow-hidden rounded-[20px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]">
+            <Image
+              src={image}
+              alt=""
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
         <div className="text-center md:text-left">
-          <h3 className="text-[22px] font-black leading-tight text-black sm:text-[26px]">
+          <h3 className="text-[36px] font-black leading-tight text-primary">
             {kicker}
           </h3>
-          <p className="mx-auto mt-3 max-w-[280px] text-[10px] font-semibold leading-tight text-gray-700 md:mx-0">
+          <p className="mt-5 max-w-[540px] text-[17px] font-medium leading-relaxed text-gray-700">
             {description}
           </p>
 
-          <div className="mt-6 flex justify-center md:justify-start">
+          <div className="mt-10 flex justify-center md:justify-start">
             <a
               href={href}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-[15px] font-black text-white transition hover:bg-green-900 shadow-[0_4px_10px_rgba(0,0,0,0.15)]"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-10 py-4 text-[19px] font-black text-white transition hover:bg-green-900 shadow-[0_12px_24px_rgba(34,84,47,0.25)]"
             >
               {action}
-              <span className="flex size-5 items-center justify-center rounded-[3px] bg-[#6fbd58] text-[14px] leading-none text-white">
+              <span className="flex size-6 items-center justify-center rounded-[5px] bg-[#6fbd58] text-[16px] leading-none text-white font-bold">
                 ✓
               </span>
             </a>
           </div>
         </div>
-
       </div>
     </section>
   );
@@ -105,74 +103,78 @@ function InfoCard({
   cta?: string;
 }) {
   return (
-    <article className="flex min-h-[360px] flex-col items-center justify-between rounded-[6px] border border-gray-700 bg-white px-5 pb-3 pt-8 text-center shadow-[14px_14px_20px_rgba(0,0,0,0.25)]">
-      <div>
-        <Image
-          src={image}
-          alt=""
-          width={220}
-          height={170}
-          className="mx-auto h-[170px] w-[220px] object-contain"
-        />
-        <h3 className="mt-4 text-base font-black leading-tight text-black">
+    <article className="group flex min-h-[460px] flex-col items-center rounded-[24px] border border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_40px_80px_rgba(0,0,0,0.12)]">
+      <div className="flex h-[240px] w-full items-center justify-center rounded-t-[24px] bg-[#f8fafc] p-12 transition-colors group-hover:bg-[#f1f5f9]">
+        <div className="relative h-full w-full">
+          <Image
+            src={image}
+            alt=""
+            fill
+            className="object-contain transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+      </div>
+      
+      <div className="flex flex-1 flex-col px-8 pb-10 pt-8 text-center">
+        <h3 className="text-[20px] font-black leading-tight text-black">
           {title}
         </h3>
-        <p className="mx-auto mt-1 max-w-[260px] text-[15px] leading-tight text-gray-800">
+        <p className="mx-auto mt-4 mb-8 max-w-[240px] text-[15px] font-medium leading-relaxed text-gray-500">
           {text}
         </p>
+        
+        {cta && (
+          <div className="mt-auto">
+            <a
+              href={cta === "Ask Experts" ? "/categories" : "/auth/signup"}
+              className="inline-flex h-[52px] items-center justify-center rounded-[12px] bg-primary px-10 text-[18px] font-black leading-none text-white transition hover:bg-green-900 shadow-[0_10px_20px_rgba(34,84,47,0.2)]"
+            >
+              {cta}
+            </a>
+          </div>
+        )}
       </div>
-      {cta && (
-        <a
-          href={cta === "Ask Experts" ? "/categories" : "/auth/signup"}
-          className="mt-5 flex h-[48px] px-8 items-center justify-center rounded-[6px] bg-primary text-lg font-black leading-none text-white transition hover:bg-green-900"
-        >
-          {cta}
-        </a>
-      )}
     </article>
   );
 }
 
 const FeaturesSection = () => {
   return (
-    <section className="bg-white pb-24">
-      <div className="mx-auto mb-7 max-w-[900px] border-t border-gray-200 pt-16 text-center">
-        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">
-          How it works
-        </p>
-        <h2 className="mt-2 text-4xl font-black text-black">
-          Connect with real Experts
+    <section className="bg-white pb-32">
+      <div className="mx-auto mb-12 max-w-[900px] border-t border-gray-200 pt-20 text-center">
+        <h2 className="mt-2 text-[52px] font-black tracking-tight text-black">
+          How Does It Work?
         </h2>
       </div>
 
       {/* Hiring Section */}
-      <FeatureBand
-        image="/learn_image.png"
-        kicker="For Hiring"
-        audience="For Hiring"
-        action="Start Here"
-        description="Imagine talking to AI—but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
-        href="/auth/signup"
-      />
+      <div className="space-y-16">
+        <FeatureBand
+          image="/learn_image.png"
+          kicker="For Hiring"
+          action="Start Here"
+          description="Imagine talking to AI—but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
+          href="/auth/signup"
+        />
 
-      <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
-        {clientCards.map((card) => (
-          <InfoCard key={card.title} {...card} />
-        ))}
+        <div className="mx-auto grid max-w-[1200px] gap-10 px-6 md:grid-cols-3">
+          {clientCards.map((card) => (
+            <InfoCard key={card.title} {...card} />
+          ))}
+        </div>
       </div>
 
       {/* Earning Section */}
-      <div className="mt-12">
+      <div className="mt-32 space-y-16">
         <FeatureBand
           image="/helper-categpry.jpg"
           kicker="For Earning"
-          audience="For Earning"
           action="Find Out How"
           description="Earn by chatting with people who need your skills. Set your own rates, times, and topics. It's that simple."
           href="/auth/signup"
         />
 
-        <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
+        <div className="mx-auto grid max-w-[1200px] gap-10 px-6 md:grid-cols-3">
           {helperCards.map((card) => (
             <InfoCard key={card.title} {...card} />
           ))}

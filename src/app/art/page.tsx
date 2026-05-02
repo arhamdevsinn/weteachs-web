@@ -51,18 +51,18 @@ const ArtPage = () => {
           {[
             {
               image: "/art 2.png",
-              title: "Search for Your Style",
-              text: "Find artists and experts who understand the medium you want to master.",
+              title: "Find Your Creative Match",
+              text: "Browse artists by style, medium, or skill level rino someone wne understands your vision.",
             },
             {
               image: "/chat.png",
-              title: "Start a Chat ⭐",
-              text: "Ask questions, share your work, and get clear feedback—no commitment.",
+              title: "stara conversation",
+              text: "nat with an artist, snare your work, ask questions, and get nonest feedback-no pressure.",
             },
             {
               image: "/art 1.png",
-              title: "Create and Improve",
-              text: "Work 1-on-1 with an artist to understand techniques and build your portfolio.",
+              title: "Grow Your Skills",
+              text: "Have a 1 on 1 chat or video call with your own expert",
               cta: "Find an Artist",
               ctaHref: "/categories"
             }
@@ -85,11 +85,11 @@ const ArtPage = () => {
         <div className="max-w-[1100px] mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <h2 className="text-[32px] md:text-[44px] font-black text-black leading-tight">
-              Everything You Need<br />to Create Better
+              Everything You Need <br />to Improve Your Art
             </h2>
             <ul className="space-y-5">
               {[
-                "Personalized feedback on your work",
+                "Personalizer feedback on vour work",
                 "Step-by-step guidance on techniques",
                 "Help developing your style and ideas",
                 "Support from real working artists",
@@ -118,9 +118,9 @@ const ArtPage = () => {
         <h2 className="text-[28px] md:text-[36px] font-black text-black mb-12">Why try out Weteachs?</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { title: "1 on 1 Creative Support", desc: "Get personalized feedback focused on your specific techniques and vision." },
-            { title: "Find the Right Artist for You", desc: "Browse different mediums and styles to match how you create best." },
-            { title: "No Pressure, Just Creativity", desc: "Start with a chat and continue only if it helps your art." }
+            { title: "Grow Your Skills", desc: "Have a 1 on 1 chat or video call with your own expert" },
+            { title: "Find Your Style Faster", desc: "Work with artists across different styles and mediums." },
+            { title: "No Pressure, Just Progress", desc: "Start with a quick chat-continue only if it's the right fit." }
           ].map((box, i) => (
             <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center min-h-[180px]">
               <h4 className="font-black text-[17px] mb-3">{box.title}</h4>
@@ -128,7 +128,7 @@ const ArtPage = () => {
               {i === 2 && (
                 <div className="mt-6 w-full">
                   <Link href="/learn" className="inline-block bg-primary text-white px-8 py-3 rounded-full font-black text-base hover:bg-primary/90 transition shadow-md">
-                    learn more
+                    Learn more
                   </Link>
                 </div>
               )}
@@ -140,9 +140,9 @@ const ArtPage = () => {
       {/* ── Section 5: Banner ── */}
       <section className="bg-primary text-white py-16 px-6 text-center">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-[32px] md:text-[44px] font-black mb-6">Talk to the Right Artist for Your Masterpiece</h2>
+          <h2 className="text-[32px] md:text-[44px] font-black mb-6">Talk to the Right Artist for Your Creative Journey</h2>
           <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed">
-            Affordable sessions, quick feedback, and a wide range of mediums—designed for creators at any level.
+            Affordable sessions, real feedback, and a wide range of creative experts-designed for artists at any level.
           </p>
         </div>
       </section>
@@ -157,14 +157,14 @@ const ArtPage = () => {
             <h2 className="text-[36px] md:text-[52px] font-black text-black leading-tight">What are people asking?</h2>
             <div className="space-y-4">
               {[
-                "“Can you show me how to blend these colors?”",
-                "“Can you review my portfolio and suggest improvements?”",
-                "“I don't understand perspective—can you break it down?”",
-                "“Can you help me master digital painting?”",
-                "“What's the best technique for shading here?”",
-                "“How do I start with oil paints as a beginner?”"
+                "“Can you critique my artwork?”",
+                "“How can I improve my shading and lighting?”",
+                "“What's the best way to develop my style?”",
+                "“Can you help me with digital painting techniques?”",
+                "“How do I price my artwork?”",
+                "“What should I improve in this design?”"
               ].map((q, i) => (
-                <p key={i} className="text-lg md:text-2xl font-bold text-gray-700 leading-tight italic">
+                <p key={i} className="text-lg md:text-xl  text-gray-700 leading-tight italic">
                   {q}
                 </p>
               ))}
@@ -183,11 +183,12 @@ const ArtPage = () => {
               <div className="flex items-baseline gap-2 mb-2">
                 <span className="text-5xl font-black text-black">$5/hr +</span>
               </div>
-              <p className="text-sm font-bold text-gray-500 mb-8">As low as $1/15min with <span className="text-blue-600">Stripe</span></p>
+              <p className="text-sm font-bold text-gray-500 mb-8">As low as $1/15min with <Link href="https://stripe.com/"><span className="text-blue-600">Stripe</span></Link></p>
 
-              <div className="flex gap-3 mb-10">
+              <div className="flex flex-wrap gap-3 mb-10">
                 <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-xs font-black">Flexible sessions</span>
                 <span className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black">No long-term contract</span>
+                <span className="bg-blue-50 text-gray-700 px-4 py-1.5 rounded-full text-xs font-black">Real artists & creators</span>
               </div>
 
               <div className="space-y-6 mt-auto">
@@ -196,8 +197,7 @@ const ArtPage = () => {
                   {[
                     "No long-term commitment",
                     "Pay only for the help you need",
-                    "Real artists and technical experts",
-                    "Start small and continue anytime"
+                    "explore citterent stvles and mentors",
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-base font-bold text-gray-700">
                       <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white">
@@ -207,7 +207,7 @@ const ArtPage = () => {
                     </li>
                   ))}
                 </ul>
-                <Link href="/stripe" className="block text-xs text-gray-400 font-bold hover:underline mt-4">Link to Stripe.com</Link>
+
               </div>
             </div>
 
@@ -234,7 +234,7 @@ const ArtPage = () => {
                   <span>Explore different styles and perspectives</span>
                 </div><div className="flex items-center gap-3 text-lg font-bold text-gray-800">
                   <ShieldCheck className="text-primary" />
-                  <span>Real Artists</span>
+                  <span>Real coaches</span>
                 </div>
               </div>
 
@@ -267,8 +267,8 @@ const ArtPage = () => {
       <section className="bg-[#1B4323] text-white py-16 px-6">
         <div className="max-w-[1000px] mx-auto space-y-0 divide-y divide-white/10">
           {[
-            { title: "What do you want to create?", desc: "Find an artist who can guide your technique." },
-            { title: "Chat with them", desc: "Ask questions and see if their style fits your vision." },
+            { title: "What do you want to create?", desc: "Find an artst we can nep bring your ideas to life." },
+            { title: "Chat with them", desc: "Share your work, get feedback, and see if it's the right fit." },
             { title: "Work together", desc: "Flexible sessions. Real guidance. Your creativity, leveled up." }
           ].map((item, i) => (
             <div key={i} className="py-10 first:pt-0 last:pb-0">
@@ -336,7 +336,7 @@ const ArtPage = () => {
               <div className="bg-[#1B4323] rounded-[24px] p-10 md:p-14 shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/10 transition-all duration-700" />
                 <h3 className="text-3xl md:text-5xl font-black text-white mb-10 relative z-10">
-                  Hire the top knowledgeable Experts
+                  Hire the top knowledgeble Experts
                 </h3>
                 <Link
                   href="/categories"
