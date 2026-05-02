@@ -51,7 +51,7 @@ const BusinessPage = () => {
             {
               image: "/business 2.png",
               title: "Find the Right Expert",
-              text: "Search for professionals with experience in your area or challenge.",
+              text: "Search for professionals with exoerence in vour area oi challenge.",
             },
             {
               image: "/chat.png",
@@ -163,7 +163,7 @@ const BusinessPage = () => {
                 "“Why isn't my business growing?”",
                 "“How do I improve my sales?”"
               ].map((q, i) => (
-                <p key={i} className="text-lg md:text-2xl font-bold text-gray-700 leading-tight italic">
+                <p key={i} className="text-lg md:text-xl  text-gray-700 leading-tight italic">
                   {q}
                 </p>
               ))}
@@ -182,9 +182,9 @@ const BusinessPage = () => {
               <div className="flex items-baseline gap-2 mb-2">
                 <span className="text-5xl font-black text-black">$5/hr +</span>
               </div>
-              <p className="text-sm font-bold text-gray-500 mb-8">As low as $1/15min with <span className="text-blue-600">Stripe</span></p>
+              <p className="text-sm font-bold text-gray-500 mb-8">As low as $1/15min with <Link href="https://stripe.com/"><span className="text-blue-600">Stripe</span></Link></p>
 
-              <div className="flex gap-3 mb-10">
+              <div className="flex flex-wrap gap-3 mb-10">
                 <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-xs font-black">Flexible sessions</span>
                 <span className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black">No long-term contract</span>
               </div>

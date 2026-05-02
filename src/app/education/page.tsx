@@ -127,7 +127,7 @@ const EducationPage = () => {
               {i === 2 && (
                 <div className="mt-6 w-full">
                   <Link href="/learn" className="inline-block bg-primary text-white px-8 py-3 rounded-full font-black text-base hover:bg-primary/90 transition shadow-md">
-                    learn step-by-step
+                    Learn step-by-step
                   </Link>
 
                 </div>
@@ -183,7 +183,7 @@ const EducationPage = () => {
               <div className="flex items-baseline gap-2 mb-2">
                 <span className="text-5xl font-black text-black">$5/hr +</span>
               </div>
-              <p className="text-sm font-bold text-gray-500 mb-8">As low as $1/15min with <span className="text-blue-600">Stripe</span></p>
+              <p className="text-sm font-bold text-gray-500 mb-8">As low as $1/15min with <Link className="text-blue-600 font-black underline decoration-4 underline-offset-8" href="https://stripe.com/">Stripe</Link></p>
 
               <div className="flex gap-3 mb-10">
                 <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-xs font-black">Flexible sessions</span>
@@ -207,7 +207,7 @@ const EducationPage = () => {
                     </li>
                   ))}
                 </ul>
-                <Link href="/stripe" className="block text-xs text-gray-400 font-bold hover:underline mt-4">Link to Stripe.com</Link>
+
               </div>
             </div>
 

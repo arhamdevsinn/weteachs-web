@@ -186,7 +186,7 @@ const FinancePage = () => {
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-[64px] font-black text-black tracking-tighter leading-none">$5/hr +</span>
             </div>
-            <p className="text-lg font-bold text-gray-500 mb-10">As low as $1/15min with <span className="text-blue-600 font-black underline decoration-4 underline-offset-8">Stripe</span></p>
+            <p className="text-lg font-bold text-gray-500 mb-10">As low as $1/15min with <Link href="https://stripe.com/" className="text-blue-600 font-black underline decoration-4 underline-offset-8">Stripe</Link></p>
 
             <div className="flex gap-4 mb-10">
               <div className="bg-green-50 text-green-700 px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest border border-green-100 flex-1 text-center">Flexible sessions</div>
@@ -194,10 +194,10 @@ const FinancePage = () => {
             </div>
 
             <div className="space-y-6 mt-auto">
-              <h4 className="text-2xl font-black text-black">“Real professionals”</h4>
+              <h4 className="text-2xl font-black text-black">Real professionals</h4>
               <ul className="space-y-4">
                 {[
-                  "Pay per session—no retainers",
+                  "Pay per session",
                   "Get quick answers or deeper guidance",
                   "Work with experts on your terms",
                   "No long-term contracts"

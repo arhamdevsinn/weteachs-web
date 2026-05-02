@@ -159,16 +159,16 @@ const MobileTechnologyPage = ({ user }) => {
             <p className="text-[28px] font-black text-black leading-none mb-1.5">$5/hr +</p>
             <p className="text-[9px] text-gray-500 font-bold mb-4 leading-tight">
               As low as $1/15min with{" "}
-              <span className="text-blue-600 font-black underline decoration-2 underline-offset-2">Stripe</span>
+              <Link href="https://stripe.com/" className="text-blue-600 font-black underline decoration-2 underline-offset-2">Stripe</Link>
             </p>
             <div className="flex flex-col gap-1.5 mb-5">
               <span className="text-[8px] bg-green-50 text-green-700 border border-green-100 rounded-[4px] px-2 py-1 font-black text-center uppercase tracking-wider">Flexible sessions</span>
               <span className="text-[8px] bg-blue-50 text-blue-700 border border-blue-100 rounded-[4px] px-2 py-1 font-black text-center uppercase tracking-wider">No long-term contract</span>
             </div>
-            <p className="text-[10px] font-black text-black mb-2.5 uppercase tracking-tighter">“Real developers”</p>
+            <p className="text-[10px] font-black text-black mb-2.5 uppercase tracking-tighter">Real developers</p>
             <ul className="space-y-2">
               {[
-                "Pay per session—no retainers",
+                "Pay per session",
                 "Solve quick issues or dive deeper",
                 "No long-term commitment",
                 "Get help exactly when you need it",
@@ -198,13 +198,13 @@ const MobileTechnologyPage = ({ user }) => {
               </div>
               <div className="flex items-center gap-2 text-[10px] font-bold text-gray-800">
                 <ShieldCheck size={16} className="text-primary shrink-0" />
-                <span>“real solutions”</span>
+                <span>real solutions</span>
               </div>
               <div className="flex items-center gap-2 text-[10px] font-bold text-gray-800">
                 <ShieldCheck size={16} className="text-primary shrink-0" />
                 <span>Real Coaches</span>
               </div>
-              <p className="text-[10px] text-gray-500 italic mt-2 leading-tight">Explore different styles and perspectives</p>
+
             </div>
             <Link href="/signup" className="block w-full bg-[#1B4323] text-white text-[12px] font-black py-3 rounded-[8px] text-center hover:bg-[#112a16] transition-colors shadow-lg">
               Get help now

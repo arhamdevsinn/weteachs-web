@@ -167,7 +167,7 @@ const TechnologyPage = () => {
                 "“Which tech stack should I use?”",
                 "“Can you review my code?”"
               ].map((q, i) => (
-                <p key={i} className="text-xl md:text-2xl font-bold text-gray-700 italic leading-snug">
+                <p key={i} className="text-xl md:text-xl text-gray-700 italic leading-snug">
                   {q}
                 </p>
               ))}
@@ -185,18 +185,18 @@ const TechnologyPage = () => {
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-[64px] font-black text-black tracking-tighter leading-none">$5/hr +</span>
             </div>
-            <p className="text-lg font-bold text-gray-500 mb-10">As low as $1/15min with <span className="text-blue-600 font-black underline decoration-4 underline-offset-8">Stripe</span></p>
+            <p className="text-lg font-bold text-gray-500 mb-10">As low as $1/15min with <Link className="text-blue-600 font-black underline decoration-4 underline-offset-8" href="https://stripe.com/"><span className="">Stripe</span></Link></p>
 
-            <div className="flex gap-4 mb-10">
-              <div className="bg-green-50 text-green-700 px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest border border-green-100 flex-1 text-center">Flexible sessions</div>
-              <div className="bg-blue-50 text-blue-700 px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest border border-blue-100 flex-1 text-center">No long-term contract</div>
+            <div className="flex flex-wrap gap-3 mb-10">
+              <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-xs font-black">Flexible sessions</span>
+              <span className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black">No long-term contract</span>
             </div>
 
             <div className="space-y-6 mt-auto">
-              <h4 className="text-2xl font-black text-black">“Real developers”</h4>
+              <h4 className="text-2xl font-black text-black">Real developers</h4>
               <ul className="space-y-4">
                 {[
-                  "Pay per session—no retainers",
+                  "Pay per session",
                   "Solve quick issues or dive deeper",
                   "No long-term commitment",
                   "Get help exactly when you need it"
@@ -209,7 +209,7 @@ const TechnologyPage = () => {
                   </li>
                 ))}
               </ul>
-              <Link href="https://stripe.com" className="block text-xs text-blue-600 font-black hover:underline mt-8 tracking-widest uppercase opacity-40">Link to Stripe.com</Link>
+
             </div>
           </div>
 
