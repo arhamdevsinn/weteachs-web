@@ -10,7 +10,7 @@ const MobileHelperBand = () => {
       <div className="mx-4 mb-8 mt-6 flex items-center gap-3 rounded-[12px] bg-[#EBF3EF] p-4 shadow-sm border border-primary/5">
         <div className="relative h-[90px] w-[120px] shrink-0 overflow-hidden rounded-[8px] shadow-sm">
           <Image
-            src="/helper-categpry.jpg"
+            src="/student.png"
             alt="For Earning"
             fill
             className="object-cover"

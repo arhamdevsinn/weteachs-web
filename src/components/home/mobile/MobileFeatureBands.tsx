@@ -18,7 +18,7 @@ const MobileFeatureBands = () => {
       <div className="mx-4 mb-6 mt-4 flex items-center gap-3 rounded-[12px] bg-[#EBF3EF] p-4 shadow-sm border border-primary/5">
         <div className="relative h-[90px] w-[120px] shrink-0 overflow-hidden rounded-[8px] shadow-sm">
           <Image
-            src="/learn_image.png"
+            src="/expert.png"
             alt="For Hiring"
             fill
             className="object-cover"

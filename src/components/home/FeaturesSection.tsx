@@ -114,7 +114,7 @@ function InfoCard({
           />
         </div>
       </div>
-      
+
       <div className="flex flex-1 flex-col px-8 pb-10 pt-8 text-center">
         <h3 className="text-[20px] font-black leading-tight text-black">
           {title}
@@ -122,7 +122,7 @@ function InfoCard({
         <p className="mx-auto mt-4 mb-8 max-w-[240px] text-[15px] font-medium leading-relaxed text-gray-500">
           {text}
         </p>
-        
+
         {cta && (
           <div className="mt-auto">
             <a
@@ -150,7 +150,7 @@ const FeaturesSection = () => {
       {/* Hiring Section */}
       <div className="space-y-16">
         <FeatureBand
-          image="/learn_image.png"
+          image="/expert.png"
           kicker="For Hiring"
           action="Start Here"
           description="Imagine talking to AI—but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
@@ -167,7 +167,7 @@ const FeaturesSection = () => {
       {/* Earning Section */}
       <div className="mt-32 space-y-16">
         <FeatureBand
-          image="/helper-categpry.jpg"
+          image="/student.png"
           kicker="For Earning"
           action="Find Out How"
           description="Earn by chatting with people who need your skills. Set your own rates, times, and topics. It's that simple."
