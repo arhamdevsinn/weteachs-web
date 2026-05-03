@@ -278,13 +278,21 @@ const Page = () => {
         <section className="py-12 px-6 max-w-[1000px] mx-auto">
           <h2 className="text-[32px] md:text-[38px] font-black text-black mb-6 text-center md:text-left">Who are the Experts?</h2>
 
-          <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+          <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
             {loadingCategories
               ? Array.from({ length: 7 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-[154px] animate-pulse rounded-[7px] bg-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
-                />
+                  className="flex h-[320px] flex-col overflow-hidden rounded-2xl bg-gray-100 animate-pulse"
+                >
+                  <div className="h-32 w-full bg-gray-200" />
+                  <div className="flex flex-col p-4 space-y-3">
+                    <div className="h-3 w-12 bg-gray-200 rounded" />
+                    <div className="h-5 w-full bg-gray-200 rounded" />
+                    <div className="h-3 w-3/4 bg-gray-200 rounded" />
+                    <div className="h-4 w-full bg-gray-200 rounded pt-2" />
+                  </div>
+                </div>
               ))
               : categories.map((category) => {
                 const title =
@@ -295,21 +303,54 @@ const Page = () => {
                   <a
                     key={category.id}
                     href={`/categories?categoryId=${encodeURIComponent(category.id)}`}
-                    className="group overflow-hidden rounded-[7px] bg-primary shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5"
+                    className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] border border-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_24px_-12px_rgba(0,0,0,0.15)]"
                   >
-                    <div className="flex h-[78px] flex-col justify-between px-3 py-2">
-                      <span className="line-clamp-1 text-left text-lg font-normal leading-none text-white">
-                        {title}
-                      </span>
-                      <span className="line-clamp-1 self-end text-[8px] font-semibold text-white/80">
-                        {teacherName}
-                      </span>
+                    {/* Image Container */}
+                    <div className="relative h-32 w-full overflow-hidden">
+                      <img
+                        src={category.category_image_url || "/sample.png"}
+                        alt={title}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                      />
                     </div>
-                    <img
-                      src={category.category_image_url || "/sample.png"}
-                      alt={title}
-                      className="h-[76px] w-full object-cover"
-                    />
+
+                    {/* Content Container */}
+                    <div className="flex flex-col p-3 pt-4">
+                      {/* Kicker */}
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#1B4323]">
+                        {category.category_name?.split(' ')[0] || "EXPERT"}
+                      </span>
+                      
+                      {/* Title */}
+                      <h3 className="mt-1 line-clamp-1 text-[16px] font-black leading-tight text-slate-900">
+                        {title}
+                      </h3>
+                      
+                      {/* Subtitle / Description */}
+                      <p className="mt-0.5 line-clamp-1 text-[11px] font-bold text-slate-400">
+                        {category.description || "Expert guidance"}
+                      </p>
+
+                      {/* Price and Language Row */}
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className="text-[12px] font-black text-slate-700">$5 / 15 mins</span>
+                        <span className="text-[10px] font-bold text-slate-400">English</span>
+                      </div>
+
+                      {/* Separator */}
+                      <div className="my-3 h-[1px] w-full bg-slate-50" />
+
+                      {/* Footer */}
+                      <div className="flex items-center justify-between gap-2 overflow-hidden">
+                        <div className="flex shrink-0 items-center gap-1">
+                          <span className="text-[10px]">❤️</span>
+                          <span className="text-[10px] font-bold text-slate-400">15 likes</span>
+                        </div>
+                        <span className="truncate text-[10px] font-black text-[#1B4323]">
+                          {teacherName}
+                        </span>
+                      </div>
+                    </div>
                   </a>
                 );
               })}
