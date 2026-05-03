@@ -55,7 +55,7 @@ const MobileBusinessPage = ({ user }) => {
             </div>
             <h3 className="text-[10px] font-black text-black uppercase leading-tight mb-1">Take Action with Confidence</h3>
             <p className="text-[8px] text-gray-600 font-bold leading-tight mb-2">Use expert advice to make smarter decisions and move forward.</p>
-            <Link href="/explore" className="block w-full bg-[#265A32] text-white text-[9px] font-black py-2 rounded-[4px] leading-tight mt-auto">
+            <Link href="/categories" className="block w-full bg-[#265A32] text-white text-[9px] font-black py-2 rounded-[4px] leading-tight mt-auto">
               Get Business Advice
             </Link>
           </div>

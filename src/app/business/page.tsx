@@ -64,7 +64,7 @@ const BusinessPage = () => {
               title: "Take Action with Confidence",
               text: "Use expert advice to make smarter decisions and move forward.",
               cta: "Get Business Advice",
-              ctaHref: "/explore"
+              ctaHref: "/categories"
             }
           ].map((item, i) => (
             <InfoCard

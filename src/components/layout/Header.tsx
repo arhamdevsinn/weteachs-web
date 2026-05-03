@@ -445,7 +445,7 @@ const Header = () => {
                           setMenuOpen(false);
                           window.location.href = "/auth/signup";
                         }}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#5B6BF9] py-3.5 text-[17px] font-bold text-white transition hover:opacity-90"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#22542F] py-3.5 text-[17px] font-bold text-white transition hover:opacity-90"
                       >
                         <UserPlus size={20} strokeWidth={2.5} />
                         Sign up
