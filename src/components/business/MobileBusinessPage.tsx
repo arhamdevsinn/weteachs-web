@@ -155,70 +155,24 @@ const MobileBusinessPage = ({ user }) => {
       </section>
 
       {/* ── Pricing + Transformation ── */}
-      <section className="px-3 py-10 bg-gray-50">
-        <div className="grid grid-cols-2 gap-3">
-          {/* Pricing Card */}
-          <div className="bg-white rounded-[16px] border border-gray-100 shadow-xl p-4">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Starting Pricing</p>
-            <p className="text-[28px] font-black text-black leading-none mb-1.5">$5/hr +</p>
-            <p className="text-[9px] text-gray-500 font-bold mb-4 leading-tight">
-              As low as $1/15min with{" "}
-              <span className="text-blue-600 font-black underline decoration-2 underline-offset-2">Stripe</span>
-            </p>
-            <div className="flex flex-col gap-1.5 mb-5">
-              <span className="text-[8px] bg-green-50 text-green-700 border border-green-100 rounded-[4px] px-2 py-1 font-black text-center uppercase tracking-wider">Flexible sessions</span>
-              <span className="text-[8px] bg-blue-50 text-blue-700 border border-blue-100 rounded-[4px] px-2 py-1 font-black text-center uppercase tracking-wider">No long-term contract</span>
-            </div>
-            <p className="text-[10px] font-black text-black mb-2.5 uppercase tracking-tighter">“Real professionals”</p>
-            <ul className="space-y-2">
-              {[
-                "Pay per session—no retainers",
-                "Get quick answers or deeper guidance",
-                "Work with experts on your terms",
-                "No long-term contracts",
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-[9px] text-gray-700 font-bold leading-tight">
-                  <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center shrink-0 mt-0.5">
-                    <Check size={10} strokeWidth={4} className="text-white" />
-                  </div>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+      <PricingTransformation
+        subText="Create your account and pick the support that matches your business"
+        badges={["Flexible sessions", "No long-term contract", "Real professionals"]}
+        pricingPoints={[
+          "Pay per session—no retainers",
+          "Get quick answers or deeper guidance",
+          "Work with experts on your terms",
+          "No long-term contracts"
+        ]}
+        transformationPoints={[
+          "Beginner Friendly",
+          "Real insights",
+          "Real Coaches",
+        ]}
+        buttonText="Get help now"
+        buttonHref="/about"
+      />
 
-          {/* Transformation Card */}
-          <div className="bg-[#EBF3EF] rounded-[16px] border border-primary/10 shadow-xl p-4">
-            <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1.5">SIGN UP PAGE</p>
-            <h3 className="text-[15px] font-black text-black leading-tight mb-4">Ready to Start Your Transformation?</h3>
-            <div className="bg-white rounded-[8px] px-3 py-2 flex items-center justify-between mb-4 border border-gray-50 shadow-sm">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">No Commitment</span>
-              <ArrowRight size={16} className="text-primary" />
-            </div>
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-800">
-                <ShieldCheck size={16} className="text-primary shrink-0" />
-                <span>Beginner Friendly</span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-800">
-                <ShieldCheck size={16} className="text-primary shrink-0" />
-                <span>“real insights”</span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-800">
-                <ShieldCheck size={16} className="text-primary shrink-0" />
-                <span>Real Coaches</span>
-              </div>
-              <p className="text-[10px] text-gray-500 italic mt-2 leading-tight">Explore different styles and perspectives</p>
-            </div>
-            <Link href="/about" className="block w-full bg-[#1B4323] text-white text-[12px] font-black py-3 rounded-[8px] text-center hover:bg-[#112a16] transition-colors shadow-lg">
-              Get help now
-            </Link>
-            <p className="text-[8px] text-gray-400 text-center mt-3 font-bold leading-tight">
-              Create your account and pick the <span className="text-gray-600 uppercase font-black tracking-tighter">business</span> support that matches your needs
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* ── FAQ Section ── */}
       <section className="py-12 px-5 bg-white text-center">
