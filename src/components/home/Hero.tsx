@@ -130,17 +130,15 @@ const Hero = () => {
                 })}
           </div>
 
-          <div className="mt-8 flex items-center justify-end gap-8">
+          <div className="mt-10 flex items-center justify-end">
             <a
               href="/categories"
-              className="flex h-[58px] items-center gap-3 rounded-full bg-primary px-8 text-center text-lg font-normal leading-tight text-white shadow-sm transition hover:bg-green-900"
+              className="group flex h-[52px] items-center gap-3 rounded-full bg-[#1B4323] px-7 text-[16px] font-black text-white shadow-[0_10px_20px_-5px_rgba(27,67,35,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#112a16] hover:shadow-[0_15px_30px_-10px_rgba(27,67,35,0.4)]"
             >
-              <span>
-                Ask an expert
-                <br />
-                anything
-              </span>
-              <ArrowRight size={34} strokeWidth={2.5} />
+              <span>Ask an expert anything</span>
+              <div className="flex size-8 items-center justify-center rounded-full bg-white/10 transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white/20">
+                <ArrowRight size={18} strokeWidth={3} />
+              </div>
             </a>
           </div>
 

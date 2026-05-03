@@ -127,7 +127,7 @@ function InfoCard({
           <div className="mt-auto">
             <a
               href={cta === "Ask Experts" ? "/categories" : "/auth/signup"}
-              className="inline-flex h-[52px] items-center justify-center rounded-[12px] bg-primary px-10 text-[18px] font-black leading-none text-white transition hover:bg-green-900 shadow-[0_10px_20px_rgba(34,84,47,0.2)]"
+              className="inline-flex h-[52px] items-center justify-center rounded-full bg-primary px-10 text-[18px] font-black leading-none text-white transition hover:bg-green-900 shadow-[0_10px_20px_rgba(34,84,47,0.2)] rounded-[24px]"
             >
               {cta}
             </a>
