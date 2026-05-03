@@ -327,8 +327,8 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
           <div>
             <h3 className="text-[20px] text-white font-bold mb-3">Pricing</h3>
             <div
-              className="text-[32px] text-white font-black transform -rotate-3 leading-none"
-              style={{ fontFamily: "cursive" }}
+              className="text-[32px] text-white font-black leading-none"
+
             >
               15MIN–1HR
             </div>
@@ -423,7 +423,7 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
               href="/auth/signup"
               className="inline-block bg-white text-[#1B4323] font-bold px-6 py-2.5 rounded-full shadow-md text-[14px] hover:shadow-lg transition"
             >
-              Sign Up &amp; Find Your Expert
+              Sign Up
             </a>
           </div>
         </section>

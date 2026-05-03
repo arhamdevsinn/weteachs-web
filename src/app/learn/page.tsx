@@ -320,12 +320,12 @@ const Page = () => {
                       <span className="text-[9px] font-black uppercase tracking-widest text-[#1B4323]">
                         {category.category_name?.split(' ')[0] || "EXPERT"}
                       </span>
-                      
+
                       {/* Title */}
                       <h3 className="mt-1 line-clamp-1 text-[16px] font-black leading-tight text-slate-900">
                         {title}
                       </h3>
-                      
+
                       {/* Subtitle / Description */}
                       <p className="mt-0.5 line-clamp-1 text-[11px] font-bold text-slate-400">
                         {category.description || "Expert guidance"}
@@ -387,7 +387,7 @@ const Page = () => {
           <div className="bg-[#113118] rounded-[16px] p-8 flex flex-col justify-between min-h-[260px] shadow-xl">
             <div>
               <h3 className="text-[28px] text-white font-bold mb-4">Pricing</h3>
-              <div className="text-[48px] text-white font-black transform -rotate-3 leading-none mt-2" style={{ fontFamily: 'cursive' }}>
+              <div className="text-[48px] text-white font-black leading-none mt-2" >
                 15MIN - 1HR
               </div>
             </div>
@@ -796,7 +796,7 @@ const Page = () => {
               }}
               className="bg-white text-primary font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
             >
-              Sign Up & Find Your Expert
+              Sign Up
             </motion.button>
 
           </section>
