@@ -31,9 +31,9 @@ const TechnologyPage = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  if (isMobile) {
-    return <MobileTechnologyPage user={user} />;
-  }
+  // if (isMobile) {
+  //   return <MobileTechnologyPage user={user} />;
+  // }
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A] font-sans overflow-x-hidden">
