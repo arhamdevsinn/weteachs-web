@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ArrowRight, Star, MessageSquare, Check, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/src/hooks/useAuth";
 import InfoCard from "@/src/components/common/InfoCard";
+import PricingTransformation from "@/src/components/common/PricingTransformation";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -174,82 +175,24 @@ const ArtPage = () => {
       </section>
 
       {/* ── Section 7: Pricing & Transformation ── */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-[1100px] mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-10">
-            {/* Pricing Card */}
-            <div className="bg-white rounded-[32px] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col">
-              <span className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Starting Pricing</span>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-black text-black">$5/hr +</span>
-              </div>
-              <p className="text-sm font-bold text-gray-500 mb-8">As low as $1/15min with <Link href="https://stripe.com/"><span className="text-blue-600">Stripe</span></Link></p>
 
-              <div className="flex flex-wrap gap-3 mb-10">
-                <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-xs font-black">Flexible sessions</span>
-                <span className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black">No long-term contract</span>
-                <span className="bg-blue-50 text-gray-700 px-4 py-1.5 rounded-full text-xs font-black">Real artists & creators</span>
-              </div>
+      <PricingTransformation
+        subText="Create your account and pick the creative support that matches your vision"
+        badges={["Flexible sessions", "No long-term contract", "Real artists & creators"]}
+        pricingPoints={[
+          "No long-term commitment",
+          "Pay only for the help you need",
+          "Explore different styles and mentors"
+        ]}
+        transformationPoints={[
+          "Beginner Friendly",
+          "Explore different styles and perspectives",
+          "Real coaches"
+        ]}
+        buttonText="Start Creating"
+        buttonHref="/auth/signup"
+      />
 
-              <div className="space-y-6 mt-auto">
-                <h4 className="text-xl font-black text-black">Artists & Mentors</h4>
-                <ul className="space-y-4">
-                  {[
-                    "No long-term commitment",
-                    "Pay only for the help you need",
-                    "explore citterent stvles and mentors",
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-base font-bold text-gray-700">
-                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white">
-                        <Check size={14} strokeWidth={4} />
-                      </div>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-              </div>
-            </div>
-
-            {/* Transformation Card */}
-            <div className="bg-[#EBF3EF] rounded-[32px] p-10 flex flex-col border border-primary/10">
-              <span className="text-[10px] font-black uppercase tracking-widest text-black mb-4">Sign up page</span>
-              <h3 className="text-4xl font-black text-black mb-8 leading-tight">Ready to Start Your<br />Transformation?</h3>
-
-              <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm">
-                <div className="flex items-center justify-between text-gray-400 text-sm font-bold mb-1">
-                  <span>No Commitment</span>
-                  <ArrowRight size={16} />
-                </div>
-
-              </div>
-
-              <div className="space-y-6 mb-12">
-                <div className="flex items-center gap-3 text-lg font-bold text-gray-800">
-                  <ShieldCheck className="text-primary" />
-                  <span>Beginner Friendly</span>
-                </div>
-                <div className="flex items-center gap-3 text-lg font-bold text-gray-800">
-                  <ShieldCheck className="text-primary" />
-                  <span>Explore different styles and perspectives</span>
-                </div><div className="flex items-center gap-3 text-lg font-bold text-gray-800">
-                  <ShieldCheck className="text-primary" />
-                  <span>Real coaches</span>
-                </div>
-              </div>
-
-              <div className="mt-auto">
-                <Link href="/auth/signup" className="block w-full bg-[#1B4323] text-white py-4 rounded-xl font-black text-xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-xl text-center">
-                  Start Creating
-                </Link>
-                <div className="flex justify-center items-center mt-3 px-2">
-                  <p className="text-[10px] text-gray-400  tracking-tighter italic justify-center items-center">Create your account and pick the creative support that matches your vision</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
       {/* ── Section 8: Quote Section ── */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-[800px] mx-auto text-center space-y-8">

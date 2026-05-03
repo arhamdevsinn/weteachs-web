@@ -8,6 +8,7 @@ import { ArrowRight, Star, MessageSquare, Check, ShieldCheck, ChevronDown, Chevr
 import { useAuth } from "@/src/hooks/useAuth";
 import InfoCard from "@/src/components/common/InfoCard";
 import MobileTechnologyPage from "@/src/components/technology/MobileTechnologyPage";
+import PricingTransformation from "@/src/components/common/PricingTransformation";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -177,79 +178,26 @@ const TechnologyPage = () => {
       </section>
 
       {/* ── Section 7: Pricing & Transformation ── */}
-      <section className="py-24 bg-gray-50 px-6">
-        <div className="max-w-[1100px] mx-auto grid md:grid-cols-2 gap-12">
-          {/* Pricing Card */}
-          <div className="bg-white rounded-[32px] p-12 shadow-2xl border border-gray-100 flex flex-col h-full">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-6 block">Starting Pricing</span>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-[64px] font-black text-black tracking-tighter leading-none">$5/hr +</span>
-            </div>
-            <p className="text-lg font-bold text-gray-500 mb-10">As low as $1/15min with <Link className="text-blue-600 font-black underline decoration-4 underline-offset-8" href="https://stripe.com/"><span className="">Stripe</span></Link></p>
+      <PricingTransformation
+        subText="Create your account and pick the tech support that matches your needs"
+        badges={["Flexible sessions", "No long-term contract", "Real developers"]}
+        pricingPoints={[
+          "Pay per session",
+          "Solve quick issues or dive deeper",
+          "No long-term commitment",
+          "Get help exactly when you need it"
+        ]}
+        transformationPoints={[
+          "Beginner Friendly",
+          "Real solutions",
+          "Real Coaches",
+          "Real Coaches",
+          "Explore different styles and perspectives",
+        ]}
+        buttonText="Get help now"
+        buttonHref="/about"
+      />
 
-            <div className="flex flex-wrap gap-3 mb-10">
-              <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-xs font-black">Flexible sessions</span>
-              <span className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black">No long-term contract</span>
-            </div>
-
-            <div className="space-y-6 mt-auto">
-              <h4 className="text-2xl font-black text-black">Real developers</h4>
-              <ul className="space-y-4">
-                {[
-                  "Pay per session",
-                  "Solve quick issues or dive deeper",
-                  "No long-term commitment",
-                  "Get help exactly when you need it"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-4 text-[17px] font-bold text-gray-700">
-                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white shrink-0 shadow-lg shadow-primary/20">
-                      <Check size={14} strokeWidth={4} />
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-            </div>
-          </div>
-
-          {/* Transformation Card */}
-          <div className="bg-[#EBF3EF] rounded-[32px] p-12 border border-primary/10 shadow-2xl flex flex-col h-full">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6 block">Sign up page</span>
-            <h3 className="text-[40px] md:text-[48px] font-black text-black mb-10 leading-[1.1] tracking-tighter">Ready to Start Your Transformation?</h3>
-
-            <div className="bg-white rounded-2xl p-6 mb-10 shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer transition-all hover:shadow-md">
-              <span className="text-xl font-black text-gray-400 uppercase tracking-tighter">No Commitment</span>
-              <ArrowRight className="text-primary group-hover:translate-x-2 transition-transform" size={28} />
-            </div>
-
-            <div className="space-y-6 mb-12">
-              <div className="flex items-center gap-4 text-xl font-bold text-gray-800">
-                <ShieldCheck className="text-primary" size={28} />
-                <span>Beginner Friendly</span>
-              </div>
-              <div className="flex items-center gap-4 text-xl font-bold text-gray-800">
-                <ShieldCheck className="text-primary" size={28} />
-                <span>“real solutions”</span>
-              </div>
-              <div className="flex items-center gap-4 text-xl font-bold text-gray-800">
-                <ShieldCheck className="text-primary" size={28} />
-                <span>Real Coaches</span>
-              </div>
-              <p className="text-xl font-bold text-gray-500 italic mt-4">Explore different styles and perspectives</p>
-            </div>
-
-            <div className="mt-auto">
-              <Link href="/about" className="block w-full bg-[#1B4323] text-white py-6 rounded-2xl font-black text-2xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-2xl text-center">
-                Get help now
-              </Link>
-              <div className="flex justify-center items-center mt-5">
-                <p className="text-sm text-gray-400 tracking-tighter italic text-center">Create your account and pick the <span className="font-black text-gray-900 not-italic uppercase">tech</span> support that matches your needs</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ── Section 8: Footer Info Boxes ── */}
       <section className="bg-[#112a16] text-white py-20 px-6">

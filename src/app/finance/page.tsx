@@ -8,6 +8,7 @@ import { ArrowRight, Star, MessageSquare, Check, ShieldCheck, ChevronDown, Chevr
 import { useAuth } from "@/src/hooks/useAuth";
 import InfoCard from "@/src/components/common/InfoCard";
 import MobileFinancePage from "@/src/components/finance/MobileFinancePage";
+import PricingTransformation from "@/src/components/common/PricingTransformation";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -178,79 +179,25 @@ const FinancePage = () => {
       </section>
 
       {/* ── Section 7: Pricing & Transformation ── */}
-      <section className="py-24 bg-gray-50 px-6">
-        <div className="max-w-[1100px] mx-auto grid md:grid-cols-2 gap-12">
-          {/* Pricing Card */}
-          <div className="bg-white rounded-[32px] p-12 shadow-2xl border border-gray-100 flex flex-col h-full">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-6 block">Starting Pricing</span>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-[64px] font-black text-black tracking-tighter leading-none">$5/hr +</span>
-            </div>
-            <p className="text-lg font-bold text-gray-500 mb-10">As low as $1/15min with <Link href="https://stripe.com/" className="text-blue-600 font-black underline decoration-4 underline-offset-8">Stripe</Link></p>
+      <PricingTransformation
+        subText="Create your account and pick the finance support that matches your needs."
+        badges={["Flexible sessions", "No long-term contract", "Real professionals"]}
+        pricingPoints={[
+          "Pay per session",
+          "Get quick answers or deeper guidance",
+          "Work with experts on your terms",
+          "No long-term contracts"
+        ]}
+        transformationPoints={[
+          "Beginner Friendly",
+          "Real insights",
+          "Real Coaches",
+          "Explore different styles and perspectives"
+        ]}
+        buttonText="Get help now"
+        buttonHref="/about"
+      />
 
-            <div className="flex gap-4 mb-10">
-              <div className="bg-green-50 text-green-700 px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest border border-green-100 flex-1 text-center">Flexible sessions</div>
-              <div className="bg-blue-50 text-blue-700 px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest border border-blue-100 flex-1 text-center">No long-term contract</div>
-            </div>
-
-            <div className="space-y-6 mt-auto">
-              <h4 className="text-2xl font-black text-black">Real professionals</h4>
-              <ul className="space-y-4">
-                {[
-                  "Pay per session",
-                  "Get quick answers or deeper guidance",
-                  "Work with experts on your terms",
-                  "No long-term contracts"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-4 text-[17px] font-bold text-gray-700">
-                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white shrink-0 shadow-lg shadow-primary/20">
-                      <Check size={14} strokeWidth={4} />
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link href="https://stripe.com" className="block text-xs text-blue-600 font-black hover:underline mt-8 tracking-widest uppercase opacity-40">Link to Stripe.com</Link>
-            </div>
-          </div>
-
-          {/* Transformation Card */}
-          <div className="bg-[#EBF3EF] rounded-[32px] p-12 border border-primary/10 shadow-2xl flex flex-col h-full">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6 block">Sign up page</span>
-            <h3 className="text-[40px] md:text-[48px] font-black text-black mb-10 leading-[1.1] tracking-tighter">Ready to Start Your Transformation?</h3>
-
-            <div className="bg-white rounded-2xl p-6 mb-10 shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer transition-all hover:shadow-md">
-              <span className="text-xl font-black text-gray-400 uppercase tracking-tighter">No Commitment</span>
-              <ArrowRight className="text-primary group-hover:translate-x-2 transition-transform" size={28} />
-            </div>
-
-            <div className="space-y-6 mb-12">
-              <div className="flex items-center gap-4 text-xl font-bold text-gray-800">
-                <ShieldCheck className="text-primary" size={28} />
-                <span>Beginner Friendly</span>
-              </div>
-              <div className="flex items-center gap-4 text-xl font-bold text-gray-800">
-                <ShieldCheck className="text-primary" size={28} />
-                <span>“real insights”</span>
-              </div>
-              <div className="flex items-center gap-4 text-xl font-bold text-gray-800">
-                <ShieldCheck className="text-primary" size={28} />
-                <span>Real Coaches</span>
-              </div>
-              <p className="text-xl font-bold text-gray-500 italic mt-4">Explore different styles and perspectives</p>
-            </div>
-
-            <div className="mt-auto">
-              <Link href="/about" className="block w-full bg-[#1B4323] text-white py-6 rounded-2xl font-black text-2xl hover:bg-[#112a16] transition transform hover:scale-[1.02] shadow-2xl text-center">
-                Get help now
-              </Link>
-              <div className="flex justify-center items-center mt-5">
-                <p className="text-sm text-gray-400 tracking-tighter italic text-center">Create your account and pick the <span className="font-black text-gray-900 not-italic uppercase">finance</span> support that matches your needs</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section className="bg-[#112a16] text-white py-20 px-6">
         <div className="max-w-[1000px] mx-auto space-y-0 divide-y divide-white/10">
