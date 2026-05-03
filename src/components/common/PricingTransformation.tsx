@@ -35,7 +35,8 @@ const PricingTransformation: React.FC<PricingTransformationProps> = ({
             <p className="mt-4 text-lg font-semibold text-slate-700 md:text-xl">
               As low as $1 / 15min.{" "}
               <Link
-                href="/hire"
+                href="https://stripe.com"
+                target="_blank"
                 className="font-bold text-blue-700 underline decoration-blue-700/30 underline-offset-4"
               >
                 Stripe

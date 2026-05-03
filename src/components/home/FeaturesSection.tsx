@@ -141,16 +141,21 @@ function InfoCard({
 const FeaturesSection = () => {
   return (
     <section className="bg-white pb-32">
-      <div className="mx-auto mb-12 max-w-[900px] border-t border-gray-200 pt-20 text-center">
+      {/* <div className="mx-auto mb-12 max-w-[900px] border-t border-gray-200 pt-20 text-center">
         <h2 className="mt-2 text-[52px] font-black tracking-tight text-black">
           How Does It Work?
         </h2>
+      </div> */}
+      <div className="px-4 pt-10 pb-4 text-center">
+        <p className="text-[20px] font-bold text-gray-400 uppercase tracking-widest mb-1">OUR KNOWLEDGE NETWORK</p>
+        <h2 className="text-[40px] font-black text-black">
+          Empower Your Growth — Learn & Earn
+        </h2>
       </div>
-
       {/* Hiring Section */}
       <div className="space-y-16">
         <FeatureBand
-          image="/expert.png"
+          image="/student.png"
           kicker="For Hiring"
           action="Start Here"
           description="Imagine talking to AI—but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
@@ -167,7 +172,7 @@ const FeaturesSection = () => {
       {/* Earning Section */}
       <div className="mt-32 space-y-16">
         <FeatureBand
-          image="/student.png"
+          image="/expert.png"
           kicker="For Earning"
           action="Find Out How"
           description="Earn by chatting with people who need your skills. Set your own rates, times, and topics. It's that simple."

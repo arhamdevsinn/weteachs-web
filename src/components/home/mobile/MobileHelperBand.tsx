@@ -10,7 +10,7 @@ const MobileHelperBand = () => {
       <div className="mx-4 mb-8 mt-6 flex items-center gap-3 rounded-[12px] bg-[#EBF3EF] p-4 shadow-sm border border-primary/5">
         <div className="relative h-[90px] w-[120px] shrink-0 overflow-hidden rounded-[8px] shadow-sm">
           <Image
-            src="/student.png"
+            src="/expert.png"
             alt="For Earning"
             fill
             className="object-cover"
@@ -27,7 +27,7 @@ const MobileHelperBand = () => {
             href="/auth/signup"
             className="mt-2 flex w-fit items-center gap-1.5 rounded-full bg-[#1B4323] px-4 py-1.5 text-[12px] font-black text-white transition shadow-md"
           >
-            Learn More
+            Find Out How
             <span className="flex size-4 items-center justify-center rounded-[3px] bg-[#6fbd58] text-[10px] leading-none text-white font-bold">
               ✓
             </span>
