@@ -59,17 +59,15 @@ const MobileHowItWorks = () => {
       <div className="mx-auto mb-10 flex max-w-[320px] rounded-[10px] border-2 border-primary bg-white p-1">
         <button
           onClick={() => setActiveTab("hiring")}
-          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${
-            activeTab === "hiring" ? "bg-primary text-white" : "bg-transparent text-gray-700"
-          }`}
+          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${activeTab === "hiring" ? "bg-primary text-white" : "bg-transparent text-gray-700"
+            } rounded-[30px]`}
         >
           For Hiring
         </button>
         <button
           onClick={() => setActiveTab("earning")}
-          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${
-            activeTab === "earning" ? "bg-primary text-white" : "bg-transparent text-gray-700"
-          }`}
+          className={`flex-1 rounded-[8px] py-2.5 text-[15px] font-bold transition-all ${activeTab === "earning" ? "bg-primary text-white" : "bg-transparent text-gray-700"
+            } rounded-[30px]`}
         >
           For Earning
         </button>
@@ -87,7 +85,7 @@ const MobileHowItWorks = () => {
               <div className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full bg-black text-[12px] font-black text-white shadow-md">
                 {index + 1}
               </div>
-              
+
               <div className="relative w-full h-full">
                 <Image
                   src={card.image}
@@ -97,7 +95,7 @@ const MobileHowItWorks = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex flex-1 flex-col px-6 pt-6 text-center">
               <h3 className="text-[17px] font-black leading-tight text-black">
                 {card.title}
@@ -105,11 +103,11 @@ const MobileHowItWorks = () => {
               <p className="mx-auto mt-3 mb-8 max-w-[220px] text-[14px] font-medium leading-relaxed text-gray-500">
                 {card.text}
               </p>
-              
+
               {card.cta && (
                 <Link
                   href={card.ctaHref}
-                  className="mt-auto flex w-full items-center justify-center rounded-[12px] bg-[#22542F] py-4 text-[17px] font-black text-white shadow-[0_10px_20px_rgba(34,84,47,0.2)] transition active:scale-95"
+                  className="mt-auto flex w-full items-center justify-center rounded-[12px] bg-[#22542F] py-4 text-[17px] font-black text-white shadow-[0_10px_20px_rgba(34,84,47,0.2)] transition active:scale-95 rounded-[30px]"
                 >
                   {card.cta}
                 </Link>
