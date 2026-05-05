@@ -14,13 +14,59 @@ import {
 } from "@/src/components/ui/dialog";
 import { getAllCategories } from "@/src/lib/api/categories";
 import { Input } from "@/src/components/ui/input";
-import { Search } from "lucide-react";
+import {
+  ArrowUpDown,
+  DollarSign,
+  Filter,
+  Search,
+  X,
+} from "lucide-react";
 import { algoliasearch } from "algoliasearch";
 import { auth } from "@/src/lib/firebase/config";
 import SignupPromptDialog from "./SignupPromptDialog";
 import { useRedditPixel } from "@/src/hooks/useRedditPixel";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 
 const PAGE_SIZE = 10; // items to reveal each scroll trigger
+
+const CATEGORY_FILTERS = [
+  "All",
+  "Arts",
+  "Business & Entrepreneur",
+  "Education",
+  "Family",
+  "Fashion & Beauty",
+  "Finance & Investing",
+  "Fitness",
+  "Foods & Cooking",
+  "Gaming",
+  "Health & Wellness",
+  "Home improvements & DIY",
+  "Language & Communication",
+  "Marketing & Social Media",
+  "Mental Health & Mindfulness",
+  "Music",
+  "Pet Care & Training",
+  "Relationships & Dating Advice",
+  "Spirituality & Religion",
+  "Technology",
+  "Travel & Culture",
+  "Random",
+];
+
+const PRICE_OPTIONS = [
+  { label: "Any price", value: "all" },
+  { label: "Under $25", value: "under-25" },
+  { label: "$25 - $50", value: "25-50" },
+  { label: "$50 - $100", value: "50-100" },
+  { label: "$100+", value: "100-plus" },
+];
+
+const SORT_OPTIONS = [
+  { label: "Newest", value: "newest" },
+  { label: "Price: low to high", value: "price-asc" },
+  { label: "Price: high to low", value: "price-desc" },
+];
 
 const getAvatarFallbackUrl = () => "/cat5.jpeg";
 
@@ -100,6 +146,9 @@ const CategoryCard = ({ cat, index, openCategoryModal }) => {
 // ─── Main Component ────────────────────────────────────────────────────────────
 const CategoriesCard = ({ filterCategory }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [topicFilter, setTopicFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [priceFilter, setPriceFilter] = useState("all");
   const searchParams = useSearchParams();
   const router = useRouter();
   const { trackSearch } = useRedditPixel();
@@ -277,6 +326,63 @@ const CategoriesCard = ({ filterCategory }) => {
     });
   };
 
+  const getPriceValue = (item) => {
+    const price = Number(item?.category_rate ?? item?.price ?? item?.rate);
+    return Number.isFinite(price) ? price : 0;
+  };
+
+  const filterByTopic = (src, topic) => {
+    if (!topic || topic === "all") return src;
+    const q = topic.toLowerCase();
+    return src.filter((item) => {
+      const title = (item.title || "").toLowerCase();
+      const itemTopic = (item.topic || "").toLowerCase();
+      return title === q || itemTopic === q || title.includes(q) || itemTopic.includes(q);
+    });
+  };
+
+  const filterByPrice = (src, priceRange) => {
+    if (!priceRange || priceRange === "all") return src;
+    return src.filter((item) => {
+      const price = getPriceValue(item);
+      if (priceRange === "under-25") return price < 25;
+      if (priceRange === "25-50") return price >= 25 && price < 50;
+      if (priceRange === "50-100") return price >= 50 && price < 100;
+      if (priceRange === "100-plus") return price >= 100;
+      return true;
+    });
+  };
+
+  const sortResults = (src) => {
+    const next = [...src];
+    if (sortBy === "price-asc") {
+      next.sort((a, b) => getPriceValue(a) - getPriceValue(b));
+    } else if (sortBy === "price-desc") {
+      next.sort((a, b) => getPriceValue(b) - getPriceValue(a));
+    } else {
+      next.sort((a, b) => (b.upload_time?.seconds || 0) - (a.upload_time?.seconds || 0));
+    }
+    return next;
+  };
+
+  const applyBrowseFilters = (src) => {
+    const activeTopic = filterCategory || topicFilter;
+    let next = filterByTopic(src, activeTopic);
+    next = filterByPrice(next, priceFilter);
+    return sortResults(next);
+  };
+
+  const clearBrowseFilters = () => {
+    setTopicFilter("all");
+    setSortBy("newest");
+    setPriceFilter("all");
+  };
+
+  const hasActiveFilters = topicFilter !== "all" || sortBy !== "newest" || priceFilter !== "all";
+
+  const activeTopicLabel = filterCategory || topicFilter;
+  const filteredSource = applyBrowseFilters(rawSource);
+
   // ─────────────────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-secondary">
@@ -291,7 +397,7 @@ const CategoriesCard = ({ filterCategory }) => {
         <div className="flex flex-col space-y-3 md:hidden">
           <div className="flex items-center justify-between">
             <h1 className="font-extrabold text-lg text-gray-900 capitalize">
-              {filterCategory ? `${filterCategory} Experts` : "Categories"}
+              {activeTopicLabel && activeTopicLabel !== "all" ? `${activeTopicLabel} Experts` : "Explore"}
             </h1>
             <button
               onClick={handleCreate}
@@ -309,34 +415,156 @@ const CategoriesCard = ({ filterCategory }) => {
               className="border-0 focus:ring-0 outline-0 w-full text-sm"
             />
           </div>
+          {!filterCategory && (
+            <div className="grid grid-cols-3 gap-2">
+              <Select value={topicFilter} onValueChange={setTopicFilter}>
+                <SelectTrigger className="w-full bg-white border-gray-200 px-2 text-[13px]">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-gray-500" />
+                    <SelectValue placeholder="Filter" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORY_FILTERS.map((option) => (
+                    <SelectItem key={option} value={option === "All" ? "all" : option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-full bg-white border-gray-200 px-2 text-[13px]">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                    <SelectValue placeholder="Sort" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {SORT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={priceFilter} onValueChange={setPriceFilter}>
+                <SelectTrigger className="w-full bg-white border-gray-200 px-2 text-[13px]">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-gray-500" />
+                    <SelectValue placeholder="Price" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {PRICE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearBrowseFilters}
+                  className="inline-flex w-fit items-center justify-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-600 justify-self-start"
+                >
+                  <X className="h-4 w-4" />
+                  Clear filters
+                </button>
+              )}
+            </div>
+          )}
         </div>
         {/* Desktop */}
         <div className="hidden md:flex items-center justify-between gap-4">
           <div className="shrink-0">
             <h1 className="font-extrabold text-xl md:text-2xl text-gray-900 capitalize">
-              {filterCategory ? `${filterCategory} Experts` : "Categories"}
+              {activeTopicLabel && activeTopicLabel !== "all" ? `${activeTopicLabel} Experts` : "Explore"}
             </h1>
             <p className="text-xs text-gray-500">
-              {filterCategory ? `Browse all ${filterCategory} experts` : "Manage and discover categories"}
+              {activeTopicLabel && activeTopicLabel !== "all" ? `Browse all ${activeTopicLabel} experts` : "Manage and discover categories"}
             </p>
           </div>
-          <div className="flex-1 max-w-xl">
-            <div className="flex items-center bg-white border rounded-md px-3 py-1.5 shadow-sm">
-              <Search className="text-gray-400 mr-2 w-4 h-4 flex-shrink-0" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by title, topic, teacher..."
-                className="border-0 focus:ring-0 outline-0 w-full"
-              />
-            </div>
-          </div>
+          
           <button
             onClick={handleCreate}
             className="shrink-0 flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-transform hover:scale-105"
           >
             + Create Category
           </button>
+        </div>
+        <div className="hidden md:flex items-center justify-between pt-4 md:pt-6 justify-center md:justify-center">
+          <div className="flex flex-wrap flex-1 flex-row items-center justify-center">
+            <div className="w-full max-w-xl py-4">
+              <div className="flex items-center bg-white border rounded-md px-3 py-1.5 shadow-sm">
+                <Search className="text-gray-400 mr-2 w-4 h-4 flex-shrink-0" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by title, topic, teacher..."
+                  className="border-0 focus:ring-0 outline-0 w-full"
+                />
+              </div>
+            </div>
+            {!filterCategory && (
+              <div className="flex  flex-wrap items-center justify-center 2 px-2 gap-2">
+                <Select value={topicFilter} onValueChange={setTopicFilter}>
+                  <SelectTrigger height="h-13" className="w-auto bg-white border-gray-200 flex-shrink-0">
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-gray-500" />
+                      <SelectValue placeholder="Filter" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORY_FILTERS.map((option) => (
+                      <SelectItem key={option} value={option === "All" ? "all" : option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger height="h-13" className="w-[170px] bg-white border-gray-200 flex-shrink-0">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                      <SelectValue placeholder="Sort" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SORT_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={priceFilter} onValueChange={setPriceFilter}>
+                  <SelectTrigger height="h-13" className="w-[150px] bg-white border-gray-200 flex-shrink-0">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-gray-500" />
+                      <SelectValue placeholder="Price" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRICE_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={clearBrowseFilters}
+                    className="shrink-0 h-13 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -345,7 +573,7 @@ const CategoriesCard = ({ filterCategory }) => {
 
         {/* ══ BRANCH 1: Specific category (e.g. /categories/education) ══ */}
         {filterCategory && !searchQuery ? (() => {
-          const all = filterByCategory(rawSource, filterCategory);
+          const all = filterByCategory(filteredSource, filterCategory);
           const visible = all.slice(0, catVisible);
           const hasMore = all.length > catVisible;
 
@@ -386,8 +614,8 @@ const CategoriesCard = ({ filterCategory }) => {
         /* ══ BRANCH 2: Search results ══ */
         : searchQuery ? (() => {
           const usingAlgolia = Array.isArray(algoliaHits);
-          const localFiltered = filterBySearch(rawSource, searchQuery);
-          const source = usingAlgolia ? algoliaHits : localFiltered.slice(0, searchVisible);
+          const localFiltered = filterBySearch(filteredSource, searchQuery);
+          const source = usingAlgolia ? applyBrowseFilters(algoliaHits) : localFiltered.slice(0, searchVisible);
           const hasMore = usingAlgolia
             ? algoliaPage < (algoliaTotalPages || 1)
             : localFiltered.length > searchVisible;
@@ -412,23 +640,15 @@ const CategoriesCard = ({ filterCategory }) => {
 
         /* ══ BRANCH 3: General home view (horizontal sections) ══ */
         : (() => {
-          const categoryTitles = [
-            "New", "Arts", "Business & Entrepreneur", "Education", "Family",
-            "Fashion & Beauty", "Finance & Investing", "Fitness", "Foods & Cooking",
-            "Gaming", "Health & Wellness", "Home improvements & DIY",
-            "Language & Communication", "Marketing & Social Media",
-            "Mental Health & Mindfulness", "Music", "Pet Care & Training",
-            "Relationships & Dating Advice", "Spirituality & Religion",
-            "Technology", "Travel & Culture", "Random",
-          ];
+          const categoryTitles = ["New", ...CATEGORY_FILTERS.slice(1)];
 
           return (
             <div className="space-y-8">
               {categoryTitles.map((title) => {
                 const items =
                   title === "New"
-                    ? [...rawSource].sort((a, b) => (b.upload_time?.seconds || 0) - (a.upload_time?.seconds || 0)).slice(0, 10)
-                    : rawSource.filter((c) => c.title === title);
+                    ? filteredSource.slice(0, 10)
+                    : filteredSource.filter((c) => c.title === title);
 
                 if (items.length === 0) return null;
 
