@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Apple, Check, Flame, Salad, TrendingUp, Users, Clock3, CircleHelp } from "lucide-react";

@@ -1,3 +1,5 @@
+"use client";
+
 import TeamWeTeachs from '@/src/components/we-teachs/TeamWeTeachs'
 import React from 'react'
 

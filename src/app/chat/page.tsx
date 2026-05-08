@@ -1,3 +1,6 @@
+"use client";
+
+
 import React from "react";
 import ChatScreen from "@/src/components/chat/ChatScreen";
 

@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 // import { useEffect, useState } from "react";
 // import { fetchLeaderboardUsers } from "@/src/utils/communityData";
 // import { Card, CardContent } from "@/src/components/ui/card";

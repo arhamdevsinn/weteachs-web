@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import ExpertDialog from '@/src/components/profile/ExpertProfile';
 import StudentDialog from '../profile/StudentProfile';
