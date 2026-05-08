@@ -106,37 +106,56 @@ const CategoryCard = ({ cat, index, openCategoryModal }) => {
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.04, 0.5), duration: 0.32, ease: "easeOut" }}
-      whileHover={{ scale: 1.03, y: -5 }}
-      className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col cursor-pointer hover:shadow-xl transition h-full"
+      className="bg-white rounded-[12px] shadow-sm border-2 border-transparent hover:border-green-500 hover:shadow-2xl overflow-hidden flex flex-col cursor-pointer transition-all duration-300 relative z-0 hover:z-10 hover:scale-105 group h-full"
       onClick={() => openCategoryModal(cat)}
     >
-      <motion.img
-        src={imageSrc}
-        alt={cat.title || "Category"}
-        className="h-40 w-full object-cover"
-        whileHover={{ scale: 1.05 }}
-        transition={{ duration: 0.3 }}
-        onError={() => setImageError(true)}
-      />
+      <div className="relative h-[160px] w-full overflow-hidden bg-gray-100">
+        <img
+          src={imageSrc}
+          alt={cat.title || "Category"}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={() => setImageError(true)}
+        />
+        {cat.likes &&
+          <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-[11px] font-bold text-gray-700 flex items-center gap-1 shadow-sm">
+            <span className="text-red-500">❤️</span> {cat.likes || 0}
+          </div>
+        }
+      </div>
+
       <div className="p-4 flex flex-col flex-1">
-        <div className="text-xs uppercase tracking-wide text-primary font-medium">
-          {cat.topic || "No topic"}
-        </div>
-        <div className="text-xl font-semibold mt-1 text-gray-800">
+        <h3 className="text-[16px] font-bold text-gray-900 mb-1 line-clamp-1">
           {cat.title || "Untitled"}
+        </h3>
+
+        <div className="flex items-center gap-1 mb-2 text-gray-800 text-[11px]">
+          {cat.rating ? (
+            <span>
+              {"★".repeat(cat.rating)}
+            </span>
+          ) : null}
+          {cat.teacher_name &&
+            <span className="text-[12px] text-gray-500  font-medium truncate">
+              {cat.teacher_name || "Unknown"}
+            </span>}
         </div>
-        <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+
+        <div className="text-[13px] text-gray-500 mb-2 line-clamp-1">
+          {cat.topic || "No topic"} • {cat.Language || "English"}
+        </div>
+
+        <p className="text-[13px] text-gray-500 mb-4 line-clamp-2 flex-1">
           {cat.description || "No description available."}
         </p>
-        <div className="flex justify-between items-center mt-2">
-          <p className="text-sm text-gray-600 font-bold">
-            ${cat.category_rate || 0} / 15 mins
-          </p>
-          <p className="text-sm text-gray-600">{cat.Language}</p>
-        </div>
-        <div className="mt-auto flex items-center justify-between pt-1 border-t text-xs text-gray-500">
-          <span>❤️ {cat.category_rate || 0} likes</span>
-          <span className="text-primary font-medium">{cat.teacher_name || "Unknown"}</span>
+
+        <div className="flex flex-col items-start gap-3 mt-auto">
+          <div className="text-[15px] font-bold text-gray-900">
+            $ {cat.category_rate || 0} <span className="text-[13px] font-normal text-gray-600">/ 15 mins</span>
+          </div>
+
+          <button className="text-green-500 border border-green-200 bg-white rounded-[6px] px-4 py-1.5 text-[13px] font-medium group-hover:bg-green-50 group-hover:border-green-400 transition-colors w-max">
+            View more
+          </button>
         </div>
       </div>
     </motion.div>
@@ -149,6 +168,8 @@ const CategoriesCard = ({ filterCategory }) => {
   const [topicFilter, setTopicFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [priceFilter, setPriceFilter] = useState("all");
+  const [mobileTabCategory, setMobileTabCategory] = useState("All");
+  const [tabPageStates, setTabPageStates] = useState({ "All": PAGE_SIZE });
   const searchParams = useSearchParams();
   const router = useRouter();
   const { trackSearch } = useRedditPixel();
@@ -249,7 +270,13 @@ const CategoriesCard = ({ filterCategory }) => {
     });
   };
 
-  useSentinel(catSentinelRef, () => setCatVisible((v) => v + PAGE_SIZE));
+  useSentinel(catSentinelRef, () => {
+    if (filterCategory) {
+      setCatVisible((v) => v + PAGE_SIZE);
+    } else {
+      loadMoreForTab(mobileTabCategory);
+    }
+  });
   useSentinel(searchSentinelRef, () => {
     const usingAlgolia = Array.isArray(algoliaHits);
     if (usingAlgolia) {
@@ -273,6 +300,17 @@ const CategoriesCard = ({ filterCategory }) => {
       if (id) return true;
     }
     return false;
+  };
+
+  const loadMoreForTab = (tabName) => {
+    setTabPageStates((prev) => ({
+      ...prev,
+      [tabName]: (prev[tabName] || PAGE_SIZE) + PAGE_SIZE,
+    }));
+  };
+
+  const getTabVisibleCount = (tabName) => {
+    return tabPageStates[tabName] || PAGE_SIZE;
   };
 
   const openCategoryModal = (cat) => {
@@ -485,7 +523,7 @@ const CategoriesCard = ({ filterCategory }) => {
               {activeTopicLabel && activeTopicLabel !== "all" ? `Browse all ${activeTopicLabel} experts` : "Manage and discover categories"}
             </p>
           </div>
-          
+
           <button
             onClick={handleCreate}
             className="shrink-0 flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition-transform hover:scale-105"
@@ -611,82 +649,152 @@ const CategoriesCard = ({ filterCategory }) => {
           );
         })()
 
-        /* ══ BRANCH 2: Search results ══ */
-        : searchQuery ? (() => {
-          const usingAlgolia = Array.isArray(algoliaHits);
-          const localFiltered = filterBySearch(filteredSource, searchQuery);
-          const source = usingAlgolia ? applyBrowseFilters(algoliaHits) : localFiltered.slice(0, searchVisible);
-          const hasMore = usingAlgolia
-            ? algoliaPage < (algoliaTotalPages || 1)
-            : localFiltered.length > searchVisible;
+          /* ══ BRANCH 2: Search results ══ */
+          : searchQuery ? (() => {
+            const usingAlgolia = Array.isArray(algoliaHits);
+            const localFiltered = filterBySearch(filteredSource, searchQuery);
+            const source = usingAlgolia ? applyBrowseFilters(algoliaHits) : localFiltered.slice(0, searchVisible);
+            const hasMore = usingAlgolia
+              ? algoliaPage < (algoliaTotalPages || 1)
+              : localFiltered.length > searchVisible;
 
-          if (source.length === 0) return (
-            <div className="text-center text-gray-500 py-16">
-              No results for &ldquo;{searchQuery}&rdquo;.
-            </div>
-          );
-
-          return (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {source.map((cat, i) => (
-                  <CategoryCard key={cat.id} cat={cat} index={i} openCategoryModal={openCategoryModal} />
-                ))}
+            if (source.length === 0) return (
+              <div className="text-center text-gray-500 py-16">
+                No results for &ldquo;{searchQuery}&rdquo;.
               </div>
-              {hasMore && <LoaderDots sentinelRef={searchSentinelRef} />}
-            </div>
-          );
-        })()
+            );
 
-        /* ══ BRANCH 3: General home view (horizontal sections) ══ */
-        : (() => {
-          const categoryTitles = ["New", ...CATEGORY_FILTERS.slice(1)];
+            return (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {source.map((cat, i) => (
+                    <CategoryCard key={cat.id} cat={cat} index={i} openCategoryModal={openCategoryModal} />
+                  ))}
+                </div>
+                {hasMore && <LoaderDots sentinelRef={searchSentinelRef} />}
+              </div>
+            );
+          })()
 
-          return (
-            <div className="space-y-8">
-              {categoryTitles.map((title) => {
-                const items =
-                  title === "New"
-                    ? filteredSource.slice(0, 10)
-                    : filteredSource.filter((c) => c.title === title);
+            /* ══ BRANCH 3: General home view ══ */
+            : (() => {
+              const categoryTitles = CATEGORY_FILTERS;
+              const selectedItems = 
+                mobileTabCategory === "All"
+                  ? filteredSource
+                  : filteredSource.filter((c) => c.title === mobileTabCategory || c.topic === mobileTabCategory);
+              const visibleItems = selectedItems.slice(0, catVisible);
+              const hasMore = selectedItems.length > catVisible;
 
-                if (items.length === 0) return null;
-
-                return (
-                  <div key={title} className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-                      <div className="flex gap-2">
+              return (
+                <>
+                  {/* Mobile: Tabs + Single Column */}
+                  <div className="md:hidden space-y-4">
+                    {/* Category Tabs */}
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                      {categoryTitles.map((cat) => (
                         <button
-                          onClick={() => document.getElementById(`scroll-${title}`)?.scrollBy({ left: -300, behavior: "smooth" })}
-                          className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 text-gray-600 text-sm"
+                          key={cat}
+                          onClick={() => {
+                            setMobileTabCategory(cat);
+                            if (!tabPageStates[cat]) {
+                              setTabPageStates((prev) => ({ ...prev, [cat]: PAGE_SIZE }));
+                            }
+                          }}
+                          className={`shrink-0 px-4 py-2 rounded-full font-medium text-sm transition-all ${
+                            mobileTabCategory === cat
+                              ? "bg-primary text-white shadow-md"
+                              : "bg-white border border-gray-200 text-gray-700 hover:border-primary"
+                          }`}
                         >
-                          &lt;
+                          {cat}
                         </button>
-                        <button
-                          onClick={() => document.getElementById(`scroll-${title}`)?.scrollBy({ left: 300, behavior: "smooth" })}
-                          className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 text-gray-600 text-sm"
-                        >
-                          &gt;
-                        </button>
-                      </div>
-                    </div>
-                    <div
-                      id={`scroll-${title}`}
-                      className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
-                    >
-                      {items.map((cat, i) => (
-                        <div key={cat.id} className="flex-shrink-0 w-72 snap-start">
-                          <CategoryCard cat={cat} index={i} openCategoryModal={openCategoryModal} />
-                        </div>
                       ))}
                     </div>
+
+                    {/* Single Column Cards - Vertical Scroll with Per-Tab Pagination */}
+                    <div className="space-y-4">
+                      {(() => {
+                        const tabVisibleCount = getTabVisibleCount(mobileTabCategory);
+                        const tabItems = selectedItems.slice(0, tabVisibleCount);
+                        const tabHasMore = selectedItems.length > tabVisibleCount;
+
+                        return tabItems.length > 0 ? (
+                          <>
+                            <AnimatePresence>
+                              {tabItems.map((cat, i) => (
+                                <div key={cat.id} className="w-full">
+                                  <CategoryCard cat={cat} index={i} openCategoryModal={openCategoryModal} />
+                                </div>
+                              ))}
+                            </AnimatePresence>
+                            {tabHasMore && (
+                              <div ref={catSentinelRef} className="h-24 flex items-center justify-center">
+                                <LoaderDots sentinelRef={undefined} />
+                              </div>
+                            )}
+                            {!tabHasMore && tabItems.length > 0 && (
+                              <p className="text-center text-gray-400 text-sm py-6">✓ All cards loaded</p>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
+                            <p className="text-lg text-gray-500 font-medium">No categories found in {mobileTabCategory}</p>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          );
-        })()}
+
+                  {/* Desktop: Horizontal Sections */}
+                  <div className="hidden md:block space-y-8">
+                    {(() => {
+                      const desktopTitles = ["New", ...CATEGORY_FILTERS.slice(1)];
+                      return desktopTitles.map((title) => {
+                        const items =
+                          title === "New"
+                            ? filteredSource.slice(0, 10)
+                            : filteredSource.filter((c) => c.title === title || c.topic === title);
+
+                        if (items.length === 0) return null;
+
+                        return (
+                          <div key={title} className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => document.getElementById(`scroll-${title}`)?.scrollBy({ left: -300, behavior: "smooth" })}
+                                  className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 text-gray-600 text-sm"
+                                >
+                                  &lt;
+                                </button>
+                                <button
+                                  onClick={() => document.getElementById(`scroll-${title}`)?.scrollBy({ left: 300, behavior: "smooth" })}
+                                  className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 text-gray-600 text-sm"
+                                >
+                                  &gt;
+                                </button>
+                              </div>
+                            </div>
+                            <div
+                              id={`scroll-${title}`}
+                              className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+                            >
+                              {items.map((cat, i) => (
+                                <div key={cat.id} className="flex-shrink-0 w-72 snap-start">
+                                  <CategoryCard cat={cat} index={i} openCategoryModal={openCategoryModal} />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </>
+              );
+            })()}
       </div>
 
       {/* ── Detail Dialog ── */}

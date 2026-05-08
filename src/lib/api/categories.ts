@@ -1,7 +1,58 @@
 // @ts-nocheck
 import { collection, getDocs, query, orderBy, getDoc, doc } from "firebase/firestore";
 import { db } from "@/src/lib/firebase/config";
+const getReputation = async (userId: string) => {
 
+
+  const reputationRef = collection(
+    db,
+    "LimboUserMode",
+    userId,
+    "Reputation"
+  );
+
+  const snapshot = await getDocs(reputationRef);
+
+  if (!snapshot.empty) {
+    // Get first document
+    const docData = snapshot.docs[0].data();
+
+    console.log(docData);
+
+    // Reputation value
+    // console.log(docData.Reputation);
+
+    return docData.Reputation;
+  }
+
+  return null;
+};
+const getRating = async (teacherId: string) => {
+
+
+  const ratingRef = collection(
+    db,
+    "TeacherDetails",
+    teacherId,
+    "TeacherReviews"
+  );
+
+  const snapshot = await getDocs(ratingRef);
+
+  if (!snapshot.empty) {
+    // Get first document
+    const docData = snapshot.docs[0].data();
+
+    console.log(docData);
+
+    // Reputation value
+    console.log("Ratings:",docData.ratings);
+
+    return docData.ratings;
+  }
+
+  return null;
+};
 export const getAllCategories = async (): Promise<[]> => {
   try {
     const q = query(collection(db, "Categories"), orderBy("upload_time", "desc"));
@@ -15,11 +66,30 @@ export const getAllCategories = async (): Promise<[]> => {
         let limbo = null;
         try {
           const tr = cat.teacher_ref;
+          let likes = null;
+          const whoCreatedRef = cat.who_created_ref;
+          if (typeof whoCreatedRef === "object" && whoCreatedRef.path) {
+            const whoCreatedSnap = await getDoc(whoCreatedRef);
+            if (whoCreatedSnap.exists()) {
+              const whoCreatedData = whoCreatedSnap.data();
+              if (whoCreatedData) {
+                likes = await getReputation(whoCreatedSnap.id);
+                cat.likes = likes; // attach likes to category for easy access
+              }
+            }
+          }
+
+
+
           if (tr) {
             // handle DocumentReference or string path
             if (typeof tr === "object" && tr.path) {
               const teacherSnap = await getDoc(tr);
-              if (teacherSnap.exists()) teacher = { id: teacherSnap.id, ...teacherSnap.data() };
+              if (teacherSnap.exists()) {
+                teacher = { id: teacherSnap.id, ...teacherSnap.data() };
+                const rating = await getRating(teacherSnap.id);
+                cat.rating = rating; // attach rating to category for easy access
+              }
             } else if (typeof tr === "string") {
               const parts = tr.split("/").filter(Boolean);
               if (parts.length >= 2) {
