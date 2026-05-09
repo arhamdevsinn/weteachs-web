@@ -11,7 +11,7 @@ const Page = () => {
 
   return (
     <>
-      <CategoriesCard  />
+      <CategoriesCard />
     </>
   );
 };
