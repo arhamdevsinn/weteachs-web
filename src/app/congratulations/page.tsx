@@ -49,7 +49,8 @@ const CongratulationsPage = () => {
       router.push('/profile');
     } else {
       // Student after profile creation
-      router.back();
+      // router.back();
+      router.push('/profile');
     }
   };
 
