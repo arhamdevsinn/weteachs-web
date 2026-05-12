@@ -32,7 +32,8 @@ const MobileFeatureBands = () => {
             Imagine talking to AI—but it's a real person. Get the answers you need in minutes.
           </p>
           <Link
-            href="/auth/signup"
+            // href="/auth/signup"
+            href="/teach"
             className="mt-2 flex w-fit items-center gap-1.5 rounded-full bg-[#1B4323] px-4 py-1.5 text-[12px] font-black text-white transition shadow-md"
           >
             Start Here

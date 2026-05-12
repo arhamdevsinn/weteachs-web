@@ -24,7 +24,8 @@ const MobileHelperBand = () => {
             Earn by chatting with people who need your skills. Set your own rates, times, and topics—it's that simple.
           </p>
           <Link
-            href="/auth/signup"
+            // href="/auth/signup"
+            href="/learn"
             className="mt-2 flex w-fit items-center gap-1.5 rounded-full bg-[#1B4323] px-4 py-1.5 text-[12px] font-black text-white transition shadow-md"
           >
             Find Out How

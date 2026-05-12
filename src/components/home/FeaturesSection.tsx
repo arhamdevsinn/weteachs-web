@@ -159,7 +159,9 @@ const FeaturesSection = () => {
           kicker="For Hiring"
           action="Start Here"
           description="Imagine talking to AI—but it's a real person. Get help tailored exactly to what you need, quickly and stress-free."
-          href="/auth/signup"
+          // href="/auth/signup"
+          href="/teach"
+
         />
 
         <div className="mx-auto grid max-w-[1200px] gap-10 px-6 md:grid-cols-3">
@@ -176,7 +178,8 @@ const FeaturesSection = () => {
           kicker="For Earning"
           action="Find Out How"
           description="Earn by chatting with people who need your skills. Set your own rates, times, and topics. It's that simple."
-          href="/auth/signup"
+          // href="/auth/signup"
+          href="/learn"
         />
 
         <div className="mx-auto grid max-w-[1200px] gap-10 px-6 md:grid-cols-3">
