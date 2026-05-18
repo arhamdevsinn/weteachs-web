@@ -349,56 +349,23 @@ const Header = () => {
 
                 {/* Drawer Links */}
                 <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-3">
-                  <Link
-                    href="/"
-                    onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/" || pathname === ""
-                      ? "bg-[#E8ECE4] text-[#22542F]"
-                      : "text-[#333333] hover:bg-gray-50"
-                      }`}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    href="/about"
-                    onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/about"
-                      ? "bg-[#E8ECE4] text-[#22542F]"
-                      : "text-[#333333] hover:bg-gray-50"
-                      }`}
-                  >
-                    Helper
-                  </Link>
-                  <Link
-                    href="/learn"
-                    onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname.startsWith("/learn")
-                      ? "bg-[#E8ECE4] text-[#22542F]"
-                      : "text-[#333333] hover:bg-gray-50"
-                      }`}
-                  >
-                    Clients
-                  </Link>
-                  <Link
-                    href="/teach"
-                    onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/teach"
-                      ? "bg-[#E8ECE4] text-[#22542F]"
-                      : "text-[#333333] hover:bg-gray-50"
-                      }`}
-                  >
-                    Learn
-                  </Link>
-                  <Link
-                    href="/categories"
-                    onClick={() => setMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${pathname === "/categories"
-                      ? "bg-[#E8ECE4] text-[#22542F]"
-                      : "text-[#333333] hover:bg-gray-50"
-                      }`}
-                  >
-                    Explore
-                  </Link>
+                  {mainNavigationItems.map((item) => {
+                    const active = pathname === item.href;
+
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className={`rounded-xl px-4 py-3.5 text-[17px] font-bold transition ${active
+                          ? "bg-[#E8ECE4] text-[#22542F]"
+                          : "text-[#333333] hover:bg-gray-50"
+                          }`}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
                 </div>
 
                 {/* Drawer Footer Actions */}
