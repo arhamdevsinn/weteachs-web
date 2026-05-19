@@ -7,6 +7,7 @@ import { CircleArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { AuthService } from '@/src/lib/firebase/auth';
 import { useRedditPixel } from '@/src/hooks/useRedditPixel';
+import { useRecaptcha } from "@/src/components/Recaptcha";
 
 declare global {
   interface Window {
@@ -26,6 +27,7 @@ function SignUpForm() {
   const [error, setError] = useState('');
   const router = useRouter();
   const { trackSignUp } = useRedditPixel();
+  const { execute } = useRecaptcha();
 
   useEffect(() => {
     // Add conversion tracking script
@@ -77,6 +79,35 @@ function SignUpForm() {
 
     setLoading(true);
     try {
+      const token = await execute('signup');
+      if (!token) {
+        setError('reCAPTCHA failed to load. Please try again.');
+        toast.error('reCAPTCHA failed to load. Please try again.');
+        return;
+      }
+
+      const verifyRes = await fetch('/api/recaptcha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, action: 'signup' }),
+      });
+
+      if (!verifyRes.ok) {
+        const text = await verifyRes.text().catch(() => verifyRes.statusText);
+        console.error('recaptcha verify error', verifyRes.status, text);
+        setError('reCAPTCHA verification failed. Please try again.');
+        toast.error('reCAPTCHA verification failed. Please try again.');
+        return;
+      }
+
+      const verifyJson = await verifyRes.json();
+      if (!verifyJson.success) {
+        console.error('recaptcha verify response:', verifyJson);
+        setError('reCAPTCHA verification failed. Please try again.');
+        toast.error('reCAPTCHA verification failed. Please try again.');
+        return;
+      }
+
       const res = await AuthService.signup(email, password);
       
       // Track Google Ads conversion
