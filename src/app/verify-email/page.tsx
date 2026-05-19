@@ -8,10 +8,12 @@ import { auth } from "@/src/lib/firebase/config";
 import { AuthService } from "@/src/lib/firebase/auth";
 import { Button } from "@/src/components/ui/button";
 import { toast } from "sonner";
+import { useAuth } from "@/src/hooks/useAuth";
 
 type VerificationDialogState = "idle" | "verifying" | "verified" | "error";
 
 const VerifyEmailPage = () => {
+   const { userId } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -43,7 +45,7 @@ const VerifyEmailPage = () => {
           localStorage.removeItem("pending_verification_email");
           localStorage.removeItem("pending_verification_password");
           localStorage.removeItem("pending_origin");
-
+      
           if (origin === "signup") router.push("/auth/login");
           else router.push("/profile");
         } catch (err) {
@@ -86,7 +88,7 @@ const VerifyEmailPage = () => {
       localStorage.removeItem("pending_origin");
 
       // Redirect based on origin
-      if (origin === "signup") router.push("/auth/login");
+      if (origin === "signup"||!userId) router.push("/auth/login");
       else router.push("/profile");
       return true;
     }
