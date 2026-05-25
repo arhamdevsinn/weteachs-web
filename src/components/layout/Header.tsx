@@ -372,6 +372,14 @@ const Header = () => {
                 <div className="border-t border-gray-100 p-5">
                   {user ? (
                     <div className="flex flex-col gap-3">
+                      <Link
+                        href="/chat"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-gray-200 py-3.5 text-[17px] font-bold text-black transition hover:bg-gray-50"
+                      >
+                        <MessageSquare size={20} strokeWidth={2.5} />
+                        Chat
+                      </Link>
                       <Button
                         variant="outline"
                         className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-gray-200 py-6 text-[16px] font-bold text-black"
@@ -397,6 +405,14 @@ const Header = () => {
                     </div>
                   ) : (
                     <div className="flex flex-col gap-3">
+                      <Link
+                        href="/chat"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-gray-200 py-3.5 text-[17px] font-bold text-black transition hover:bg-gray-50"
+                      >
+                        <MessageSquare size={20} strokeWidth={2.5} />
+                        Chat
+                      </Link>
                       <button
                         onClick={() => {
                           setMenuOpen(false);
