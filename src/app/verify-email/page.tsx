@@ -3,14 +3,22 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { onAuthStateChanged, signInWithEmailAndPassword, applyActionCode } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  applyActionCode,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
+} from "firebase/auth";
 import { auth } from "@/src/lib/firebase/config";
 import { AuthService } from "@/src/lib/firebase/auth";
 import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/src/hooks/useAuth";
 
 type VerificationDialogState = "idle" | "verifying" | "verified" | "error";
+type ResetPasswordState = "idle" | "checking" | "ready" | "success" | "error";
 
 const VerifyEmailPage = () => {
    const { userId } = useAuth();
@@ -18,17 +26,36 @@ const VerifyEmailPage = () => {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [dialogState, setDialogState] = useState<VerificationDialogState>("idle");
+  const [resetState, setResetState] = useState<ResetPasswordState>("idle");
+  const [resetEmail, setResetEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const pollRef = useRef<number | null>(null);
 
   const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  // Handle direct email verification via oobCode
+  // Handle Firebase action links via oobCode.
   useEffect(() => {
     const oobCode = searchParams.get("oobCode");
+    const mode = searchParams.get("mode");
 
     if (oobCode) {
-      const verifyByOobCode = async () => {
+      const handleActionCode = async () => {
         try {
+          if (mode === "resetPassword") {
+            setResetState("checking");
+            const email = await verifyPasswordResetCode(auth, oobCode);
+            setResetEmail(email);
+            setResetState("ready");
+            return;
+          }
+
+          if (mode && mode !== "verifyEmail") {
+            setDialogState("error");
+            toast.error("This account action is not supported.");
+            return;
+          }
+
           setDialogState("verifying");
           await applyActionCode(auth, oobCode);
 
@@ -49,15 +76,54 @@ const VerifyEmailPage = () => {
           if (origin === "signup") router.push("/auth/login");
           else router.push("/profile");
         } catch (err) {
-          console.error("Email verification failed:", err);
-          setDialogState("error");
-          toast.error("❌ Verification link is invalid or expired. Please request a new one.");
+          console.error("Firebase action link failed:", err);
+
+          if (mode === "resetPassword") {
+            setResetState("error");
+            toast.error("❌ Password reset link is invalid or expired. Please request a new one.");
+          } else {
+            setDialogState("error");
+            toast.error("❌ Verification link is invalid or expired. Please request a new one.");
+          }
         }
       };
 
-      verifyByOobCode();
+      handleActionCode();
     }
   }, [searchParams, router]);
+
+  const handleResetPassword = async () => {
+    const oobCode = searchParams.get("oobCode");
+
+    if (!oobCode) {
+      toast.error("Password reset link is missing a code.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await confirmPasswordReset(auth, oobCode, newPassword);
+      setResetState("success");
+      toast.success("Password reset successfully. Please log in.");
+      await sleep(1400);
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Password reset failed:", error);
+      toast.error("Could not reset password. Please request a new reset link.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const checkVerification = async () => {
     let user = auth.currentUser;
@@ -142,6 +208,78 @@ const VerifyEmailPage = () => {
       setLoading(false);
     }
   };
+
+  if (searchParams.get("mode") === "resetPassword") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-green-100 px-4">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 max-w-md w-full flex flex-col items-center">
+          <svg className="mb-6 text-primary" width={64} height={64} fill="none" viewBox="0 0 64 64">
+            <rect width="64" height="64" rx="16" fill="#D1FAE5" />
+            <path
+              d="M22 30V24a10 10 0 0120 0v6M20 30h24v18H20V30z"
+              stroke="#059669"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+
+          <h1 className="text-2xl font-bold text-green-900 mb-2">Reset Password</h1>
+
+          {resetState === "checking" && (
+            <p className="text-gray-700 text-center">Checking your reset link...</p>
+          )}
+
+          {resetState === "error" && (
+            <>
+              <p className="text-gray-700 text-center mb-6">
+                This password reset link is invalid or expired. Please request a new one.
+              </p>
+              <Button
+                onClick={() => router.push("/auth/forgot-password")}
+                className="w-full bg-primary text-white rounded-sm"
+              >
+                Request New Reset Link
+              </Button>
+            </>
+          )}
+
+          {resetState === "success" && (
+            <p className="text-gray-700 text-center">Your password was reset. Redirecting to login...</p>
+          )}
+
+          {resetState === "ready" && (
+            <div className="w-full">
+              <p className="text-gray-700 text-center mb-6">
+                Create a new password for {resetEmail || "your account"}.
+              </p>
+              <Input
+                type="password"
+                placeholder="New password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="mb-3"
+              />
+              <Input
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="mb-5"
+              />
+              <Button
+                onClick={handleResetPassword}
+                disabled={loading}
+                className="w-full bg-primary text-white rounded-sm hover:bg-secondary hover:border-1 hover:border-primary hover:text-primary"
+              >
+                {loading ? "Resetting..." : "Reset Password"}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 via-white to-green-100 px-4">

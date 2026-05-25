@@ -34,7 +34,7 @@ const ForgotPassword = () => {
       router.push("/auth/login");
       setEmail(""); // clear input
     } catch (err: unknown) {
-      setError(isErrorWithMessage(err) ? err.message : 'Failed to send reset email.');
+      toast.error(isErrorWithMessage(err) ? err.message : "Failed to send reset email.");
     } finally {
       setLoading(false);
     }
