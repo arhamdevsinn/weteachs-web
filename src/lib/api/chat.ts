@@ -1,10 +1,10 @@
 // @ts-nocheck
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
   arrayUnion,
   serverTimestamp,
   query,
@@ -34,9 +34,10 @@ export const getOrCreateConversation = async (
   try {
     // First, check if a conversation already exists
     const conversationId = await findExistingConversation(currentUserId, expertId);
-    
+
     if (conversationId) {
       console.log("Found existing conversation:", conversationId);
+       await updateConversation(conversationId, currentUserId, expertId);
       return conversationId;
     }
 
@@ -87,7 +88,7 @@ const findExistingConversation = async (
     if (!snapshot1.empty) {
       return snapshot1.docs[0].id;
     }
-    
+
     if (!snapshot2.empty) {
       return snapshot2.docs[0].id;
     }
@@ -134,37 +135,38 @@ const createNewConversation = async (
         currentUserData.display_name || "User",
         expertData.display_name || "Expert"
       ],
-      
+
       // chats metadata
       chats_paid_for: false,
-      paid_chats: false,
+      // paid_chats: false,
+      paid_chat: false,
       home_chats: false,
       stream_chats: false,
       completed: false,
       Reviewed: false,
       Student_Reply_true: false,
-      
+
       // Online status
       is_student_online: false,
       is_expert_online: false,
-      
+
       // Last message info
       last_message: "",
       last_message_time: serverTimestamp(),
       last_message_seen_by: [],
-      
+
       // Last seen timestamps
       student_last_seen: serverTimestamp(),
       expert_last_seen: serverTimestamp(),
-      
+
       // Creation time
       modified_time: serverTimestamp(),
-      
+
       // References to related documents (if needed)
       student_ref: currentUserData.student_ref || null,
       teacher_ref: expertData.teacher_ref || null,
       job_ref: null,
-      
+
       // Stripe IDs (if available)
       studentStripeID: currentUserData.stripeAccountID || currentUserData.stripeAccountId || "",
       teacherStripeID: expertData.stripeAccountID || expertData.stripeAccountId || "",
@@ -189,6 +191,33 @@ const createNewConversation = async (
     throw error;
   }
 };
+const updateConversation = async (
+  docId:string,
+  currentUserId: string,
+  expertId: string
+): Promise<string> => {
+  try {
+
+
+    // Update the conversation document in 'chats' collection
+    const conversationRef = await updateDoc(doc(db, "chats", docId), {
+
+      paid_chat: false,
+
+      // Last message info
+      last_message_time: serverTimestamp(),
+
+
+    });
+
+  
+
+
+  } catch (error) {
+    console.error("Error creating new conversation:", error);
+    throw error;
+  }
+};
 
 /**
  * Send a message in a conversation
@@ -203,10 +232,10 @@ export const sendMessage = async (
 ) => {
   try {
     console.log("sendMessage called with:", { conversationId, senderId, messageText, senderName });
-    
+
     // Get sender's document reference
     const senderRef = doc(db, "LimboUserMode", senderId);
-    
+
     // Always fetch the sender's name from Firestore to ensure it's not null
     let finalSenderName = senderName;
     try {
@@ -225,14 +254,14 @@ export const sendMessage = async (
       console.error("Error fetching sender document:", fetchError);
       finalSenderName = senderName || "User";
     }
-    
+
     // Ensure finalSenderName is never null or undefined
     if (!finalSenderName || finalSenderName === null || finalSenderName === undefined) {
       finalSenderName = "User";
     }
-    
+
     console.log("About to save message with nameofsender:", finalSenderName);
-    
+
     // Add message to the chat_messages subcollection
     const messageRef = await addDoc(
       collection(db, "chats", conversationId, "chat_messages"),
@@ -286,7 +315,7 @@ export const getUserConversations = async (userId: string): Promise<Conversation
           const studentRefDoc = await getDoc(data.student_ref);
           if (studentRefDoc.exists()) studentRefData = studentRefDoc.data();
         }
-      } catch (e) {}
+      } catch (e) { }
       return { limborefData, studentRefData };
     };
 
@@ -354,17 +383,17 @@ export const getConversationMessages = async (conversationId: string) => {
       collection(db, "chats", conversationId, "chat_messages"),
       orderBy("created_at", "asc")
     );
-    
+
     const snapshot = await getDocs(messagesQuery);
-    
+
     const messages = await Promise.all(
       snapshot.docs.map(async (docSnap) => {
         const data = docSnap.data();
-        
+
         // Get sender's details from the 'sent_by' reference
         let senderData = {};
         let senderId = "";
-        
+
         if (data.sent_by && typeof data.sent_by === 'object' && data.sent_by.id) {
           senderId = data.sent_by.id;
           const senderDoc = await getDoc(data.sent_by);
@@ -416,11 +445,11 @@ export const subscribeToMessages = (
       const messages = await Promise.all(
         snapshot.docs.map(async (docSnap) => {
           const data = docSnap.data();
-          
+
           // Get sender's details from the 'sent_by' reference
           let senderData = {};
           let senderId = "";
-          
+
           if (data.sent_by && typeof data.sent_by === 'object' && data.sent_by.id) {
             senderId = data.sent_by.id;
             const senderDoc = await getDoc(data.sent_by);
@@ -454,11 +483,13 @@ export const subscribeToMessages = (
 
 // Helper to get chats by paid/free
 const getChatsByType = async (userId: string, paid: boolean): Promise<Conversation[]> => {
+  console.log(`Fetching ${paid ? "paid" : "free"} chats for user:`, userId);
   const userRef = doc(db, "LimboUserMode", userId);
   const q = query(
     collection(db, "chats"),
     where("users", "array-contains", userRef),
-    where("paid_chat", "==", paid)
+    where("paid_chat", "==", paid),
+    // orderBy("last_message_time", "desc") 
   );
   const snapshot = await getDocs(q);
   // ...map snapshot.docs to Conversation[] as in your existing code
