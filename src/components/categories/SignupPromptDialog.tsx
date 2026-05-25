@@ -37,28 +37,28 @@ const SignupPromptDialog: React.FC<SignupPromptDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl p-5 sm:p-6">
+        <DialogHeader className="pr-6 text-left">
+          <DialogTitle className="text-2xl font-bold leading-tight text-gray-900 sm:text-2xl">
             Join WeTeachs
           </DialogTitle>
-          <DialogDescription className="text-gray-600 mt-2">
+          <DialogDescription className="mt-1.5 text-base leading-6 text-gray-600 sm:text-sm">
             {categoryName
               ? `Sign up to access "${categoryName}" and connect with expert teachers.`
               : "Sign up to access categories and connect with expert teachers."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-6 space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+        <div className="space-y-3 py-3 sm:space-y-4 sm:py-5">
+          <div className="flex items-start gap-3 rounded-xl bg-gray-50 p-3 sm:bg-transparent sm:p-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 sm:h-8 sm:w-8">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth="2"
                 stroke="currentColor"
-                className="w-5 h-5 text-primary"
+                className="h-5 w-5 text-primary"
               >
                 <path
                   strokeLinecap="round"
@@ -67,23 +67,25 @@ const SignupPromptDialog: React.FC<SignupPromptDialogProps> = ({
                 />
               </svg>
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Learn from Experts</h3>
-              <p className="text-sm text-gray-600">
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold leading-6 text-gray-900">
+                Learn from Experts
+              </h3>
+              <p className="text-sm leading-5 text-gray-600">
                 Access thousands of categories taught by professionals
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+          <div className="flex items-start gap-3 rounded-xl bg-gray-50 p-3 sm:bg-transparent sm:p-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 sm:h-8 sm:w-8">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth="2"
                 stroke="currentColor"
-                className="w-5 h-5 text-primary"
+                className="h-5 w-5 text-primary"
               >
                 <path
                   strokeLinecap="round"
@@ -92,23 +94,25 @@ const SignupPromptDialog: React.FC<SignupPromptDialogProps> = ({
                 />
               </svg>
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Build Connections</h3>
-              <p className="text-sm text-gray-600">
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold leading-6 text-gray-900">
+                Build Connections
+              </h3>
+              <p className="text-sm leading-5 text-gray-600">
                 Connect with teachers and learners worldwide
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+          <div className="flex items-start gap-3 rounded-xl bg-gray-50 p-3 sm:bg-transparent sm:p-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 sm:h-8 sm:w-8">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth="2"
                 stroke="currentColor"
-                className="w-5 h-5 text-primary"
+                className="h-5 w-5 text-primary"
               >
                 <path
                   strokeLinecap="round"
@@ -117,25 +121,27 @@ const SignupPromptDialog: React.FC<SignupPromptDialogProps> = ({
                 />
               </svg>
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Track Progress</h3>
-              <p className="text-sm text-gray-600">
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold leading-6 text-gray-900">
+                Track Progress
+              </h3>
+              <p className="text-sm leading-5 text-gray-600">
                 Monitor your learning journey and achievements
               </p>
             </div>
           </div>
         </div>
 
-        <DialogFooter className="flex gap-3 sm:gap-3">
+        <DialogFooter className="gap-3 pt-1 sm:gap-3">
           <button
             onClick={handleLogin}
-            className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+            className="min-h-12 flex-1 rounded-xl border border-gray-300 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
           >
             Log In
           </button>
           <button
             onClick={handleSignup}
-            className="flex-1 px-4 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition"
+            className="min-h-12 flex-1 rounded-xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary/90"
           >
             Sign Up Free
           </button>
