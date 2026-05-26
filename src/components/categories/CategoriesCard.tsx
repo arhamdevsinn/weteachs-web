@@ -10,7 +10,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/src/components/ui/dialog";
 import { getAllCategories } from "@/src/lib/api/categories";
 import { Input } from "@/src/components/ui/input";
@@ -800,25 +799,25 @@ const CategoriesCard = ({ filterCategory }) => {
       {/* ── Detail Dialog ── */}
       {selectedCategory && (
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>{selectedCategory.title}</DialogTitle>
+          <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-4xl overflow-y-auto p-4 sm:p-6">
+            <DialogHeader className="pr-8 text-left">
+              <DialogTitle className="text-xl leading-tight sm:text-2xl">{selectedCategory.title}</DialogTitle>
             </DialogHeader>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-3">
               <div className="md:col-span-1 flex items-center justify-center">
                 <img
                   src={!modalImageError && selectedCategory.image ? selectedCategory.image : getAvatarFallbackUrl()}
                   alt={selectedCategory.title}
-                  className="w-full h-48 object-cover rounded-lg border"
+                  className="h-44 w-full rounded-lg border object-cover sm:h-48"
                   onError={() => setModalImageError(true)}
                 />
               </div>
               <div className="md:col-span-2">
                 <div className="text-sm text-gray-500 mb-4">{selectedCategory.topic}</div>
-                <p className="text-gray-700 mb-4 whitespace-pre-line">
+                <p className="mb-4 max-h-48 overflow-y-auto whitespace-pre-line text-sm leading-6 text-gray-700 sm:max-h-none sm:text-base sm:leading-7">
                   {selectedCategory.description || "No description provided."}
                 </p>
-                <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                <div className="grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2">
                   <div><div className="font-bold text-gray-800">Rate</div><div>${selectedCategory.category_rate ?? "N/A"}/15 mins</div></div>
                   <div><div className="font-medium text-gray-800">Language</div><div>{selectedCategory.Language || teacherDetails?.language || "Any"}</div></div>
                   <div><div className="font-medium text-gray-800">Experience</div><div>{selectedCategory.ExperienceLevel || "—"}</div></div>
@@ -827,18 +826,13 @@ const CategoriesCard = ({ filterCategory }) => {
                 <div className="mt-6">
                   <button
                     onClick={() => router.push(`/profile?name=${selectedCategory.teacher?.usernameT || ""}`)}
-                    className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
+                    className="w-full rounded-md bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary/90 sm:w-auto sm:py-2"
                   >
                     View Teacher
                   </button>
                 </div>
               </div>
             </div>
-            <DialogFooter>
-              <button className="px-4 py-2 text-sm text-gray-600" onClick={() => setOpen(false)}>
-                Close
-              </button>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
