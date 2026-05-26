@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
@@ -833,6 +834,11 @@ const CategoriesCard = ({ filterCategory }) => {
                 </div>
               </div>
             </div>
+            <DialogFooter className="sm:hidden">
+              <button className="w-full rounded-md border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-600" onClick={() => setOpen(false)}>
+                Close
+              </button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
