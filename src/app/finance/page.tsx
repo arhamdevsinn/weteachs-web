@@ -40,7 +40,7 @@ const FinancePage = () => {
 
 
       {/* ── Section 1: Hero ── */}
-      <section className="relative px-4 pb-16 md:pb-24 max-w-[1180px] mx-auto">
+      <section className="relative px-4 pb-8 md:pb-24 max-w-[1180px] mx-auto">
         <div className="relative aspect-[1.45/1] md:aspect-[1.91/1] w-full overflow-hidden rounded-[32px] bg-gray-100 shadow-2xl border-4 border-white">
           <img
             src={isMobile ? "/Finance mobile page.png" : "/Finance page.png"}
@@ -51,11 +51,11 @@ const FinancePage = () => {
       </section>
 
       {/* ── Section 2: How Does It Work? ── */}
-      <section className="py-16 px-6 max-w-[1200px] mx-auto text-center">
-        <h2 className="text-[44px] md:text-[72px] font-black text-black mb-16 tracking-tight">
+      <section className="py-8 px-6 md:py-16 max-w-[1200px] mx-auto text-center">
+        <h2 className="text-[44px] md:text-[72px] font-black text-black mb-6 md:mb-16 tracking-tight">
           How Does It Work?
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-4">
+        <div className="grid grid-cols-1 gap-5 px-0 md:grid-cols-3 md:gap-12 md:px-4">
           {[
             {
               image: "/finance 2.png",

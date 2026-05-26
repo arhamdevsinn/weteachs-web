@@ -32,7 +32,7 @@ const BusinessPage = () => {
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A] font-sans overflow-x-hidden">
       {/* ── Section 1: Hero ── */}
-      <section className="relative px-4 pt-10 pb-16 md:pt-14 md:pb-24 max-w-[1180px] mx-auto">
+      <section className="relative px-4 pt-6 pb-8 md:pt-14 md:pb-24 max-w-[1180px] mx-auto">
         <div className="relative aspect-[1.45/1] md:aspect-[1.91/1] w-full overflow-hidden rounded-2xl bg-gray-100 shadow-xl">
           <img
             src={isMobile ? "/business page mobile.png" : "/business page.png"}
@@ -43,11 +43,11 @@ const BusinessPage = () => {
       </section>
 
       {/* ── Section 2: How Does It Work? ── */}
-      <section className="py-16 px-6 max-w-[1000px] mx-auto text-center">
-        <h2 className="text-[36px] md:text-[54px] font-black text-black mb-14 tracking-tight">
+      <section className="py-8 px-6 md:py-16 max-w-[1000px] mx-auto text-center">
+        <h2 className="text-[36px] md:text-[54px] font-black text-black mb-6 md:mb-14 tracking-tight">
           How Does It Work?
         </h2>
-        <div className="mx-auto grid max-w-[1120px] gap-12 px-6 py-16 md:grid-cols-3">
+        <div className="mx-auto grid max-w-[1120px] gap-5 px-0 py-4 md:grid-cols-3 md:gap-12 md:px-6 md:py-16">
           {[
             {
               image: "/business 2.png",
