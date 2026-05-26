@@ -124,6 +124,16 @@
 }
 }
 
+@media (max-width: 767px) {
+  .grecaptcha-badge {
+    bottom: 86px !important;
+    left: 8px !important;
+    right: auto !important;
+    transform: scale(0.55);
+    transform-origin: bottom left;
+  }
+}
+
 /* Custom animations for chat */
 @keyframes fadeIn {
   from {
