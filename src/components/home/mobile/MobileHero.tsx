@@ -29,7 +29,7 @@ const MobileHero = () => {
       <img
         src="/Home_image_mobile.png"
         alt="A person smiling while talking with an expert on a laptop"
-        className="absolute inset-0 h-full w-full object-cover object-center"
+        className="absolute inset-0 h-full w-full object-cover object-top"
       />
       {/* Subtle overlay for better text contrast */}
       <div className="absolute inset-0 bg-black/10" />
