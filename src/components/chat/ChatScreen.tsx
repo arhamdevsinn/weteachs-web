@@ -1138,13 +1138,13 @@ const ChatScreen = () => {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-[#E8ECE4] via-white to-[#E8ECE4]/50 md:py-2 md:px-6 md:min-h-[calc(100vh-4rem)]">
-        <div className="h-full">
-          <div className="flex w-[100%] flex-col md:flex-row h-[calc(100vh-4rem)] md:h-[calc(100vh-6rem)] bg-white md:rounded-2xl md:shadow-2xl overflow-hidden md:border md:border-gray-100">
+      <div className="min-h-[calc(100dvh-68px)] bg-gradient-to-br from-[#E8ECE4] via-white to-[#E8ECE4]/50 md:min-h-[calc(100vh-4rem)] md:py-2 md:px-6">
+        <div className="min-h-[calc(100dvh-68px)] md:h-full md:min-h-0">
+          <div className="flex min-h-[calc(100dvh-68px)] w-[100%] flex-col overflow-visible bg-white md:h-[calc(100vh-6rem)] md:min-h-0 md:flex-row md:overflow-hidden md:rounded-2xl md:border md:border-gray-100 md:shadow-2xl">
             {/* Sidebar Skeleton */}
-            <aside className="sm:w-[40%] w-full bg-gradient-to-b from-[#22542F] to-[#1a4023] text-white flex flex-col">
+            <aside className="sm:w-[40%] w-full bg-gradient-to-b from-[#22542F] to-[#1a4023] text-white flex flex-col md:h-full md:min-h-0">
               {/* Header Skeleton */}
-              <div className="px-6 py-5 border-b border-white/10 bg-black/10">
+              <div className="sticky top-[68px] z-20 flex-shrink-0 px-6 py-5 border-b border-white/10 bg-[#1d4f2b] md:static md:bg-black/10">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-white/20 animate-pulse"></div>
                   <div className="space-y-2">
@@ -1160,7 +1160,7 @@ const ChatScreen = () => {
                 </div>
               </div>
               {/* Conversations List Skeleton */}
-              <nav className="flex-1 overflow-y-auto p-4 space-y-3">
+              <nav className="flex-1 p-4 space-y-3 md:min-h-0 md:overflow-y-auto">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="flex gap-3 items-center p-3">
                     <div className="w-14 h-14 rounded-full bg-white/20 animate-pulse"></div>
@@ -1232,15 +1232,15 @@ const ChatScreen = () => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-[#E8ECE4] via-white to-[#E8ECE4]/50 md:py-2 md:px-6 md:min-h-[calc(100vh-4rem)]">
-      <div className=" h-full">
-        <div className="flex w-[100%] flex-col md:flex-row h-[calc(100vh-4rem)] md:h-[calc(100vh-6rem)] bg-white md:rounded-2xl md:shadow-2xl overflow-hidden md:border md:border-gray-100">
+    <div className="min-h-[calc(100dvh-68px)] bg-gradient-to-br from-[#E8ECE4] via-white to-[#E8ECE4]/50 md:min-h-[calc(100vh-4rem)] md:py-2 md:px-6">
+      <div className="min-h-[calc(100dvh-68px)] md:h-full md:min-h-0">
+        <div className="flex min-h-[calc(100dvh-68px)] w-[100%] flex-col overflow-visible bg-white md:h-[calc(100vh-6rem)] md:min-h-0 md:flex-row md:overflow-hidden md:rounded-2xl md:border md:border-gray-100 md:shadow-2xl">
           {/* Sidebar - Hidden on mobile when chat is selected */}
-          <aside className={`sm:w-[40%] w-full bg-gradient-to-b from-[#22542F] to-[#1a4023] text-white flex flex-col ${
+          <aside className={`sm:w-[40%] w-full bg-gradient-to-b from-[#22542F] to-[#1a4023] text-white flex flex-col md:h-full md:min-h-0 ${
             showChatSection ? 'hidden md:flex' : 'flex'
           }`}>
             {/* Header */}
-            <div className="px-6 py-5 border-b border-white/10 bg-black/10">
+            <div className="sticky top-[68px] z-20 flex-shrink-0 px-6 py-5 border-b border-white/10 bg-[#1d4f2b] md:static md:bg-black/10">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1289,7 +1289,7 @@ const ChatScreen = () => {
             </div>
 
             {/* Conversations List */}
-            <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+            <nav className="flex-1 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent md:min-h-0 md:overflow-y-auto">
               {activeTab === "calls" ? (
                 callsLoading ? (
                   <div className="p-4 space-y-4">
