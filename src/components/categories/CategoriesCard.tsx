@@ -521,25 +521,54 @@ const CategoriesCard = ({ filterCategory }) => {
             "A WeTeachs user";
 
           const subject = "Your category received a new like on WeTeachs";
+          const categoryTitle = cat.title || "Untitled category";
+          const dashboardLink = `${window.location.origin}/categories?categoryId=${encodeURIComponent(cat.id)}`;
           const textContent = [
             `Hello ${creatorContact.name},`,
             "",
-            `Great news: ${likerName} liked your category, \"${cat.title || "Untitled"}\".`,
+            `Your category \"${categoryTitle}\" received a new like from ${likerName}.`,
             "",
-            "This indicates strong interest in your expertise and helps improve your category visibility.",
+            "This engagement helps improve the visibility of your profile and category within WeTeachs.",
             "",
-            "You can view your category activity by signing in to your WeTeachs dashboard.",
+            `View the category activity here: ${dashboardLink}`,
             "",
-            "Best regards,",
-            "The WeTeachs Team",
+            "Regards,",
+            "WeTeachs Support Team",
           ].join("\n");
-const emailPayload = {
-            // to: creatorContact.email,
-            to:"arhamsarwar786@gmail.com",
+          const htmlContent = `
+            <div style="font-family: Arial, Helvetica, sans-serif; background:#f8fafc; padding:24px; color:#1f2937;">
+              <div style="max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#1f6f3f,#2f855a); padding:24px 28px; color:#ffffff;">
+                  <div style="font-size:14px; letter-spacing:0.08em; text-transform:uppercase; opacity:0.9;">WeTeachs</div>
+                  <h1 style="margin:10px 0 0; font-size:24px; line-height:1.3;">Your category received a new like</h1>
+                </div>
+                <div style="padding:28px; font-size:15px; line-height:1.7;">
+                  <p style="margin:0 0 16px;">Hello ${creatorContact.name},</p>
+                  <p style="margin:0 0 16px;">${likerName} liked your category <strong>${categoryTitle}</strong>.</p>
+                  <p style="margin:0 0 16px;">This engagement helps improve the visibility of your profile and category within WeTeachs.</p>
+                  <div style="margin:24px 0; text-align:center;">
+                    <a href="${dashboardLink}" style="display:inline-block; background:#1f6f3f; color:#ffffff; text-decoration:none; padding:12px 20px; border-radius:999px; font-weight:600;">View category activity</a>
+                  </div>
+                  <p style="margin:0; color:#6b7280;">Regards,<br />WeTeachs Support Team</p>
+                </div>
+              </div>
+            </div>
+          `.trim();
+
+          const emailPayload = {
+            to: creatorContact.email, 
+            // to:"arhamsarwar786@gmail.com",
             subject,
+            htmlContent,
             textContent,
+            tags: ["category-like", "we-teachs"],
+            params: {
+              categoryId: cat.id,
+              categoryTitle,
+              likerName,
+            },
           };
-          console.log("Sending like notification email with payload:", emailPayload);
+
           await sendBrevoEmail(emailPayload).catch((emailError) => {
             console.warn("Failed to send category like email:", emailError);
           });
