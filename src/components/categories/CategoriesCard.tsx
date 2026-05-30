@@ -22,10 +22,18 @@ import {
   X,
 } from "lucide-react";
 import { algoliasearch } from "algoliasearch";
-import { auth } from "@/src/lib/firebase/config";
+import { auth, db } from "@/src/lib/firebase/config";
 import SignupPromptDialog from "./SignupPromptDialog";
 import { useRedditPixel } from "@/src/hooks/useRedditPixel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  getDoc,
+  runTransaction,
+} from "firebase/firestore";
+import { sendBrevoEmail } from "@/src/lib/api/brevoEmail";
 
 const PAGE_SIZE = 10; // items to reveal each scroll trigger
 
@@ -97,9 +105,18 @@ const LoaderDots = ({ sentinelRef }) => (
 );
 
 // ─── Category Card ─────────────────────────────────────────────────────────────
-const CategoryCard = ({ cat, index, openCategoryModal }) => {
+const CategoryCard = ({
+  cat,
+  index,
+  openCategoryModal,
+  onToggleLike,
+  likingCategoryId,
+}) => {
   const [imageError, setImageError] = useState(false);
   const imageSrc = !imageError && cat.image ? cat.image : getAvatarFallbackUrl();
+  const categoryLikeCount = Number(cat.likes ?? cat.liked_user_ref?.length ?? 0);
+  const isLiking = likingCategoryId === cat.id;
+  const isLikedByCurrentUser = Boolean(cat.isLikedByCurrentUser);
 
   return (
     <motion.div
@@ -116,11 +133,19 @@ const CategoryCard = ({ cat, index, openCategoryModal }) => {
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           onError={() => setImageError(true)}
         />
-        {cat.likes &&
-          <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-[11px] font-bold text-gray-700 flex items-center gap-1 shadow-sm">
-            <span className="text-red-500">❤️</span> {cat.likes || 0}
-          </div>
-        }
+        <button
+          type="button"
+          onClick={(event) => onToggleLike(event, cat)}
+          disabled={isLiking}
+          className={`absolute top-2 right-2 backdrop-blur-sm px-2 py-1 rounded-md text-[11px] font-bold flex items-center gap-1 shadow-sm border transition-colors ${
+            isLikedByCurrentUser
+              ? "bg-red-50 border-red-200 text-red-700"
+              : "bg-white/90 border-gray-200 text-gray-700"
+          } ${isLiking ? "opacity-60 cursor-not-allowed" : "hover:bg-white"}`}
+          aria-label="Toggle like"
+        >
+          <span className="text-red-500">❤️</span> {categoryLikeCount}
+        </button>
       </div>
 
       <div className="p-4 flex flex-col flex-1">
@@ -181,6 +206,99 @@ const CategoriesCard = ({ filterCategory }) => {
 
   const { profile, categories, teacherDetails, loading: profileLoading } = useUserProfile(uid);
 
+  const getRefId = (ref) => {
+    if (!ref) return "";
+    if (typeof ref === "string") {
+      const parts = ref.split("/").filter(Boolean);
+      return parts[parts.length - 1] || "";
+    }
+    if (typeof ref === "object" && ref.id) return ref.id;
+    if (typeof ref === "object" && ref.path) {
+      const parts = ref.path.split("/").filter(Boolean);
+      return parts[parts.length - 1] || "";
+    }
+    return "";
+  };
+
+  const getDocRefFromValue = (value) => {
+    if (!value) return null;
+    if (typeof value === "object" && value.path) return value;
+    if (typeof value === "string") {
+      const parts = value.split("/").filter(Boolean);
+      if (parts.length >= 2) {
+        return doc(db, parts[0], ...parts.slice(1));
+      }
+    }
+    return null;
+  };
+
+  const getCategoryCreatorContact = async (categoryItem) => {
+    const creatorRef = getDocRefFromValue(categoryItem?.who_created_ref);
+    if (creatorRef) {
+      const creatorSnap = await getDoc(creatorRef);
+      if (creatorSnap.exists()) {
+        const creatorData = creatorSnap.data();
+        return {
+          uid: creatorSnap.id,
+          email: creatorData?.email || creatorData?.contact_email || "",
+          name:
+            creatorData?.display_name ||
+            creatorData?.displayName ||
+            creatorData?.name ||
+            "WeTeachs Creator",
+        };
+      }
+    }
+
+    const teacherLimboRef = getDocRefFromValue(
+      categoryItem?.teacher?.limbo_ref || categoryItem?.teacher?.limboRef
+    );
+    if (teacherLimboRef) {
+      const teacherLimboSnap = await getDoc(teacherLimboRef);
+      if (teacherLimboSnap.exists()) {
+        const teacherLimboData = teacherLimboSnap.data();
+        return {
+          uid: teacherLimboSnap.id,
+          email: teacherLimboData?.email || teacherLimboData?.contact_email || "",
+          name:
+            teacherLimboData?.display_name ||
+            teacherLimboData?.displayName ||
+            teacherLimboData?.name ||
+            "WeTeachs Creator",
+        };
+      }
+    }
+
+    return {
+      uid: "",
+      email: categoryItem?.teacher?.limbo?.email || categoryItem?.teacher?.email || "",
+      name: categoryItem?.teacher_name || "WeTeachs Creator",
+    };
+  };
+
+  const normalizeCategoryLikeMeta = (categoryItem) => {
+    const likedRefs = Array.isArray(categoryItem?.liked_user_ref)
+      ? categoryItem.liked_user_ref
+      : Array.isArray(categoryItem?.Liked_user_ref)
+        ? categoryItem.Liked_user_ref
+        : [];
+
+    const likes =
+      typeof categoryItem?.likes === "number"
+        ? categoryItem.likes
+        : likedRefs.length;
+
+    const isLikedByCurrentUser = Boolean(
+      uid && likedRefs.some((ref) => getRefId(ref) === uid)
+    );
+
+    return {
+      ...categoryItem,
+      likes,
+      isLikedByCurrentUser,
+    };
+  };
+
   // ── All categories (Firestore) ───────────────────────────────────────────────
   const [allCategories, setAllCategories] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -192,7 +310,10 @@ const CategoriesCard = ({ filterCategory }) => {
     (async () => {
       try {
         const cats = await getAllCategories();
-        if (mounted) { setAllCategories(cats); setLoading(false); }
+        if (mounted) {
+          setAllCategories((cats || []).map(normalizeCategoryLikeMeta));
+          setLoading(false);
+        }
       } catch {
         if (mounted) { setError("Failed to load categories"); setLoading(false); }
       }
@@ -291,6 +412,7 @@ const CategoriesCard = ({ filterCategory }) => {
   const [open, setOpen] = useState(false);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [modalImageError, setModalImageError] = useState(false);
+  const [likingCategoryId, setLikingCategoryId] = useState(null);
   const initialOpened = useRef(false);
 
   const isAuthenticated = () => {
@@ -317,6 +439,117 @@ const CategoriesCard = ({ filterCategory }) => {
     setModalImageError(false);
     if (isAuthenticated()) { setSelectedCategory(cat); setOpen(true); }
     else { setSelectedCategory(cat); setShowSignupPrompt(true); }
+  };
+
+  const handleToggleLike = async (event, cat) => {
+    event.stopPropagation();
+
+    if (!uid) {
+      setShowSignupPrompt(true);
+      return;
+    }
+    if (!cat?.id || likingCategoryId) return;
+
+    try {
+      setLikingCategoryId(cat.id);
+
+      const categoryRef = doc(db, "Categories", cat.id);
+      const userRef = doc(db, "LimboUserMode", uid);
+
+      const nextLikeState = await runTransaction(db, async (transaction) => {
+        const categorySnap = await transaction.get(categoryRef);
+        if (!categorySnap.exists()) throw new Error("Category not found");
+
+        const categoryData = categorySnap.data();
+        const likedRefs = Array.isArray(categoryData?.liked_user_ref)
+          ? categoryData.liked_user_ref
+          : Array.isArray(categoryData?.Liked_user_ref)
+            ? categoryData.Liked_user_ref
+            : [];
+        const likeFieldName = Array.isArray(categoryData?.liked_user_ref)
+          ? "liked_user_ref"
+          : Array.isArray(categoryData?.Liked_user_ref)
+            ? "Liked_user_ref"
+            : "liked_user_ref";
+
+        const alreadyLiked = likedRefs.some((ref) => getRefId(ref) === uid);
+        const updatedCount = alreadyLiked
+          ? Math.max(0, likedRefs.length - 1)
+          : likedRefs.length + 1;
+
+        transaction.update(categoryRef, {
+          [likeFieldName]: alreadyLiked
+            ? arrayRemove(userRef)
+            : arrayUnion(userRef),
+        });
+
+        return {
+          likes: updatedCount,
+          isLikedByCurrentUser: !alreadyLiked,
+        };
+      });
+
+      setAllCategories((prev) =>
+        (prev || []).map((item) =>
+          item.id === cat.id
+            ? {
+                ...item,
+                likes: nextLikeState.likes,
+                isLikedByCurrentUser: nextLikeState.isLikedByCurrentUser,
+              }
+            : item
+        )
+      );
+
+      setSelectedCategory((prev) =>
+        prev && prev.id === cat.id
+          ? {
+              ...prev,
+              likes: nextLikeState.likes,
+              isLikedByCurrentUser: nextLikeState.isLikedByCurrentUser,
+            }
+          : prev
+      );
+
+      if (nextLikeState.isLikedByCurrentUser) {
+        const creatorContact = await getCategoryCreatorContact(cat);
+        if (creatorContact?.email && creatorContact.uid !== uid) {
+          const likerName =
+            profile?.display_name ||
+            profile?.displayName ||
+            profile?.name ||
+            "A WeTeachs user";
+
+          const subject = "Your category received a new like on WeTeachs";
+          const textContent = [
+            `Hello ${creatorContact.name},`,
+            "",
+            `Great news: ${likerName} liked your category, \"${cat.title || "Untitled"}\".`,
+            "",
+            "This indicates strong interest in your expertise and helps improve your category visibility.",
+            "",
+            "You can view your category activity by signing in to your WeTeachs dashboard.",
+            "",
+            "Best regards,",
+            "The WeTeachs Team",
+          ].join("\n");
+const emailPayload = {
+            // to: creatorContact.email,
+            to:"arhamsarwar786@gmail.com",
+            subject,
+            textContent,
+          };
+          console.log("Sending like notification email with payload:", emailPayload);
+          await sendBrevoEmail(emailPayload).catch((emailError) => {
+            console.warn("Failed to send category like email:", emailError);
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to toggle category like:", error);
+    } finally {
+      setLikingCategoryId(null);
+    }
   };
 
   useEffect(() => {
@@ -626,7 +859,14 @@ const CategoriesCard = ({ filterCategory }) => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <AnimatePresence>
                       {visible.map((cat, i) => (
-                        <CategoryCard key={cat.id} cat={cat} index={i} openCategoryModal={openCategoryModal} />
+                        <CategoryCard
+                          key={cat.id}
+                          cat={cat}
+                          index={i}
+                          openCategoryModal={openCategoryModal}
+                          onToggleLike={handleToggleLike}
+                          likingCategoryId={likingCategoryId}
+                        />
                       ))}
                     </AnimatePresence>
                   </div>
@@ -668,7 +908,14 @@ const CategoriesCard = ({ filterCategory }) => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {source.map((cat, i) => (
-                    <CategoryCard key={cat.id} cat={cat} index={i} openCategoryModal={openCategoryModal} />
+                    <CategoryCard
+                      key={cat.id}
+                      cat={cat}
+                      index={i}
+                      openCategoryModal={openCategoryModal}
+                      onToggleLike={handleToggleLike}
+                      likingCategoryId={likingCategoryId}
+                    />
                   ))}
                 </div>
                 {hasMore && <LoaderDots sentinelRef={searchSentinelRef} />}
@@ -724,7 +971,13 @@ const CategoriesCard = ({ filterCategory }) => {
                             <AnimatePresence>
                               {tabItems.map((cat, i) => (
                                 <div key={cat.id} className="w-full">
-                                  <CategoryCard cat={cat} index={i} openCategoryModal={openCategoryModal} />
+                                  <CategoryCard
+                                    cat={cat}
+                                    index={i}
+                                    openCategoryModal={openCategoryModal}
+                                    onToggleLike={handleToggleLike}
+                                    likingCategoryId={likingCategoryId}
+                                  />
                                 </div>
                               ))}
                             </AnimatePresence>
@@ -783,7 +1036,13 @@ const CategoriesCard = ({ filterCategory }) => {
                             >
                               {items.map((cat, i) => (
                                 <div key={cat.id} className="flex-shrink-0 w-72 snap-start">
-                                  <CategoryCard cat={cat} index={i} openCategoryModal={openCategoryModal} />
+                                  <CategoryCard
+                                    cat={cat}
+                                    index={i}
+                                    openCategoryModal={openCategoryModal}
+                                    onToggleLike={handleToggleLike}
+                                    likingCategoryId={likingCategoryId}
+                                  />
                                 </div>
                               ))}
                             </div>

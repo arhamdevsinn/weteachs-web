@@ -1,32 +1,16 @@
 // @ts-nocheck
 import { collection, getDocs, query, orderBy, getDoc, doc } from "firebase/firestore";
 import { db } from "@/src/lib/firebase/config";
-const getReputation = async (userId: string) => {
 
-
-  const reputationRef = collection(
-    db,
-    "LimboUserMode",
-    userId,
-    "Reputation"
-  );
-
-  const snapshot = await getDocs(reputationRef);
-
-  if (!snapshot.empty) {
-    // Get first document
-    const docData = snapshot.docs[0].data();
-
-    console.log(docData);
-
-    // Reputation value
-    // console.log(docData.Reputation);
-
-    return docData.Reputation;
+const getLikedUserCount = (data: Record<string, unknown>) => {
+  const likedUsers = data.liked_user_ref || data.Liked_user_ref;
+  if (Array.isArray(likedUsers)) {
+    return likedUsers.length;
   }
 
-  return null;
+  return 0;
 };
+
 const getRating = async (teacherId: string) => {
 
 
@@ -66,18 +50,19 @@ export const getAllCategories = async (): Promise<[]> => {
         let limbo = null;
         try {
           const tr = cat.teacher_ref;
-          let likes = null;
           const whoCreatedRef = cat.who_created_ref;
-          if (typeof whoCreatedRef === "object" && whoCreatedRef.path) {
-            const whoCreatedSnap = await getDoc(whoCreatedRef);
-            if (whoCreatedSnap.exists()) {
-              const whoCreatedData = whoCreatedSnap.data();
-              if (whoCreatedData) {
-                likes = await getReputation(whoCreatedSnap.id);
-                cat.likes = likes; // attach likes to category for easy access
-              }
-            }
-          }
+          // if (typeof whoCreatedRef === "object" && whoCreatedRef.path) {
+          //   const whoCreatedSnap = await getDoc(whoCreatedRef);
+          //   if (whoCreatedSnap.exists()) {
+          //     const whoCreatedData = whoCreatedSnap.data();
+          //     if (whoCreatedData) {
+          //       cat.likes = getLikedUserCount(whoCreatedData); // attach like count to category for easy access
+          //     }
+          //   }
+          // }
+          // if (!cat.likes) {
+            cat.likes = getLikedUserCount(cat);
+          // }
 
 
 
@@ -191,6 +176,7 @@ export const getCategoriesPage = async ({
         } catch (err) {
           console.error("Failed to resolve teacher_ref for category", cat.id, err);
         }
+        cat.likes = getLikedUserCount(cat);
         // attach resolved limbo object on teacher if available
         if (teacher && limbo) teacher.limbo = limbo;
         return { ...cat, teacher };
