@@ -255,7 +255,6 @@ const UserProfile = () => {
   // always render using fetched username data (no storedId logic)
   const displayTeacher = fallbackTeacher;
   const displayProfile = fallbackProfile;
-  console.log("Displaying profile:", displayProfile);
   const displayCategories = fallbackCategories;
   const subcollections = subcollectionsData;
 

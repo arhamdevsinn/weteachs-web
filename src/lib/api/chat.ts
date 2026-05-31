@@ -20,6 +20,7 @@ import {
 import { limit } from "firebase/firestore";
 import { db } from "@/src/lib/firebase/config";
 import type { Conversation } from "@/src/lib/types/chat";
+import { sendMessageNotificationEmail } from "@/src/lib/api/brevoEmail";
 
 /**
  * Get or create a conversation between two users
@@ -228,7 +229,12 @@ export const sendMessage = async (
   senderId: string,
   messageText: string,
   senderName: string = "User",
-  sharedUrl: string = ""
+  sharedUrl: string = "",
+  messageContext?: {
+    isReply?: boolean;
+    replySenderName?: string;
+    replyPreview?: string;
+  }
 ) => {
   try {
     console.log("sendMessage called with:", { conversationId, senderId, messageText, senderName });
@@ -280,6 +286,39 @@ export const sendMessage = async (
       last_message_time: serverTimestamp(),
       last_message_seen_by: [senderRef], // Only sender has seen it initially
     });
+
+    try {
+      const conversationDoc = await getDoc(doc(db, "chats", conversationId));
+      const conversationData = conversationDoc.exists() ? conversationDoc.data() || {} : {};
+      const userRefs = Array.isArray(conversationData.users) ? conversationData.users : [];
+      const recipientRef = userRefs.find((ref: any) => ref?.id && ref.id !== senderId) || null;
+
+      if (recipientRef?.id) {
+        const recipientDoc = await getDoc(recipientRef);
+        const recipientData = recipientDoc.exists() ? recipientDoc.data() || {} : {};
+        const senderDoc = await getDoc(senderRef);
+        const senderData = senderDoc.exists() ? senderDoc.data() || {} : {};
+        const conversationUrl = typeof window !== "undefined"
+          ? `${window.location.origin}/chat?conversationId=${conversationId}`
+          : `https://weteachs.com/chat?conversationId=${conversationId}`;
+        const recipientName = recipientData.display_name || recipientData.displayName || recipientData.name || "User";
+
+        await sendMessageNotificationEmail({
+          to: recipientData.email || "",
+          recipientName,
+          senderName: senderData.display_name || senderData.displayName || senderData.name || finalSenderName || "User",
+          messageText,
+          conversationUrl,
+          isReply: Boolean(messageContext?.isReply),
+          replySenderName: messageContext?.replySenderName,
+          replyPreview: messageContext?.replyPreview,
+        }).catch((emailError) => {
+          console.warn("Failed to send message email:", emailError);
+        });
+      }
+    } catch (emailLookupError) {
+      console.warn("Failed preparing message email:", emailLookupError);
+    }
 
     console.log("Message sent successfully:", messageRef.id);
     return messageRef.id;

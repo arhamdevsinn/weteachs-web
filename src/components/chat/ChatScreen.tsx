@@ -20,6 +20,7 @@ import type { CallRecord } from "@/src/lib/types/call";
 import { auth, db } from "@/src/lib/firebase/config";
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { toast } from "sonner";
+import { sendPaymentNotificationEmail } from "@/src/lib/api/brevoEmail";
 import {
   Dialog,
   DialogContent,
@@ -670,7 +671,11 @@ const ChatScreen = () => {
       if (replyTo) {
         messageText = `↩️ ${replyTo.senderName ? replyTo.senderName + ': ' : ''}${replyTo.text}\n${messageText}`;
       }
-      await sendMessage(selectedChat.id, currentUserId, messageText, senderName);
+      await sendMessage(selectedChat.id, currentUserId, messageText, senderName, "", replyTo ? {
+        isReply: true,
+        replySenderName: replyTo.senderName,
+        replyPreview: replyTo.text,
+      } : undefined);
       setInput("");
       setReplyTo(null);
     } catch (error) {
@@ -874,6 +879,7 @@ const ChatScreen = () => {
     let transactionDocRef: any = null;
     let amountInCents = 0;
     let existingTransferId: string | null = null;
+    let jobData: any = null;
 
     if (!transactionsSnap.empty) {
       const txDoc = transactionsSnap.docs[0];
@@ -901,7 +907,7 @@ const ChatScreen = () => {
       if (jobRef) {
         const jobSnap = await getDoc(jobRef);
         if (jobSnap.exists()) {
-          const jobData = jobSnap.data() || {};
+          jobData = jobSnap.data() || {};
           totalPrice = Number(jobData.total_price ?? jobData.job_price ?? 0);
         }
       }
@@ -944,6 +950,38 @@ const ChatScreen = () => {
         console.warn("Failed updating transaction payout fields:", error);
       });
     }
+
+    const [currentUserSnap, expertSnap] = await Promise.all([
+      currentUserId ? getDoc(doc(db, "LimboUserMode", currentUserId)) : Promise.resolve(null),
+      expertUid ? getDoc(doc(db, "LimboUserMode", expertUid)) : Promise.resolve(null),
+    ]);
+    const currentUserData = currentUserSnap?.exists() ? currentUserSnap.data() : null;
+    const expertData = expertSnap?.exists() ? expertSnap.data() : null;
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://weteachs.com";
+    const paymentDetailsUrl = `${origin}/chat?conversationId=${selectedChat.id}&payment=success`;
+
+    await Promise.allSettled([
+      sendPaymentNotificationEmail({
+        to: currentUserData?.email || auth.currentUser?.email || "",
+        recipientName: currentUserData?.display_name || currentUserData?.displayName || currentUserName || "You",
+        counterpartyName: expertData?.display_name || selectedChat?.otherParticipant?.display_name || "Expert",
+        amount: `$${(amountInCents / 100).toFixed(2)}`,
+        topic: jobData?.job_topic || jobData?.topic || selectedChat?.otherParticipant?.display_name || "your session",
+        statusLabel: "payment release",
+        detailsUrl: paymentDetailsUrl,
+      }),
+      sendPaymentNotificationEmail({
+        to: expertData?.email || selectedChat?.otherParticipant?.email || "",
+        recipientName: expertData?.display_name || selectedChat?.otherParticipant?.display_name || "Expert",
+        counterpartyName: currentUserData?.display_name || currentUserName || "a student",
+        amount: `$${(amountInCents / 100).toFixed(2)}`,
+        topic: jobData?.job_topic || jobData?.topic || selectedChat?.otherParticipant?.display_name || "your session",
+        statusLabel: "payout update",
+        detailsUrl: paymentDetailsUrl,
+      }),
+    ]).catch((emailError) => {
+      console.warn("Failed to send payment email:", emailError);
+    });
 
     return { alreadyReleased: false, transferId: transferResult?.transferId || null };
   };

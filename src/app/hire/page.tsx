@@ -18,6 +18,7 @@ import {
 import { useAuth } from "@/src/hooks/useAuth";
 import { useUploadImage } from "@/src/hooks/useUploadImage";
 import { db, serverTimestamp } from "@/src/lib/firebase/config";
+import { sendHireNotificationEmail } from "@/src/lib/api/brevoEmail";
 import {
   addDoc,
   collection,
@@ -557,7 +558,7 @@ const HirePage = () => {
                       message: "Hire request sent.",
                     });
 
-                    await addDoc(collection(db, "Notifications"), {
+                    const teacherNotificationRef = await addDoc(collection(db, "Notifications"), {
                       created_time: serverTimestamp(),
                       did_didnt_accept: "no",
                       hired_price: `$${(receiptData?.rate || 0).toFixed(2)}`,
@@ -580,6 +581,35 @@ const HirePage = () => {
                       message: "Hired you!",
                       student_notification_ref: studentNotificationRef,
                     });
+
+                    const teacherLimboSnap = await getDoc(teacherLimboRef);
+                    const teacherLimboData = teacherLimboSnap.exists() ? teacherLimboSnap.data() : null;
+                    const recipientEmail =
+                      teacherData?.email ||
+                      teacherData?.contact_email ||
+                      teacherLimboData?.email ||
+                      teacherLimboData?.contact_email ||
+                      "";
+
+                    if (recipientEmail) {
+                      const origin = window.location.origin;
+                      await sendHireNotificationEmail({
+                        to: recipientEmail,
+                        recipientName:
+                          teacherData?.display_name ||
+                          teacherData?.displayName ||
+                          teacherData?.name ||
+                          teacherName,
+                        senderName: receiptData?.name || limboData?.display_name || "Student",
+                        topic: receiptData?.topic || topic,
+                        amount: `$${(receiptData?.rate || 0).toFixed(2)}`,
+                        timeLabel: receiptData?.lengthLabel || `${jobLength} min`,
+                        detailsUrl: `${origin}/job-preview?notificationId=${teacherNotificationRef.id}`,
+                      }).catch((emailError) => {
+                        console.warn("Failed to send hire email:", emailError);
+                      });
+                    }
+
                     setSuccessDialogOpen(false);
                     router.push("/notifications");
                   } catch (err) {
