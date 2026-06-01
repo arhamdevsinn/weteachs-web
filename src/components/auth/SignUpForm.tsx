@@ -29,31 +29,31 @@ function SignUpForm() {
   const { trackSignUp } = useRedditPixel();
   const { execute } = useRecaptcha();
 
-  useEffect(() => {
-    // Add conversion tracking script
-    const script = document.createElement('script');
-    script.innerHTML = `
-      function gtag_report_conversion(url) {
-        var callback = function () {
-          if (typeof(url) != 'undefined') {
-            window.location = url;
-          }
-        };
-        gtag('event', 'conversion', {
-            'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
-            'value': 0.27,
-            'currency': 'USD',
-            'event_callback': callback
-        });
-        return false;
-      }
-    `;
-    document.head.appendChild(script);
+  // useEffect(() => {
+  //   // Add conversion tracking script
+  //   const script = document.createElement('script');
+  //   script.innerHTML = `
+  //     function gtag_report_conversion(url) {
+  //       var callback = function () {
+  //         if (typeof(url) != 'undefined') {
+  //           window.location = url;
+  //         }
+  //       };
+  //       gtag('event', 'conversion', {
+  //           'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
+  //           'value': 0.27,
+  //           'currency': 'USD',
+  //           'event_callback': callback
+  //       });
+  //       return false;
+  //     }
+  //   `;
+  //   document.head.appendChild(script);
 
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
+  //   return () => {
+  //     document.head.removeChild(script);
+  //   };
+  // }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,14 +110,14 @@ function SignUpForm() {
 
       const res = await AuthService.signup(email, password);
       
-      // Track Google Ads conversion
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'conversion', {
-          'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
-          'value': 0.27,
-          'currency': 'USD'
-        });
-      }
+      // // Track Google Ads conversion
+      // if (typeof window !== 'undefined' && window.gtag) {
+      //   window.gtag('event', 'conversion', {
+      //     'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
+      //     'value': 0.27,
+      //     'currency': 'USD'
+      //   });
+      // }
 
       // Track Reddit SignUp — fires Pixel + CAPI in parallel
       trackSignUp({

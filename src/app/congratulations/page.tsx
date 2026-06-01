@@ -14,6 +14,32 @@ const CongratulationsPage = () => {
 
   const isExpert = searchParams.get('expert') === 'true';
   const isAfterCategory = searchParams.get('category') === 'true';
+  // copy from sign up form for conversion tracking - will need to be updated to be more accurate and not duplicated across pages
+    useEffect(() => {
+    // Add conversion tracking script
+    const script = document.createElement('script');
+    script.innerHTML = `
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+            'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
+            'value': 0.27,
+            'currency': 'USD',
+            'event_callback': callback
+        });
+        return false;
+      }
+    `;
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   useEffect(() => {
     //     // Add Google Analytics conversion script
@@ -32,6 +58,16 @@ const CongratulationsPage = () => {
     //     script.parentNode.removeChild(script);
     //   }
     // };
+
+    // Track Google Ads conversion
+    // if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-11114959066/zQ2fCKqRt-EbENqhg7Qp',
+        'value': 0.27,
+        'currency': 'USD'
+      });
+    // }
+
     window.gtag?.("event", "conversion", {
       send_to: "AW-11114959066/JckvCPnY6-8bENqhg7Qp",
     });
@@ -90,9 +126,9 @@ const CongratulationsPage = () => {
           <p className="text-gray-500 mb-8">
             {isExpert
               ? (isAfterCategory
-                  ? "Welcome to WeTeachs! You're now ready to start teaching and connecting with students."
-                  : "Welcome to WeTeachs! You're now ready to set up your expertise category."
-                )
+                ? "Welcome to WeTeachs! You're now ready to start teaching and connecting with students."
+                : "Welcome to WeTeachs! You're now ready to set up your expertise category."
+              )
               : "Welcome to WeTeachs! You're now ready to start your learning journey."
             }
           </p>
