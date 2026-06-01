@@ -49,11 +49,11 @@ type CategoryLikeEmailArgs = {
   dashboardLink: string;
 };
 
-const BREVO_EMAIL_ENDPOINT =  process.env.BREVO_EMAIL_FUNCTION_URL ||
+const BREVO_EMAIL_ENDPOINT = process.env.BREVO_EMAIL_FUNCTION_URL ||
   "https://us-central1-weteach-4-z4d3id.cloudfunctions.net/sendEmail";
 
 export async function sendBrevoEmail(payload: SendBrevoEmailPayload) {
-console.log("BREVO_EMAIL_ENDPOINT:", BREVO_EMAIL_ENDPOINT);
+  console.log("BREVO_EMAIL_ENDPOINT:", BREVO_EMAIL_ENDPOINT);
 
   const response = await fetch(BREVO_EMAIL_ENDPOINT, {
     method: "POST",
@@ -62,7 +62,7 @@ console.log("BREVO_EMAIL_ENDPOINT:", BREVO_EMAIL_ENDPOINT);
     },
     body: JSON.stringify(payload),
   });
- console.log("Brevo email response status:", response.statusText," --->>",response);
+  console.log("Brevo email response status:", response.statusText, " --->>", response);
   const contentType = response.headers.get("content-type") || "";
   const rawResponse = contentType.includes("application/json")
     ? await response.json().catch(async () => await response.text())
@@ -287,45 +287,44 @@ export async function sendCategoryLikeEmail({
   categoryTitle,
   dashboardLink,
 }: CategoryLikeEmailArgs) {
-    try {
-  const subject = "Your category received a new like on WeTeachs";
-  const intro = `Hello ${recipientName},`;
-  const bodyLines = [
-    `${likerName} liked your category <strong>${categoryTitle}</strong>.`,
-    "This engagement helps improve the visibility of your profile and category within WeTeachs.",
-  ];
-  const htmlContent = renderEmailLayout({
-    eyebrow: "WeTeachs",
-    title: "Your category received a new like",
-    intro,
-    bodyLines,
-    ctaLabel: "View category activity",
-    ctaUrl: dashboardLink,
-  });
-  const textContent = [
-    `Hello ${recipientName},`,
-    "",
-    `${likerName} liked your category \"${categoryTitle}\".`,
-    "",
-    "This engagement helps improve the visibility of your profile and category within WeTeachs.",
-    "",
-    `View the category activity here: ${dashboardLink}`,
-    "",
-    "Regards,",
-    "WeTeachs Support Team",
-  ].join("\n");
+  try {
+    const subject = "Your category received a new like on WeTeachs";
+    const intro = `Hello ${recipientName},`;
+    const bodyLines = [
+      `${likerName} liked your category <strong>${categoryTitle}</strong>.`,
+      "This engagement helps improve the visibility of your profile and category within WeTeachs.",
+    ];
+    const htmlContent = renderEmailLayout({
+      eyebrow: "WeTeachs",
+      title: "Your category received a new like",
+      intro,
+      bodyLines,
+      ctaLabel: "View category activity",
+      ctaUrl: dashboardLink,
+    });
+    const textContent = [
+      `Hello ${recipientName},`,
+      "",
+      `${likerName} liked your category \"${categoryTitle}\".`,
+      "",
+      "This engagement helps improve the visibility of your profile and category within WeTeachs.",
+      "",
+      `View the category activity here: ${dashboardLink}`,
+      "",
+      "Regards,",
+      "WeTeachs Support Team",
+    ].join("\n");
 
-  return sendBrevoEmail({
-    to,
-    subject,
-    htmlContent,
-    textContent,
-    tags: ["category-like", "we-teachs"],
-    params: { recipientName, likerName, categoryTitle, dashboardLink },
-  });
-}catch (error) {
-  console.error("Failed to send category like email", error);
-  throw error instanceof Error ? error : new Error("Unknown error sending category like email");    
+    return sendBrevoEmail({
+      to,
+      subject,
+      htmlContent,
+      textContent,
+      tags: ["category-like", "we-teachs"],
+      params: { recipientName, likerName, categoryTitle, dashboardLink },
+    });
+  } catch (error) {
+    console.error("Failed to send category like email", error);
+    throw error instanceof Error ? error : new Error("Unknown error sending category like email");
+  }
 }
-}
- 
