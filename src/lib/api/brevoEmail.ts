@@ -287,7 +287,7 @@ export async function sendCategoryLikeEmail({
   categoryTitle,
   dashboardLink,
 }: CategoryLikeEmailArgs) {
-  try {
+  // try {
     const subject = "Your category received a new like on WeTeachs";
     const intro = `Hello ${recipientName},`;
     const bodyLines = [
@@ -323,8 +323,8 @@ export async function sendCategoryLikeEmail({
       tags: ["category-like", "we-teachs"],
       params: { recipientName, likerName, categoryTitle, dashboardLink },
     });
-  } catch (error) {
-    console.error("Failed to send category like email", error);
-    throw error instanceof Error ? error : new Error("Unknown error sending category like email");
-  }
+  // } catch (error) {
+  //   console.error("Failed to send category like email", error);
+  //   throw error instanceof Error ? error : new Error("Unknown error sending category like email");
+  // }
 }
