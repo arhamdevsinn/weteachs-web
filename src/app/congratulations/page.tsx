@@ -9,6 +9,7 @@ import Head from "next/head";
 
 
 const CongratulationsPage = () => {
+  
   const router = useRouter();
   const searchParams = useSearchParams();
 
