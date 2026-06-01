@@ -53,7 +53,6 @@ const BREVO_EMAIL_ENDPOINT = process.env.BREVO_EMAIL_FUNCTION_URL ||
   "https://us-central1-weteach-4-z4d3id.cloudfunctions.net/sendEmail";
 
 export async function sendBrevoEmail(payload: SendBrevoEmailPayload) {
-  console.log("BREVO_EMAIL_ENDPOINT:", BREVO_EMAIL_ENDPOINT);
 
   const response = await fetch(BREVO_EMAIL_ENDPOINT, {
     method: "POST",
@@ -62,7 +61,6 @@ export async function sendBrevoEmail(payload: SendBrevoEmailPayload) {
     },
     body: JSON.stringify(payload),
   });
-  console.log("Brevo email response status:", response.statusText, " --->>", response);
   const contentType = response.headers.get("content-type") || "";
   const rawResponse = contentType.includes("application/json")
     ? await response.json().catch(async () => await response.text())
