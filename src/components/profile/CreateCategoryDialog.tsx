@@ -26,7 +26,8 @@ export const CreateCategoryDialog = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md bg-white rounded-xl p-6 shadow-lg">
+      <DialogContent className="w-[calc(100vw-1rem)] max-w-lg p-0 overflow-hidden max-h-[calc(100vh-1rem)] sm:w-full sm:max-h-[calc(100vh-2rem)]">
+        <div className="max-h-[calc(100vh-1rem)] overflow-y-auto p-4 sm:max-h-[calc(100vh-2rem)] sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-xl text-center font-semibold text-primary">
             Create Category
@@ -36,7 +37,7 @@ export const CreateCategoryDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 mt-4">
+        <div className="mt-4 space-y-3">
           <label className="text-sm font-medium text-gray-700">Category Title</label>
           <Input
             placeholder="Title"
@@ -87,16 +88,16 @@ export const CreateCategoryDialog = ({
             type="file"
             accept="image/*"
             onChange={handleImage}
-            className="text-sm"
+            className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20"
           />
 
           {previewImage && (
             <div className="mt-3 flex justify-center">
               <div className="relative group">
-                <Image  priority={true}
+                <Image priority={true}
                   src={previewImage}
                   alt="Preview"
-                  className="w-40 h-40 object-cover rounded-lg border border-gray-200 shadow-sm"
+                  className="h-40 w-40 rounded-lg border border-gray-200 object-cover shadow-sm sm:h-44 sm:w-44"
                 />
                 <button
                   onClick={() => {
@@ -120,6 +121,7 @@ export const CreateCategoryDialog = ({
         >
           {loading ? "Creating..." : "Create Category"}
         </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

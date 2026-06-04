@@ -428,28 +428,28 @@ const ExpertDialog = () => {
 
       {/* === Category Dialog === */}
       <Dialog open={openCategory} onOpenChange={setOpenCategory} className="z-50 w-full">
-  <DialogContent className="max-w-auto bg-white rounded-xl p-10 shadow-lg">
-          <div className="flex flex-row gap-8">
+  <DialogContent className="w-[min(96vw,1100px)] max-h-[calc(100vh-2rem)] p-0 overflow-hidden">
+          <div className="flex max-h-[calc(100vh-2rem)] flex-col gap-5 overflow-y-auto p-4 sm:p-6 md:flex-row md:gap-6">
             {/* Live Preview Card */}
-            <div className="flex-1 min-w-[280px] max-w-[340px] bg-white rounded-xl shadow-md p-6 border border-gray-200">
-              <div className="bg-gradient-to-r from-green-200 to-green-400 h-40 rounded-lg mb-6 flex items-center justify-center">
+            <div className="w-full rounded-2xl border border-gray-200 bg-white p-4 shadow-md md:w-[320px] md:flex-none md:p-5">
+              <div className="mb-4 flex aspect-[16/10] w-full items-center justify-center rounded-2xl bg-gradient-to-r from-green-200 to-green-400 p-4">
                 {categoryData.imageFile ? (
-                  <img src={URL.createObjectURL(categoryData.imageFile)} alt="Preview" className="w-40 h-40 object-cover rounded-lg border border-gray-200 shadow-sm" />
+                  <img src={URL.createObjectURL(categoryData.imageFile)} alt="Preview" className="h-full w-full rounded-xl object-cover shadow-sm" />
                 ) : (
-                  <span className="text-gray-400">No image</span>
+                  <span className="text-sm font-medium text-gray-500">No image</span>
                 )}
               </div>
-              <h4 className="text-xl font-bold text-green-700">{categoryData.topic || "Topic "}</h4>
-              <p className="text-gray-600">{categoryData.title || "Category"}</p>
-              <p className="text-gray-600 mb-4">{categoryData.description || "Description "}</p>
-              <div className="flex justify-between text-sm text-gray-700">
+              <h4 className="text-lg font-bold text-green-700 sm:text-xl">{categoryData.topic || "Topic"}</h4>
+              <p className="text-sm text-gray-600 sm:text-base">{categoryData.title || "Category"}</p>
+              <p className="mb-4 text-sm text-gray-600 sm:text-base">{categoryData.description || "Description"}</p>
+              <div className="flex flex-wrap gap-3 text-xs text-gray-700 sm:text-sm">
                 <span>${categoryData.category_rate || 3} / 15min</span>
                 <span>{categoryData.ExperienceLevel || "Level (Advanced)"}</span>
                 <span>{categoryData.Language || "Language (English)"}</span>
               </div>
             </div>
             {/* Form Section */}
-            <div className="flex-[2]">
+            <div className="w-full min-w-0 md:flex-1">
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold text-primary">
                   Create Category
@@ -458,7 +458,7 @@ const ExpertDialog = () => {
                   Fill in details to create a new category for your expert profile.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-3 mt-4">
+              <div className="mt-4 space-y-3 md:max-w-none">
                 <label className="text-sm font-medium text-gray-700">Categories</label>
                 <Select
                   value={categoryData.title}
@@ -536,7 +536,7 @@ const ExpertDialog = () => {
                   onChange={(e) => setCategoryData({ ...categoryData, Language: e.target.value })}
                 />
                 <label className="text-sm font-medium text-gray-700">Upload Category Image</label>
-                <label className="flex items-center gap-2 cursor-pointer w-fit px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg border border-primary/30 text-primary font-medium transition">
+                <label className="flex w-full max-w-fit items-center gap-2 cursor-pointer rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 font-medium text-primary transition hover:bg-primary/20 sm:w-fit">
                   <Upload className="w-5 h-5" />
                   <span>Upload Image</span>
                   <input
@@ -564,7 +564,7 @@ const ExpertDialog = () => {
                 )} */}
               </div>
               <Button
-                className="w-full mt-5 bg-primary text-white hover:bg-primary/90"
+                className="mt-5 w-full bg-primary text-white hover:bg-primary/90"
                 onClick={handleCategorySubmit}
                 disabled={loading}
               >
