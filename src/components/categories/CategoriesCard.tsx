@@ -144,7 +144,8 @@ const CategoryCard = ({
           } ${isLiking ? "opacity-60 cursor-not-allowed" : "hover:bg-white"}`}
           aria-label="Toggle like"
         >
-          <span className="text-red-500">❤️</span> {categoryLikeCount}
+          <span className="text-red-500">❤️</span>
+          {categoryLikeCount > 0 ? ` ${categoryLikeCount}` : null}
         </button>
       </div>
 
