@@ -37,7 +37,7 @@ const EducationPage = () => {
           <img
             src="/education page.png"
             alt="Expert Guidance"
-            className="h-full w-full object-cover"
+            // className="h-full w-full object-cover"
           />
 
         </div>

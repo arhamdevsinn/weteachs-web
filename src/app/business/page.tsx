@@ -37,7 +37,7 @@ const BusinessPage = () => {
           <img
             src={isMobile ? "/business page mobile.png" : "/business page.png"}
             alt="Business Expert Guidance"
-            className="h-full w-full object-cover"
+            // className="h-full w-full object-cover"
           />
         </div>
       </section>

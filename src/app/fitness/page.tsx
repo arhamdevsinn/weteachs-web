@@ -99,7 +99,7 @@ export default function FitnessPage() {
 
             <div className="overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-xl">
               <Image
-                src="/help3.jpeg"
+                src="/help3.png"
                 alt="Person doing a workout at home"
                 width={800}
                 height={540}

@@ -27,7 +27,7 @@ const MobileHero = () => {
     <section className="relative w-full h-[340px] sm:h-[400px]">
       {/* Full-width Hero Image */}
       <img
-        src="/Home_image_mobile.png"
+        src="/Home_image_mobile copy.png"
         alt="A person smiling while talking with an expert on a laptop"
         className="absolute inset-0 h-full w-full object-cover object-top"
       />

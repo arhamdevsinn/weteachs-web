@@ -112,44 +112,17 @@ const MobileLearnPage = ({ categories, loadingCategories, user }: MobileLearnPag
       <section className="relative w-full h-[340px]">
         <img
           src="/client_image_mobile.png"
+          // src="/learn_image.png"
           alt="Learn with Weteachs"
-          className="absolute inset-0 h-full w-full object-cover object-center"
+          // className="absolute inset-0 h-full w-full object-contain object-center "
+          className="absolute inset-0 h-full w-full object-contain object-center"
+
         />
 
 
-        {/* Search + pills at bottom */}
-        {/* <div className="absolute bottom-4 left-0 w-full px-4 flex flex-col gap-2">
-          <form
-            onSubmit={handleSubmit}
-            className="flex h-[38px] w-full items-center overflow-hidden rounded-[6px] bg-white shadow-lg border border-gray-200"
-          >
-            <input
-              name="q"
-              placeholder="Search"
-              className="min-w-0 flex-1 px-3 text-[14px] text-gray-800 outline-none placeholder:text-gray-500"
-            />
-            <button
-              type="submit"
-              className="flex h-full w-[38px] items-center justify-center text-gray-600"
-            >
-              <Search size={18} strokeWidth={1.8} />
-            </button>
-          </form>
-          <div className="flex gap-2 overflow-x-auto scrollbar-none">
-            {categoryPills.map((pill) => (
-              <Link
-                key={pill.label}
-                href={pill.href}
-                className="flex shrink-0 items-center gap-1 rounded-[4px] border border-white/80 bg-transparent px-2 py-0.5 text-[9px] font-semibold text-white hover:bg-white/20"
-              >
-                {pill.label}
-                <ChevronRight size={12} strokeWidth={3} className="text-white" />
-              </Link>
-            ))}
-          </div>
-        </div> */}
+
         {/* Bottom Overlay - Search and Pills */}
-        <div className="absolute bottom-5 left-0 w-full px-4 flex flex-col gap-2">
+        <div className="absolute bottom-8 left-0 w-full px-4 flex flex-col gap-2 justify-center items-center">
           {/* Search Bar */}
           <form
             onSubmit={handleSubmit}

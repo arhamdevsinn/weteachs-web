@@ -218,7 +218,7 @@ const Page = () => {
             <img
               src="/learn_image.png"
               alt="A person smiling while talking with an expert on a laptop"
-              className="h-full w-full object-cover"
+              // className="h-full w-full object-cover"
             />
           </picture>
 

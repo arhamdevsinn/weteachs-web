@@ -36,7 +36,7 @@ const Hero = () => {
             <img
               src="/hi3.png"
               alt="A person smiling while talking with an expert on a laptop"
-              className="h-full w-full object-cover"
+              // className="h-full w-full object-cover"
             />
           </picture>
 

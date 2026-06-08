@@ -45,7 +45,7 @@ const FinancePage = () => {
           <img
             src={isMobile ? "/Finance mobile page.png" : "/Finance page.png"}
             alt="Finance Expert Guidance"
-            className="h-full w-full object-cover brightness-[0.7]"
+            // className="h-full w-full"
           />
         </div>
       </section>

@@ -43,7 +43,7 @@ const TechnologyPage = () => {
           <img
             src="/technology page.png"
             alt="Technology Guidance"
-            className="h-full w-full object-cover brightness-[0.7]"
+            // className="h-full w-full object-cover brightness-[0.7]"
           />
 
         </div>

@@ -37,7 +37,7 @@ const ArtPage = () => {
           <img
             src={isMobile ? "/art page mobile.png" : "/art page.png"}
             alt="Art Expert Guidance"
-            className="h-full w-full object-cover"
+            // className="h-full w-full object-cover"
           />
 
         </div>
